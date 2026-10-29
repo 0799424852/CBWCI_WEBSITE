@@ -884,6 +884,63 @@ def api_admin_meeting_share(meeting_id):
     return jsonify({'success': True, 'link': link})
 
 # ========================================
+# OLD "*.html" LINKS -> REAL PAGES
+# The templates link to files like login.html, but Flask serves /login.
+# These routes catch the old links and send people to the right page.
+# ========================================
+
+MEMBER_PAGE_ALIASES = {
+    'login.html': 'login',
+    'register.html': 'register',
+    'index.html': 'home',
+    'profile.html': 'profile',
+    'edit_profile.html': 'edit_profile',
+    'security.html': 'security',
+    'sermons.html': 'sermons',
+    'followup.html': 'followup',
+}
+
+ADMIN_PAGE_ALIASES = {
+    'Dashboard.html': 'admin_dashboard', 'dashboard.html': 'admin_dashboard',
+    'Members.html': 'admin_members', 'members.html': 'admin_members',
+    'Drivers.html': 'admin_drivers', 'Driver.html': 'admin_drivers', 'drivers.html': 'admin_drivers',
+    'FollowUp.html': 'admin_followup', 'followup.html': 'admin_followup',
+    'Transport.html': 'admin_transport', 'transport.html': 'admin_transport',
+    'Settings.html': 'admin_settings', 'settings.html': 'admin_settings',
+    'Logout.html': 'logout',
+}
+
+
+def _redirect_to(endpoint):
+    def view():
+        target = url_for(endpoint)
+        if request.query_string:
+            target += '?' + request.query_string.decode()
+        return redirect(target)
+    return view
+
+
+def _add_alias(path, endpoint):
+    if any(rule.rule == path for rule in app.url_map.iter_rules()):
+        return  # a real route already uses this path
+    app.add_url_rule(path, endpoint='alias_' + path.strip('/').replace('/', '_').replace('.', '_'),
+                     view_func=_redirect_to(endpoint))
+
+
+# Admin pages first, so "/admin/followup.html" means the ADMIN follow-up page
+for _name, _endpoint in ADMIN_PAGE_ALIASES.items():
+    _add_alias('/admin/' + _name, _endpoint)
+
+# Member pages are linked from the root, from /admin/ pages and from /driver/ pages
+for _name, _endpoint in MEMBER_PAGE_ALIASES.items():
+    for _prefix in ('', '/admin', '/driver'):
+        _add_alias(f'{_prefix}/{_name}', _endpoint)
+
+# The driver dashboard links to itself
+_add_alias('/driver/Drivers_Dashboard.html', 'driver_dashboard')
+
+
+# ========================================
 # ERROR HANDLERS
 # ========================================
 

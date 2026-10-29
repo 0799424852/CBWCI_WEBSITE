@@ -11,6 +11,14 @@
         databaseURL: 'https://cbwci-892de-default-rtdb.firebaseio.com'
     };
 
+    // Announcements older than this are never popped up (they still show in Notifications)
+    const MAX_ALERT_AGE_MS = 7 * 24 * 60 * 60 * 1000;
+
+    // Never pop an alert over a live video meeting
+    if (window.location.pathname.indexOf('/meeting/') === 0) return;
+
+    let checkedThisPage = false;
+
     function loadScript(src) {
         return new Promise(function (resolve, reject) {
             const script = document.createElement('script');
@@ -32,6 +40,25 @@
             firebase.initializeApp(firebaseConfig);
         }
         return firebase.app();
+    }
+
+    // ---- "already alerted" memory, kept per user in this browser ----
+    function alertedKey(uid) {
+        return 'cbwci_alerted_announcements_' + uid;
+    }
+
+    function loadAlerted(uid) {
+        try { return JSON.parse(localStorage.getItem(alertedKey(uid)) || '{}'); } catch (error) { return {}; }
+    }
+
+    function saveAlerted(uid, alerted) {
+        try {
+            // keep the newest 200 entries so the list never grows forever
+            const ids = Object.keys(alerted).sort(function (a, b) { return alerted[b] - alerted[a]; }).slice(0, 200);
+            const trimmed = {};
+            ids.forEach(function (id) { trimmed[id] = alerted[id]; });
+            localStorage.setItem(alertedKey(uid), JSON.stringify(trimmed));
+        } catch (error) {}
     }
 
     function updateUnreadBadges(announcements) {
@@ -65,6 +92,7 @@
 
         const message = document.createElement('span');
         message.textContent = announcement.message || '';
+        message.style.whiteSpace = 'pre-line';
 
         const close = document.createElement('button');
         close.type = 'button';
@@ -73,25 +101,59 @@
         close.style.cssText = 'position:absolute;right:12px;top:10px;border:0;background:transparent;color:#4a1942;font-size:22px;cursor:pointer;';
         close.addEventListener('click', function () { alert.remove(); });
 
-        alert.append(title, message, close);
+        alert.append(title, message);
+        if (/^(https?:\/\/|\/)/.test(announcement.link || '')) {
+            const join = document.createElement('a');
+            join.href = announcement.link;
+            join.target = '_blank';
+            join.rel = 'noopener';
+            join.textContent = 'Join meeting';
+            join.style.cssText = 'display:inline-block;margin-top:10px;padding:8px 16px;border-radius:8px;background:#4a1942;color:#fff;text-decoration:none;font-weight:600;';
+            alert.append(document.createElement('br'), join);
+        }
+        alert.append(close);
         document.body.appendChild(alert);
+    }
+
+    async function checkAnnouncements(user) {
+        // Visitors who are not logged in never get an alert
+        if (!user) return;
+        // Only once per page load, however many times Firebase reports the login state
+        if (checkedThisPage) return;
+        checkedThisPage = true;
+
+        const apiBase = window.location.port === '5500' ? 'http://127.0.0.1:5000' : '';
+        const response = await fetch(`${apiBase}/api/announcements`, {
+            headers: { Authorization: `Bearer ${await user.getIdToken()}` }
+        });
+        if (!response.ok) throw new Error(`Announcements request failed (${response.status})`);
+        const payload = await response.json();
+        const announcements = payload.announcements || [];   // newest first
+        updateUnreadBadges(announcements);
+
+        const alerted = loadAlerted(user.uid);
+        const fresh = announcements.filter(function (item) { return !alerted[item.id]; });
+        if (!fresh.length) return;
+
+        // Remember everything as alerted BEFORE showing, so it can never pop up twice
+        const now = Date.now();
+        announcements.forEach(function (item) { alerted[item.id] = alerted[item.id] || now; });
+        saveAlerted(user.uid, alerted);
+
+        // Show only the newest new announcement, and only if it is recent
+        const newest = fresh[0];
+        const createdAt = Number(newest.createdAt);
+        const isRecent = !createdAt || (now - createdAt) <= MAX_ALERT_AGE_MS;
+        if (isRecent) showAnnouncementAlert(newest);
     }
 
     async function start() {
         try {
             const announcementApp = await ensureFirebase();
-            announcementApp.auth().onAuthStateChanged(async function (user) {
-                const apiBase = window.location.port === '5500' ? 'http://127.0.0.1:5000' : '';
-                const headers = {};
-                if (user) headers.Authorization = `Bearer ${await user.getIdToken()}`;
-                const response = await fetch(`${apiBase}/api/announcements`, {
-                    headers
+            announcementApp.auth().onAuthStateChanged(function (user) {
+                checkAnnouncements(user).catch(function (error) {
+                    console.error('CBWCI announcements could not load:', error);
                 });
-                if (!response.ok) throw new Error(`Announcements request failed (${response.status})`);
-                const payload = await response.json();
-                const announcements = payload.announcements || [];
-                updateUnreadBadges(announcements);
-                if (announcements.length) showAnnouncementAlert(announcements[0]);
             });
         } catch (error) {
             console.error('CBWCI announcements could not load:', error);
