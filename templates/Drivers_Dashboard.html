@@ -1,0 +1,1822 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Driver Dashboard - CBWCI</title>
+    
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <!-- Font Awesome Icons -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- AOS Animation -->
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+    
+    <!-- Firebase SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+    
+    <style>
+        /* ===== CBWCI BRAND COLORS ===== */
+        :root {
+            --cbwci-purple: #4A1942;
+            --cbwci-purple-light: #6B2D5F;
+            --cbwci-purple-dark: #2E0F28;
+            --cbwci-gold: #C9A84C;
+            --cbwci-gold-light: #E8CD7A;
+            --cbwci-gold-dark: #A8893A;
+            --cbwci-cream: #FDF8F0;
+            --cbwci-dark: #1A0F16;
+            --cbwci-text: #2C1A24;
+            --cbwci-muted: #7A6A72;
+            --shadow: 0 10px 40px rgba(74, 25, 66, 0.12);
+            --shadow-hover: 0 15px 50px rgba(74, 25, 66, 0.2);
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            --success: #2D8F5C;
+            --danger: #C0392B;
+            --warning: #E67E22;
+            --info: #2980B9;
+        }
+
+        /* ===== GLOBAL ===== */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--cbwci-cream);
+            color: var(--cbwci-text);
+            padding-top: 80px;
+            min-height: 100vh;
+        }
+
+        /* ===== NAVBAR ===== */
+        .navbar {
+            background: rgba(74, 25, 66, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 12px 0;
+            box-shadow: 0 4px 30px rgba(0,0,0,0.2);
+            border-bottom: 3px solid var(--cbwci-gold);
+        }
+
+        .navbar-brand {
+            font-family: 'Playfair Display', serif;
+            font-weight: 900;
+            font-size: 20px;
+            color: white !important;
+            letter-spacing: 2px;
+        }
+
+        .navbar-brand .gold {
+            color: var(--cbwci-gold);
+            display: block;
+            font-size: 14px;
+            letter-spacing: 4px;
+        }
+
+        .navbar-brand i {
+            color: var(--cbwci-gold);
+            margin-right: 10px;
+        }
+
+        .nav-link {
+            color: rgba(255,255,255,0.8) !important;
+            font-weight: 500;
+            font-size: 14px;
+            letter-spacing: 1px;
+            transition: var(--transition);
+            padding: 8px 18px !important;
+            border-radius: 8px;
+        }
+
+        .nav-link:hover {
+            color: var(--cbwci-gold) !important;
+            background: rgba(201, 168, 76, 0.1);
+        }
+
+        .nav-link.active {
+            color: var(--cbwci-gold) !important;
+        }
+
+        .navbar .btn-logout {
+            background: transparent;
+            border: 2px solid rgba(255,255,255,0.2);
+            color: white;
+            padding: 6px 20px;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 13px;
+            transition: var(--transition);
+            text-decoration: none;
+            cursor: pointer;
+        }
+
+        .navbar .btn-logout:hover {
+            background: var(--danger);
+            border-color: var(--danger);
+            transform: translateY(-2px);
+            color: white;
+        }
+
+        /* ===== STATS CARDS ===== */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: white;
+            border-radius: 16px;
+            padding: 20px 24px;
+            box-shadow: var(--shadow);
+            border: 1px solid rgba(201, 168, 76, 0.1);
+            transition: var(--transition);
+        }
+
+        .stat-card:hover {
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-hover);
+        }
+
+        .stat-card .stat-icon {
+            font-size: 32px;
+            color: var(--cbwci-gold);
+            margin-bottom: 10px;
+        }
+
+        .stat-card .stat-number {
+            font-family: 'Playfair Display', serif;
+            font-weight: 900;
+            font-size: 32px;
+            color: var(--cbwci-purple);
+        }
+
+        .stat-card .stat-label {
+            font-size: 14px;
+            color: var(--cbwci-muted);
+            margin-top: 2px;
+        }
+
+        .stat-card .stat-sub {
+            font-size: 12px;
+            color: var(--cbwci-muted);
+            margin-top: 6px;
+            padding-top: 6px;
+            border-top: 1px solid #f0ebe4;
+        }
+
+        /* ===== DRIVER INFO BAR ===== */
+        .driver-info-bar {
+            background: white;
+            border-radius: 16px;
+            padding: 20px 30px;
+            box-shadow: var(--shadow);
+            border: 1px solid rgba(201, 168, 76, 0.1);
+            margin-bottom: 30px;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .driver-info-bar .driver-details {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .driver-info-bar .driver-avatar {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--cbwci-purple), var(--cbwci-purple-dark));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 24px;
+            font-weight: 700;
+            font-family: 'Playfair Display', serif;
+        }
+
+        .driver-info-bar .driver-name {
+            font-weight: 700;
+            font-size: 18px;
+            color: var(--cbwci-purple);
+        }
+
+        .driver-info-bar .driver-location {
+            font-size: 14px;
+            color: var(--cbwci-muted);
+        }
+
+        .driver-info-bar .driver-location i {
+            color: var(--cbwci-gold);
+            margin-right: 6px;
+        }
+
+        .driver-info-bar .driver-status {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .status-badge {
+            padding: 6px 16px;
+            border-radius: 50px;
+            font-size: 13px;
+            font-weight: 600;
+        }
+
+        .status-badge.online {
+            background: rgba(45, 143, 92, 0.12);
+            color: var(--success);
+        }
+
+        .status-badge.offline {
+            background: rgba(122, 106, 114, 0.12);
+            color: var(--cbwci-muted);
+        }
+
+        .status-badge.busy {
+            background: rgba(230, 126, 34, 0.12);
+            color: var(--warning);
+        }
+
+        /* ===== BOOKINGS SECTION ===== */
+        .bookings-section {
+            background: white;
+            border-radius: 16px;
+            padding: 25px 30px;
+            box-shadow: var(--shadow);
+            border: 1px solid rgba(201, 168, 76, 0.1);
+        }
+
+        .bookings-section .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #f0ebe4;
+        }
+
+        .bookings-section .section-header h5 {
+            font-family: 'Playfair Display', serif;
+            font-weight: 700;
+            color: var(--cbwci-purple);
+            margin: 0;
+        }
+
+        .bookings-section .section-header .filter-group {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .bookings-section .section-header .filter-group .btn-filter {
+            padding: 6px 18px;
+            border-radius: 50px;
+            border: 2px solid #E8DCC8;
+            background: transparent;
+            font-size: 13px;
+            font-weight: 500;
+            color: var(--cbwci-muted);
+            transition: var(--transition);
+            cursor: pointer;
+        }
+
+        .bookings-section .section-header .filter-group .btn-filter:hover {
+            border-color: var(--cbwci-gold);
+            color: var(--cbwci-purple);
+        }
+
+        .bookings-section .section-header .filter-group .btn-filter.active {
+            background: var(--cbwci-purple);
+            border-color: var(--cbwci-purple);
+            color: white;
+        }
+
+        /* ===== BOOKING CARD ===== */
+        .booking-card {
+            background: var(--cbwci-cream);
+            border-radius: 12px;
+            padding: 20px 24px;
+            border: 1px solid rgba(201, 168, 76, 0.1);
+            transition: var(--transition);
+            margin-bottom: 15px;
+        }
+
+        .booking-card:hover {
+            border-color: var(--cbwci-gold);
+            box-shadow: var(--shadow);
+        }
+
+        .booking-card .booking-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 12px;
+        }
+
+        .booking-card .booking-header .booking-id {
+            font-weight: 700;
+            color: var(--cbwci-purple);
+            font-size: 14px;
+        }
+
+        .booking-card .booking-header .booking-id small {
+            font-weight: 400;
+            color: var(--cbwci-muted);
+            font-size: 12px;
+        }
+
+        .booking-card .booking-status {
+            padding: 4px 14px;
+            border-radius: 50px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .booking-status.pending {
+            background: rgba(230, 126, 34, 0.12);
+            color: var(--warning);
+        }
+
+        .booking-status.confirmed {
+            background: rgba(41, 128, 185, 0.12);
+            color: var(--info);
+        }
+
+        .booking-status.in-progress {
+            background: rgba(74, 25, 66, 0.12);
+            color: var(--cbwci-purple);
+            animation: pulse 2s infinite;
+        }
+
+        .booking-status.picked-up {
+            background: rgba(45, 143, 92, 0.12);
+            color: var(--success);
+        }
+
+        .booking-status.completed {
+            background: rgba(45, 143, 92, 0.2);
+            color: var(--success);
+        }
+
+        .booking-status.cancelled {
+            background: rgba(192, 57, 43, 0.12);
+            color: var(--danger);
+        }
+
+        .booking-status.rejected {
+            background: rgba(192, 57, 43, 0.12);
+            color: var(--danger);
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.6; }
+        }
+
+        .booking-card .booking-details {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 12px;
+            margin-bottom: 12px;
+        }
+
+        .booking-card .booking-details .detail-item {
+            font-size: 14px;
+            color: var(--cbwci-text);
+        }
+
+        .booking-card .booking-details .detail-item i {
+            color: var(--cbwci-gold);
+            width: 20px;
+            margin-right: 6px;
+        }
+
+        .booking-card .booking-details .detail-item .label {
+            color: var(--cbwci-muted);
+            font-size: 12px;
+            display: block;
+            margin-bottom: 2px;
+        }
+
+        .booking-card .booking-actions {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-top: 12px;
+            padding-top: 12px;
+            border-top: 1px solid rgba(201, 168, 76, 0.15);
+        }
+
+        .booking-card .booking-actions .btn-action {
+            padding: 6px 18px;
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: 600;
+            border: none;
+            transition: var(--transition);
+            cursor: pointer;
+        }
+
+        .btn-action.btn-approve {
+            background: var(--success);
+            color: white;
+        }
+
+        .btn-action.btn-approve:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(45, 143, 92, 0.3);
+        }
+
+        .btn-action.btn-reject {
+            background: var(--danger);
+            color: white;
+        }
+
+        .btn-action.btn-reject:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(192, 57, 43, 0.3);
+        }
+
+        .btn-action.btn-pickup {
+            background: var(--warning);
+            color: white;
+        }
+
+        .btn-action.btn-pickup:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(230, 126, 34, 0.3);
+        }
+
+        .btn-action.btn-complete {
+            background: var(--info);
+            color: white;
+        }
+
+        .btn-action.btn-complete:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(41, 128, 185, 0.3);
+        }
+
+        .btn-action.btn-call {
+            background: var(--cbwci-gold);
+            color: var(--cbwci-purple-dark);
+        }
+
+        .btn-action.btn-call:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(201, 168, 76, 0.3);
+        }
+
+        .btn-action.btn-cancel {
+            background: var(--danger);
+            color: white;
+        }
+
+        .btn-action.btn-cancel:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(192, 57, 43, 0.3);
+        }
+
+        .btn-action:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none !important;
+        }
+
+        /* ===== LOADING SPINNER ===== */
+        .loading-spinner {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 40px 0;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .loading-spinner .spinner {
+            width: 50px;
+            height: 50px;
+            border: 4px solid var(--cbwci-cream);
+            border-top: 4px solid var(--cbwci-gold);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .loading-spinner p {
+            color: var(--cbwci-muted);
+            font-size: 14px;
+        }
+
+        /* ===== EMPTY STATE ===== */
+        .empty-state {
+            text-align: center;
+            padding: 50px 20px;
+        }
+
+        .empty-state i {
+            font-size: 64px;
+            color: var(--cbwci-gold-light);
+            margin-bottom: 20px;
+        }
+
+        .empty-state h6 {
+            font-weight: 700;
+            color: var(--cbwci-purple);
+            margin-bottom: 8px;
+        }
+
+        .empty-state p {
+            color: var(--cbwci-muted);
+            font-size: 14px;
+        }
+
+        /* ===== TOAST ===== */
+        .toast-container {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            z-index: 9999;
+        }
+
+        .toast-custom {
+            background: white;
+            border-radius: 12px;
+            padding: 18px 28px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.15);
+            border-left: 5px solid var(--success);
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            animation: slideUp 0.5s ease;
+            margin-top: 12px;
+            min-width: 320px;
+            max-width: 450px;
+        }
+
+        .toast-custom i {
+            font-size: 28px;
+            color: var(--success);
+        }
+
+        .toast-custom .msg h6 {
+            margin: 0;
+            font-weight: 600;
+            font-size: 15px;
+        }
+
+        .toast-custom .msg small {
+            color: var(--cbwci-muted);
+            font-size: 13px;
+        }
+
+        .toast-custom.toast-danger {
+            border-left-color: var(--danger);
+        }
+
+        .toast-custom.toast-danger i {
+            color: var(--danger);
+        }
+
+        .toast-custom.toast-warning {
+            border-left-color: var(--warning);
+        }
+
+        .toast-custom.toast-warning i {
+            color: var(--warning);
+        }
+
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(30px) scale(0.95); }
+            to { opacity: 1; transform: translateY(0) scale(1); }
+        }
+
+        @keyframes slideOut {
+            from { opacity: 1; transform: translateX(0); }
+            to { opacity: 0; transform: translateX(50px); }
+        }
+
+        .toast-custom.hiding {
+            animation: slideOut 0.4s ease forwards;
+        }
+
+        /* ===== MODAL ===== */
+        .modal-content {
+            border-radius: 16px;
+            border: none;
+            box-shadow: var(--shadow-hover);
+        }
+
+        .modal-header {
+            border-bottom: 2px solid #f0ebe4;
+            padding: 20px 24px;
+        }
+
+        .modal-header .modal-title {
+            font-family: 'Playfair Display', serif;
+            font-weight: 700;
+            color: var(--cbwci-purple);
+        }
+
+        .modal-body {
+            padding: 24px;
+        }
+
+        .modal-footer {
+            border-top: 2px solid #f0ebe4;
+            padding: 16px 24px;
+        }
+
+        .modal .booking-summary {
+            background: var(--cbwci-cream);
+            border-radius: 12px;
+            padding: 16px 20px;
+            margin: 10px 0;
+        }
+
+        .modal .booking-summary .summary-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 6px 0;
+            border-bottom: 1px solid rgba(201, 168, 76, 0.1);
+        }
+
+        .modal .booking-summary .summary-item:last-child {
+            border-bottom: none;
+        }
+
+        .modal .booking-summary .summary-item .label {
+            color: var(--cbwci-muted);
+            font-size: 13px;
+        }
+
+        .modal .booking-summary .summary-item .value {
+            font-weight: 600;
+            color: var(--cbwci-purple);
+        }
+
+        /* ===== RESPONSIVE ===== */
+        @media (max-width: 992px) {
+            .driver-info-bar {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 15px;
+            }
+            .driver-info-bar .driver-status {
+                width: 100%;
+                justify-content: flex-start;
+            }
+        }
+
+        @media (max-width: 768px) {
+            body {
+                padding-top: 70px;
+            }
+            .stats-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+            .bookings-section {
+                padding: 20px 15px;
+            }
+            .booking-card .booking-details {
+                grid-template-columns: 1fr;
+            }
+            .navbar-brand {
+                font-size: 16px;
+            }
+            .navbar-brand .gold {
+                font-size: 11px;
+            }
+            .toast-custom {
+                min-width: unset;
+                max-width: 90vw;
+                padding: 14px 18px;
+            }
+        }
+
+        @media (max-width: 576px) {
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+            .driver-info-bar {
+                padding: 15px;
+            }
+            .bookings-section .section-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 10px;
+            }
+            .booking-card {
+                padding: 15px;
+            }
+            .booking-card .booking-actions {
+                flex-direction: column;
+            }
+            .booking-card .booking-actions .btn-action {
+                width: 100%;
+                text-align: center;
+            }
+        }
+
+        .hidden {
+            display: none !important;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- ======================================== -->
+    <!-- NAVBAR -->
+    <!-- ======================================== -->
+    <nav class="navbar navbar-expand-lg fixed-top">
+        <div class="container">
+            <a class="navbar-brand" href="index.html">
+                <i class="fas fa-church"></i>
+                CBWCI
+                <span class="gold">Changed By The Word</span>
+            </a>
+            <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon" style="filter: invert(1);"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto align-items-lg-center">
+                    <li class="nav-item">
+                        <a class="nav-link" href="index.html">Home</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active" href="Drivers_Dashboard.html">
+                            <i class="fas fa-taxi"></i> Driver Dashboard
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="profile.html">Profile</a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="#" class="btn btn-logout" onclick="logoutUser(event)">
+                            <i class="fas fa-sign-out-alt"></i> Logout
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- ======================================== -->
+    <!-- MAIN CONTENT -->
+    <!-- ======================================== -->
+    <div class="container" style="padding: 20px 0 60px;">
+
+        <!-- ===== LOADING STATE ===== -->
+        <div id="loadingState" style="text-align: center; padding: 60px 0;">
+            <div class="loading-spinner">
+                <div class="spinner"></div>
+                <p>Loading your dashboard...</p>
+            </div>
+        </div>
+
+        <!-- ===== DASHBOARD CONTENT ===== -->
+        <div id="dashboardContent" class="hidden">
+
+            <!-- ===== DRIVER INFO BAR ===== -->
+            <div class="driver-info-bar" data-aos="fade-up">
+                <div class="driver-details">
+                    <div class="driver-avatar" id="driverAvatar">--</div>
+                    <div>
+                        <div class="driver-name" id="driverName">Loading...</div>
+                        <div class="driver-location">
+                            <i class="fas fa-map-marker-alt"></i>
+                            <span id="driverLocation">No location assigned</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="driver-status">
+                    <select class="form-select" id="driverStatusSelect" style="width: auto; border-radius: 50px; padding: 6px 20px; font-size: 13px; font-weight: 600; border: 2px solid #E8DCC8;">
+                        <option value="online">🟢 Online</option>
+                        <option value="busy">🟡 Busy</option>
+                        <option value="offline">🔴 Offline</option>
+                    </select>
+                    <span class="status-badge online" id="statusBadge">🟢 Online</span>
+                </div>
+            </div>
+
+            <!-- ===== STATS ===== -->
+            <div class="stats-grid" data-aos="fade-up" data-aos-delay="100">
+                <div class="stat-card">
+                    <div class="stat-icon"><i class="fas fa-clock"></i></div>
+                    <div class="stat-number" id="statPending">0</div>
+                    <div class="stat-label">Pending Approval</div>
+                    <div class="stat-sub">Awaiting your decision</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon"><i class="fas fa-check-circle"></i></div>
+                    <div class="stat-number" id="statApproved">0</div>
+                    <div class="stat-label">Approved Rides</div>
+                    <div class="stat-sub">Ready for pickup</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon"><i class="fas fa-users"></i></div>
+                    <div class="stat-number" id="statPickedUp">0</div>
+                    <div class="stat-label">Picked Up</div>
+                    <div class="stat-sub">Passengers onboard</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon"><i class="fas fa-flag-checkered"></i></div>
+                    <div class="stat-number" id="statCompleted">0</div>
+                    <div class="stat-label">Completed</div>
+                    <div class="stat-sub">Successfully dropped off</div>
+                </div>
+            </div>
+
+            <!-- ===== BOOKINGS SECTION ===== -->
+            <div class="bookings-section" data-aos="fade-up" data-aos-delay="200">
+                <div class="section-header">
+                    <h5><i class="fas fa-list" style="color: var(--cbwci-gold);"></i> Your Bookings</h5>
+                    <div class="filter-group">
+                        <button class="btn-filter active" data-filter="all" onclick="filterBookings('all')">All</button>
+                        <button class="btn-filter" data-filter="pending" onclick="filterBookings('pending')">Pending</button>
+                        <button class="btn-filter" data-filter="approved" onclick="filterBookings('approved')">Approved</button>
+                        <button class="btn-filter" data-filter="picked-up" onclick="filterBookings('picked-up')">Picked Up</button>
+                        <button class="btn-filter" data-filter="completed" onclick="filterBookings('completed')">Completed</button>
+                        <button class="btn-filter" data-filter="rejected" onclick="filterBookings('rejected')">Rejected</button>
+                    </div>
+                </div>
+
+                <div id="bookingsContainer">
+                    <div class="loading-spinner">
+                        <div class="spinner"></div>
+                        <p>Loading bookings...</p>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- ======================================== -->
+    <!-- CONFIRMATION MODAL -->
+    <!-- ======================================== -->
+    <div class="modal fade" id="actionModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="modalTitle">Confirm Action</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <p id="modalMessage">Are you sure you want to perform this action?</p>
+                    <div class="booking-summary" id="modalSummary">
+                        <!-- Dynamic content -->
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline-custom" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-primary-custom" id="modalConfirmBtn" onclick="executeModalAction()">
+                        <i class="fas fa-check"></i> Confirm
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ======================================== -->
+    <!-- TOAST CONTAINER -->
+    <!-- ======================================== -->
+    <div class="toast-container" id="toastContainer"></div>
+
+    <!-- ======================================== -->
+    <!-- SCRIPTS -->
+    <!-- ======================================== -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js">
+    </script>
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js">
+    </script>
+
+    <script>
+        // ========================================
+        // INITIALIZE AOS
+        // ========================================
+        AOS.init({
+            duration: 800,
+            once: true
+        });
+
+        // ========================================
+        // FIREBASE CONFIGURATION
+        // ========================================
+        const firebaseConfig = {
+            apiKey: "AIzaSyBhXS5EOZjEAahTjk8XPd-9PkG3HeKV8bg",
+            authDomain: "cbwci-892de.firebaseapp.com",
+            projectId: "cbwci-892de",
+            storageBucket: "cbwci-892de.firebasestorage.app",
+            messagingSenderId: "187272132769",
+            appId: "1:187272132769:web:63a9fcba465e54867d98e0",
+            databaseURL: "https://cbwci-892de-default-rtdb.firebaseio.com"
+        };
+
+        // Initialize Firebase
+        firebase.initializeApp(firebaseConfig);
+        const database = firebase.database();
+        const auth = firebase.auth();
+        console.log('✅ Firebase initialized successfully');
+
+        // ========================================
+        // DOM REFERENCES
+        // ========================================
+        const loadingState = document.getElementById('loadingState');
+        const dashboardContent = document.getElementById('dashboardContent');
+        const bookingsContainer = document.getElementById('bookingsContainer');
+        const driverAvatar = document.getElementById('driverAvatar');
+        const driverName = document.getElementById('driverName');
+        const driverLocation = document.getElementById('driverLocation');
+        const statusBadge = document.getElementById('statusBadge');
+        const driverStatusSelect = document.getElementById('driverStatusSelect');
+        const statPending = document.getElementById('statPending');
+        const statApproved = document.getElementById('statApproved');
+        const statPickedUp = document.getElementById('statPickedUp');
+        const statCompleted = document.getElementById('statCompleted');
+
+        let currentUserId = null;
+        let currentDriverData = null;
+        let allBookings = [];
+        let currentFilter = 'all';
+        let modalAction = null;
+        let modalBookingId = null;
+        let bookingsListeners = [];
+        let driverDataListener = null;
+
+        // ========================================
+        // GET USER ID FROM SESSION OR AUTH
+        // ========================================
+        function getUserId() {
+            const authenticatedUser = auth.currentUser;
+            if (authenticatedUser) {
+                return authenticatedUser.uid;
+            }
+
+            const sessionUser = sessionStorage.getItem('cbwci_user');
+            if (sessionUser) {
+                try {
+                    const userData = JSON.parse(sessionUser);
+                    if (userData && userData.uid) {
+                        return userData.uid;
+                    }
+                } catch (e) {
+                    console.warn('⚠️ Invalid session data');
+                }
+            }
+            const user = auth.currentUser;
+            if (user) {
+                return user.uid;
+            }
+            return null;
+        }
+
+        // ========================================
+        // FIND DRIVER BY EMAIL OR UID
+        // ========================================
+        function findDriverByAuth(authUser) {
+            return new Promise((resolve, reject) => {
+                // First try to find by UID
+                const userRef = database.ref('users/' + authUser.uid);
+                userRef.once('value')
+                    .then((snapshot) => {
+                        const data = snapshot.val();
+                        if (data && (data.role === 'driver' || data.role === 'admin')) {
+                            // This user is a driver
+                            resolve({ uid: authUser.uid, data: data });
+                            return;
+                        }
+                        
+                        // If not found by UID, search all users for matching email
+                        // This handles the case where a driver was created by admin
+                        // with a different UID than the auth user
+                        const usersRef = database.ref('users');
+                        usersRef.once('value')
+                            .then((usersSnapshot) => {
+                                const users = usersSnapshot.val();
+                                if (users) {
+                                    // Search for driver with matching email
+                                    const authEmail = authUser.email;
+                                    for (const [uid, userData] of Object.entries(users)) {
+                                        if (userData.email && userData.email.toLowerCase() === authEmail.toLowerCase() && 
+                                            (userData.role === 'driver' || userData.role === 'admin')) {
+                                            // Found matching driver by email
+                                            resolve({ uid: uid, data: userData });
+                                            return;
+                                        }
+                                    }
+                                    
+                                    // If still not found, check if this user has driver data in drivers node
+                                    const driversRef = database.ref('drivers');
+                                    driversRef.once('value')
+                                        .then((driversSnapshot) => {
+                                            const drivers = driversSnapshot.val();
+                                            if (drivers) {
+                                                for (const [uid, driverData] of Object.entries(drivers)) {
+                                                    if (driverData.email && driverData.email.toLowerCase() === authEmail.toLowerCase()) {
+                                                        // Found driver in drivers node
+                                                        resolve({ uid: uid, data: driverData });
+                                                        return;
+                                                    }
+                                                }
+                                            }
+                                            // No driver found
+                                            resolve(null);
+                                        })
+                                        .catch(() => resolve(null));
+                                } else {
+                                    resolve(null);
+                                }
+                            })
+                            .catch(() => resolve(null));
+                    })
+                    .catch(() => resolve(null));
+            });
+        }
+
+        // ========================================
+        // LOAD DRIVER DATA
+        // ========================================
+        function loadDriverData(uid) {
+            if (!uid) {
+                showToast('Error', 'Please log in to access the driver dashboard.', 'danger');
+                loadingState.classList.add('hidden');
+                dashboardContent.classList.remove('hidden');
+                return;
+            }
+
+            // First try to find driver by auth
+            const user = auth.currentUser;
+            if (!user) {
+                // Not authenticated, try direct lookup
+                directDriverLookup(uid);
+                return;
+            }
+
+            findDriverByAuth(user)
+                .then((result) => {
+                    if (result) {
+                        currentUserId = result.uid;
+                        currentDriverData = result.data;
+                        updateDriverUI(result.data);
+                        loadBookings(result.data);
+                        
+                        // Set up real-time listener for driver data
+                        if (driverDataListener) {
+                            driverDataListener.off();
+                        }
+                        driverDataListener = database.ref('users/' + result.uid);
+                        driverDataListener.on('value', (snapshot) => {
+                            const data = snapshot.val();
+                            if (data) {
+                                currentDriverData = data;
+                                updateDriverUI(data);
+                            }
+                        });
+                    } else {
+                        // Try direct lookup
+                        directDriverLookup(uid);
+                    }
+                })
+                .catch((error) => {
+                    console.error('❌ Error finding driver:', error);
+                    directDriverLookup(uid);
+                });
+        }
+
+        function directDriverLookup(uid) {
+            const userRef = database.ref('users/' + uid);
+            userRef.once('value')
+                .then((snapshot) => {
+                    const data = snapshot.val();
+                    if (data && (data.role === 'driver' || data.role === 'admin')) {
+                        currentUserId = uid;
+                        currentDriverData = data;
+                        updateDriverUI(data);
+                        loadBookings(data);
+                    } else {
+                        // Check drivers node
+                        const driversRef = database.ref('drivers/' + uid);
+                        driversRef.once('value')
+                            .then((driverSnap) => {
+                                const driverData = driverSnap.val();
+                                if (driverData) {
+                                    currentUserId = uid;
+                                    currentDriverData = driverData;
+                                    updateDriverUI(driverData);
+                                    loadBookings(driverData);
+                                } else {
+                                    showToast('Error', 'Driver profile not found.', 'danger');
+                                    loadingState.classList.add('hidden');
+                                    dashboardContent.classList.remove('hidden');
+                                }
+                            })
+                            .catch(() => {
+                                showToast('Error', 'Driver profile not found.', 'danger');
+                                loadingState.classList.add('hidden');
+                                dashboardContent.classList.remove('hidden');
+                            });
+                    }
+                })
+                .catch((error) => {
+                    console.error('❌ Error loading driver data:', error);
+                    showToast('Error', 'Failed to load driver data.', 'danger');
+                    loadingState.classList.add('hidden');
+                    dashboardContent.classList.remove('hidden');
+                });
+        }
+
+        // ========================================
+        // UPDATE DRIVER UI
+        // ========================================
+        function updateDriverUI(data) {
+            const name = data.fullName || data.name || 'Driver';
+            const location = data.assignedLocation || data.location || 'No location assigned';
+            
+            const initials = name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2);
+            driverAvatar.textContent = initials || '--';
+            driverName.textContent = name;
+            driverLocation.textContent = location;
+
+            const status = data.status || 'online';
+            updateStatusUI(status);
+            driverStatusSelect.value = status;
+
+            // Remove old listener to avoid duplicates
+            driverStatusSelect.removeEventListener('change', handleStatusChange);
+            driverStatusSelect.addEventListener('change', handleStatusChange);
+        }
+
+        function handleStatusChange() {
+            const newStatus = this.value;
+            updateDriverStatus(newStatus);
+        }
+
+        // ========================================
+        // UPDATE STATUS UI
+        // ========================================
+        function updateStatusUI(status) {
+            statusBadge.className = `status-badge ${status}`;
+            const statusLabels = {
+                'online': '🟢 Online',
+                'busy': '🟡 Busy',
+                'offline': '🔴 Offline'
+            };
+            statusBadge.textContent = statusLabels[status] || status;
+        }
+
+        // ========================================
+        // UPDATE DRIVER STATUS
+        // ========================================
+        function updateDriverStatus(status) {
+            if (!currentUserId) return;
+            
+            updateStatusUI(status);
+            
+            // Update in both users and drivers nodes
+            const updates = {};
+            updates['users/' + currentUserId + '/status'] = status;
+            updates['drivers/' + currentUserId + '/status'] = status;
+            
+            database.ref().update(updates)
+                .then(() => {
+                    showToast('Status Updated', `You are now ${status}.`, 'success');
+                })
+                .catch((error) => {
+                    console.error('❌ Error updating status:', error);
+                    showToast('Error', 'Failed to update status.', 'danger');
+                });
+        }
+
+        // ========================================
+        // LOAD BOOKINGS
+        // ========================================
+        function normalizeLocation(value) {
+            return String(value || '')
+                .toLowerCase()
+                .replace(/[^a-z0-9]/g, '');
+        }
+
+        function loadBookings(driverData) {
+            const assignedLocation = driverData.assignedLocation || driverData.location;
+            const normalizedAssignedLocation = normalizeLocation(assignedLocation);
+
+            // Clean up previous listeners
+            bookingsListeners.forEach(listener => {
+                listener.ref.off(listener.event, listener.callback);
+            });
+            bookingsListeners = [];
+
+            let feedBookings = [];
+            let memberBookings = [];
+
+            function renderCombinedBookings() {
+                const combined = new Map();
+                memberBookings.forEach(booking => combined.set(booking.bookingId || booking.id, booking));
+                feedBookings.forEach(booking => combined.set(booking.bookingId || booking.id, booking));
+
+                const flexibleRoute = !normalizedAssignedLocation ||
+                    normalizedAssignedLocation === 'flexible' ||
+                    normalizedAssignedLocation === 'flexiblemultipleroutes';
+                const bookings = Array.from(combined.values()).filter(booking => {
+                    const bookingLocation = booking.location || booking.pickup || booking.pickupLocation;
+                    return (flexibleRoute || normalizeLocation(bookingLocation) === normalizedAssignedLocation) &&
+                        !['cancelled', 'deleted'].includes(String(booking.status || '').toLowerCase());
+                });
+
+                allBookings = bookings;
+                renderBookings(bookings);
+                updateStats(bookings);
+                loadingState.classList.add('hidden');
+                dashboardContent.classList.remove('hidden');
+            }
+
+            const bookingsRef = database.ref('bookings');
+            const feedCallback = snapshot => {
+                const data = snapshot.val() || {};
+                feedBookings = Object.entries(data).map(([id, booking]) => ({
+                    ...booking,
+                    id,
+                    feedBookingId: id,
+                    userId: booking.userId || null,
+                    rideHistoryId: booking.rideHistoryId || null
+                }));
+                renderCombinedBookings();
+            };
+            const feedError = error => {
+                console.error('❌ Error loading shared bookings:', error);
+                showToast('Booking Feed Unavailable', 'Loading bookings saved to member accounts.', 'warning');
+            };
+            bookingsRef.on('value', feedCallback, feedError);
+            bookingsListeners.push({ ref: bookingsRef, event: 'value', callback: feedCallback });
+
+            const membersRef = database.ref('users');
+            const membersCallback = snapshot => {
+                const members = snapshot.val() || {};
+                memberBookings = Object.entries(members).flatMap(([memberId, member]) => {
+                    const history = member && member.taxiHistory;
+                    if (!history || typeof history !== 'object') return [];
+
+                    return Object.entries(history).map(([historyId, ride]) => ({
+                        ...ride,
+                        id: ride.bookingId || `member-${memberId}-${historyId}`,
+                        bookingId: ride.bookingId || historyId,
+                        userId: memberId,
+                        rideHistoryId: historyId,
+                        passengerName: ride.passengerName || ride.fullName || member.fullName || member.name || 'Unknown',
+                        passengerPhone: ride.passengerPhone || ride.phone || member.phone || '',
+                        location: ride.location || ride.pickup || ride.pickupLocation,
+                        pickup: ride.pickup || ride.pickupLocation || ride.location,
+                        source: 'member-history'
+                    }));
+                });
+                renderCombinedBookings();
+            };
+            const membersError = error => {
+                console.warn('Unable to read member ride histories; using shared booking feed.', error);
+                renderCombinedBookings();
+            };
+            membersRef.on('value', membersCallback, membersError);
+            bookingsListeners.push({ ref: membersRef, event: 'value', callback: membersCallback });
+        }
+
+        // ========================================
+        // RENDER BOOKINGS
+        // ========================================
+        function renderBookings(bookings) {
+            let filteredBookings = bookings;
+            
+            if (currentFilter !== 'all') {
+                filteredBookings = bookings.filter(b => b.status === currentFilter);
+            }
+
+            if (filteredBookings.length === 0) {
+                bookingsContainer.innerHTML = `
+                    <div class="empty-state">
+                        <i class="fas fa-calendar-check"></i>
+                        <h6>No Bookings Found</h6>
+                        <p>${currentFilter === 'all' ? 'No bookings available for your location.' : `No ${currentFilter} bookings found.`}</p>
+                    </div>
+                `;
+                return;
+            }
+
+            let html = '';
+            filteredBookings.forEach((booking, index) => {
+                const statusClass = booking.status || 'pending';
+                const passengerName = booking.passengerName || booking.fullName || 'Unknown';
+                const passengerPhone = booking.phone || booking.passengerPhone || 'N/A';
+                const pickup = booking.pickup || booking.pickupLocation || 'N/A';
+                const dropoff = booking.dropoff || booking.dropoffLocation || 'Church';
+                const time = booking.time || booking.pickupTime || 'TBD';
+                const date = booking.date || 'Today';
+
+                html += `
+                    <div class="booking-card" data-booking-id="${booking.id || index}" data-aos="fade-up" data-aos-delay="${index * 50}">
+                        <div class="booking-header">
+                            <div class="booking-id">
+                                <i class="fas fa-ticket-alt" style="color: var(--cbwci-gold);"></i>
+                                Booking #${booking.id || 'N/A'}
+                                <small>• ${date}</small>
+                            </div>
+                            <span class="booking-status ${statusClass}">
+                                ${getStatusIcon(statusClass)} ${getStatusLabel(statusClass)}
+                            </span>
+                        </div>
+                        <div class="booking-details">
+                            <div class="detail-item">
+                                <span class="label"><i class="fas fa-user"></i> Passenger</span>
+                                ${passengerName}
+                            </div>
+                            <div class="detail-item">
+                                <span class="label"><i class="fas fa-phone"></i> Phone</span>
+                                ${passengerPhone}
+                            </div>
+                            <div class="detail-item">
+                                <span class="label"><i class="fas fa-map-pin"></i> Pickup</span>
+                                ${pickup}
+                            </div>
+                            <div class="detail-item">
+                                <span class="label"><i class="fas fa-flag-checkered"></i> Dropoff</span>
+                                ${dropoff}
+                            </div>
+                            <div class="detail-item">
+                                <span class="label"><i class="fas fa-clock"></i> Time</span>
+                                ${time}
+                            </div>
+                            <div class="detail-item">
+                                <span class="label"><i class="fas fa-users"></i> Passengers</span>
+                                ${booking.passengerCount || 1}
+                            </div>
+                        </div>
+                        <div class="booking-actions">
+                            ${getBookingActions(booking, statusClass)}
+                        </div>
+                    </div>
+                `;
+            });
+
+            bookingsContainer.innerHTML = html;
+        }
+
+        // ========================================
+        // GET STATUS ICON
+        // ========================================
+        function getStatusIcon(status) {
+            const icons = {
+                'pending': '🕐',
+                'approved': '✅',
+                'picked-up': '🚗',
+                'completed': '🏁',
+                'rejected': '❌',
+                'cancelled': '❌'
+            };
+            return icons[status] || '📌';
+        }
+
+        // ========================================
+        // GET STATUS LABEL
+        // ========================================
+        function getStatusLabel(status) {
+            const labels = {
+                'pending': 'Pending Approval',
+                'approved': 'Approved',
+                'picked-up': 'Picked Up',
+                'completed': 'Completed',
+                'rejected': 'Rejected',
+                'cancelled': 'Cancelled'
+            };
+            return labels[status] || status;
+        }
+
+        // ========================================
+        // GET BOOKING ACTIONS
+        // ========================================
+        function getBookingActions(booking, status) {
+            const bookingId = booking.id || 'N/A';
+            
+            switch(status) {
+                case 'pending':
+                    return `
+                        <button class="btn-action btn-approve" onclick="openModal('approve', '${bookingId}')">
+                            <i class="fas fa-check"></i> Approve Ride
+                        </button>
+                        <button class="btn-action btn-reject" onclick="openModal('reject', '${bookingId}')">
+                            <i class="fas fa-times"></i> Reject Ride
+                        </button>
+                        <button class="btn-action btn-call" onclick="callPassenger('${booking.passengerPhone || ''}')">
+                            <i class="fas fa-phone"></i> Call Passenger
+                        </button>
+                    `;
+                case 'approved':
+                    return `
+                        <button class="btn-action btn-pickup" onclick="openModal('pickup', '${bookingId}')">
+                            <i class="fas fa-taxi"></i> Confirm Pickup
+                        </button>
+                        <button class="btn-action btn-cancel" onclick="openModal('cancel', '${bookingId}')">
+                            <i class="fas fa-times"></i> Cancel Ride
+                        </button>
+                        <button class="btn-action btn-call" onclick="callPassenger('${booking.passengerPhone || ''}')">
+                            <i class="fas fa-phone"></i> Call Passenger
+                        </button>
+                    `;
+                case 'picked-up':
+                    return `
+                        <button class="btn-action btn-complete" onclick="openModal('complete', '${bookingId}')">
+                            <i class="fas fa-flag-checkered"></i> Complete Dropoff
+                        </button>
+                        <button class="btn-action btn-call" onclick="callPassenger('${booking.passengerPhone || ''}')">
+                            <i class="fas fa-phone"></i> Call Passenger
+                        </button>
+                    `;
+                case 'completed':
+                    return `
+                        <button class="btn-action" style="background: var(--cbwci-cream); color: var(--cbwci-muted); cursor: default;" disabled>
+                            <i class="fas fa-check-circle" style="color: var(--success);"></i> Completed
+                        </button>
+                    `;
+                case 'rejected':
+                    return `
+                        <button class="btn-action" style="background: var(--cbwci-cream); color: var(--danger); cursor: default;" disabled>
+                            <i class="fas fa-times-circle" style="color: var(--danger);"></i> Rejected
+                        </button>
+                    `;
+                default:
+                    return `
+                        <button class="btn-action btn-call" onclick="callPassenger('${booking.passengerPhone || ''}')">
+                            <i class="fas fa-phone"></i> Call Passenger
+                        </button>
+                    `;
+            }
+        }
+
+        // ========================================
+        // OPEN CONFIRMATION MODAL
+        // ========================================
+        function openModal(action, bookingId) {
+            const booking = allBookings.find(b => b.id === bookingId);
+            if (!booking) {
+                showToast('Error', 'Booking not found.', 'danger');
+                return;
+            }
+
+            modalAction = action;
+            modalBookingId = bookingId;
+
+            const modal = new bootstrap.Modal(document.getElementById('actionModal'));
+            const modalTitle = document.getElementById('modalTitle');
+            const modalMessage = document.getElementById('modalMessage');
+            const modalSummary = document.getElementById('modalSummary');
+            const confirmBtn = document.getElementById('modalConfirmBtn');
+
+            const actionLabels = {
+                'approve': 'Approve Ride',
+                'reject': 'Reject Ride',
+                'pickup': 'Confirm Pickup',
+                'complete': 'Complete Dropoff',
+                'cancel': 'Cancel Ride'
+            };
+
+            const actionMessages = {
+                'approve': 'You are about to approve this ride request. The passenger will be notified.',
+                'reject': 'You are about to reject this ride request. The passenger will be notified.',
+                'pickup': 'You are about to confirm that you have picked up the passenger(s).',
+                'complete': 'You are about to mark this ride as completed.',
+                'cancel': 'You are about to cancel this ride. This action cannot be undone.'
+            };
+
+            const actionColors = {
+                'approve': 'var(--success)',
+                'reject': 'var(--danger)',
+                'pickup': 'var(--warning)',
+                'complete': 'var(--info)',
+                'cancel': 'var(--danger)'
+            };
+
+            modalTitle.textContent = actionLabels[action] || 'Confirm Action';
+            modalMessage.textContent = actionMessages[action] || 'Are you sure?';
+            confirmBtn.style.background = actionColors[action] || 'var(--cbwci-purple)';
+
+            // Build summary
+            modalSummary.innerHTML = `
+                <div class="summary-item">
+                    <span class="label">Booking ID</span>
+                    <span class="value">#${booking.id}</span>
+                </div>
+                <div class="summary-item">
+                    <span class="label">Passenger</span>
+                    <span class="value">${booking.passengerName || booking.fullName || 'Unknown'}</span>
+                </div>
+                <div class="summary-item">
+                    <span class="label">Pickup</span>
+                    <span class="value">${booking.pickup || booking.pickupLocation || 'N/A'}</span>
+                </div>
+                <div class="summary-item">
+                    <span class="label">Dropoff</span>
+                    <span class="value">${booking.dropoff || booking.dropoffLocation || 'Church'}</span>
+                </div>
+                <div class="summary-item">
+                    <span class="label">Passengers</span>
+                    <span class="value">${booking.passengerCount || 1}</span>
+                </div>
+            `;
+
+            modal.show();
+        }
+
+        // ========================================
+        // EXECUTE MODAL ACTION
+        // ========================================
+        function executeModalAction() {
+            if (!modalAction || !modalBookingId) return;
+
+            const modal = bootstrap.Modal.getInstance(document.getElementById('actionModal'));
+            modal.hide();
+
+            // Find the booking
+            const booking = allBookings.find(b => b.id === modalBookingId);
+            if (!booking) {
+                showToast('Error', 'Booking not found.', 'danger');
+                return;
+            }
+
+            switch(modalAction) {
+                case 'approve':
+                    updateBookingStatus(modalBookingId, 'approved');
+                    break;
+                case 'reject':
+                    updateBookingStatus(modalBookingId, 'rejected');
+                    break;
+                case 'pickup':
+                    updateBookingStatus(modalBookingId, 'picked-up');
+                    break;
+                case 'complete':
+                    updateBookingStatus(modalBookingId, 'completed');
+                    break;
+                case 'cancel':
+                    updateBookingStatus(modalBookingId, 'cancelled');
+                    break;
+                default:
+                    showToast('Error', 'Invalid action.', 'danger');
+            }
+
+            modalAction = null;
+            modalBookingId = null;
+        }
+
+        // ========================================
+        // UPDATE BOOKING STATUS
+        // ========================================
+        function updateBookingStatus(bookingId, newStatus) {
+            if (!bookingId || bookingId === 'N/A') {
+                showToast('Error', 'Invalid booking ID.', 'danger');
+                return;
+            }
+
+            const booking = allBookings.find(b => b.id === bookingId);
+            if (!booking) {
+                showToast('Error', 'Booking not found.', 'danger');
+                return;
+            }
+
+            const statusMessages = {
+                'approved': '✅ Ride approved! The passenger has been notified.',
+                'rejected': '❌ Ride rejected. The passenger has been notified.',
+                'picked-up': '🚗 Passenger picked up! Safe travels!',
+                'completed': '🏁 Trip completed! Great job! 🎉',
+                'cancelled': '❌ Ride cancelled.'
+            };
+
+            const statusColors = {
+                'approved': 'success',
+                'rejected': 'danger',
+                'picked-up': 'warning',
+                'completed': 'success',
+                'cancelled': 'danger'
+            };
+
+            const updateData = {
+                status: newStatus,
+                driverId: currentUserId,
+                driverName: currentDriverData?.fullName || currentDriverData?.name || 'Driver',
+                updatedAt: firebase.database.ServerValue.TIMESTAMP
+            };
+
+            // Add timestamps for specific statuses
+            if (newStatus === 'approved') {
+                updateData.approvedAt = firebase.database.ServerValue.TIMESTAMP;
+            }
+            if (newStatus === 'picked-up') {
+                updateData.pickedUpAt = firebase.database.ServerValue.TIMESTAMP;
+            }
+            if (newStatus === 'completed') {
+                updateData.completedAt = firebase.database.ServerValue.TIMESTAMP;
+            }
+
+            const updates = {};
+            if (booking.feedBookingId) {
+                Object.keys(updateData).forEach(key => {
+                    updates[`bookings/${booking.feedBookingId}/${key}`] = updateData[key];
+                });
+            }
+            if (booking.userId && booking.rideHistoryId) {
+                Object.keys(updateData).forEach(key => {
+                    updates[`users/${booking.userId}/taxiHistory/${booking.rideHistoryId}/${key}`] = updateData[key];
+                });
+            }
+
+            if (Object.keys(updates).length === 0) {
+                showToast('Error', 'No writable booking record was found.', 'danger');
+                return;
+            }
+
+            database.ref().update(updates)
+                .then(() => {
+                    showToast('Status Updated', statusMessages[newStatus] || `Booking ${newStatus}.`, statusColors[newStatus] || 'info');
+                    
+                    // Track completed trips
+                    if (newStatus === 'completed') {
+                        const completedRef = database.ref('drivers/' + currentUserId + '/completedTrips');
+                        completedRef.push({
+                            bookingId: bookingId,
+                            passengerName: booking.passengerName || booking.fullName || 'Unknown',
+                            location: booking.location || 'N/A',
+                            completedAt: firebase.database.ServerValue.TIMESTAMP
+                        });
+                    }
+                })
+                .catch((error) => {
+                    console.error('❌ Error updating booking:', error);
+                    showToast('Error', 'Failed to update booking status.', 'danger');
+                });
+        }
+
+        // ========================================
+        // CALL PASSENGER
+        // ========================================
+        function callPassenger(phoneNumber) {
+            if (!phoneNumber || phoneNumber === 'N/A') {
+                showToast('No Phone Number', 'This passenger has no phone number on file.', 'warning');
+                return;
+            }
+            
+            const formattedNumber = phoneNumber.replace(/\s/g, '');
+            window.location.href = `tel:${formattedNumber}`;
+        }
+
+        // ========================================
+        // UPDATE STATS
+        // ========================================
+        function updateStats(bookings) {
+            const pending = bookings.filter(b => b.status === 'pending').length;
+            const approved = bookings.filter(b => b.status === 'approved').length;
+            const pickedUp = bookings.filter(b => b.status === 'picked-up').length;
+            const completed = bookings.filter(b => b.status === 'completed').length;
+            
+            statPending.textContent = pending;
+            statApproved.textContent = approved;
+            statPickedUp.textContent = pickedUp;
+            statCompleted.textContent = completed;
+        }
+
+        // ========================================
+        // FILTER BOOKINGS
+        // ========================================
+        function filterBookings(filter) {
+            currentFilter = filter;
+            
+            document.querySelectorAll('.btn-filter').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            document.querySelector(`.btn-filter[data-filter="${filter}"]`)?.classList.add('active');
+            
+            renderBookings(allBookings);
+        }
+
+        // ========================================
+        // HELPER FUNCTIONS
+        // ========================================
+        function capitalize(str) {
+            return str.charAt(0).toUpperCase() + str.slice(1);
+        }
+
+        // ========================================
+        // SHOW TOAST NOTIFICATION
+        // ========================================
+        function showToast(title, message, type = 'success') {
+            const container = document.getElementById('toastContainer');
+            const iconMap = {
+                'success': 'fa-check-circle',
+                'danger': 'fa-exclamation-circle',
+                'warning': 'fa-exclamation-triangle',
+                'info': 'fa-info-circle'
+            };
+
+            const toast = document.createElement('div');
+            toast.className = `toast-custom toast-${type}`;
+            toast.innerHTML = `
+                <i class="fas ${iconMap[type] || 'fa-check-circle'}"></i>
+                <div class="msg">
+                    <h6>${title}</h6>
+                    <small>${message}</small>
+                </div>
+            `;
+
+            container.appendChild(toast);
+
+            setTimeout(() => {
+                toast.classList.add('hiding');
+                setTimeout(() => toast.remove(), 400);
+            }, 4000);
+        }
+
+        // ========================================
+        // LOGOUT
+        // ========================================
+        function logoutUser(event) {
+            event.preventDefault();
+            if (confirm('Are you sure you want to logout?')) {
+                bookingsListeners.forEach(listener => {
+                    if (listener.off) listener.off();
+                });
+                if (driverDataListener) {
+                    driverDataListener.off();
+                }
+                
+                auth.signOut()
+                    .then(() => {
+                        sessionStorage.removeItem('cbwci_user');
+                        showToast('Logged Out', 'You have been successfully logged out.', 'info');
+                        setTimeout(() => {
+                            window.location.href = 'login.html';
+                        }, 1500);
+                    })
+                    .catch((error) => {
+                        showToast('Logout Error', 'Failed to logout. Please try again.', 'danger');
+                    });
+            }
+        }
+
+        // ========================================
+        // CONSOLE BRANDING
+        // ========================================
+        console.log('%c✝ CBWCI - Driver Dashboard ✝', 'font-size: 18px; color: #C9A84C; font-weight: bold;');
+        console.log('%c"Change, Dominate and Walk in Glory"', 'font-size: 14px; color: #4A1942; font-style: italic;');
+        console.log('🚗 Driver Dashboard - Complete ride management');
+        console.log('✅ Approve/Reject rides');
+        console.log('🚗 Confirm pickups');
+        console.log('🏁 Complete dropoffs');
+        console.log('🔄 Real-time updates with Firebase Realtime Database');
+
+        // ========================================
+        // START - CHECK AUTH AND LOAD DASHBOARD
+        // ========================================
+        auth.onAuthStateChanged(function(user) {
+            if (user) {
+                sessionStorage.setItem('cbwci_user', JSON.stringify({ 
+                    uid: user.uid,
+                    email: user.email,
+                    displayName: user.displayName
+                }));
+                console.log('✅ User authenticated:', user.uid);
+                loadDriverData(user.uid);
+            } else {
+                const uid = getUserId();
+                if (uid) {
+                    console.log('✅ Using session user:', uid);
+                    loadDriverData(uid);
+                } else {
+                    loadingState.classList.add('hidden');
+                    dashboardContent.classList.remove('hidden');
+                    showToast('Not Logged In', 'Please log in to access the driver dashboard.', 'warning');
+                }
+            }
+        });
+    </script>
+
+</body>
+</html>

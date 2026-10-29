@@ -1,0 +1,1443 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - CBWCI</title>
+    
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <!-- Font Awesome Icons -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
+    
+    <!-- ======================================== -->
+    <!-- FIREBASE SDKs -->
+    <!-- ======================================== -->
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js">
+    </script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js">
+    </script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js">
+    </script>
+    
+    <!-- ======================================== -->
+    <!-- FIREBASE CONFIGURATION -->
+    <!-- ======================================== -->
+    <script>
+        // Firebase configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyBhXS5EOZjEAahTjk8XPd-9PkG3HeKV8bg",
+            authDomain: "cbwci-892de.firebaseapp.com",
+            projectId: "cbwci-892de",
+            storageBucket: "cbwci-892de.firebasestorage.app",
+            messagingSenderId: "187272132769",
+            appId: "1:187272132769:web:63a9fcba465e54867d98e0",
+            databaseURL: "https://cbwci-892de-default-rtdb.firebaseio.com"
+        };
+
+        // Initialize Firebase
+        if (!firebase.apps.length) {
+            firebase.initializeApp(firebaseConfig);
+            console.log('✅ Firebase initialized successfully!');
+        }
+
+        // Make auth and database available globally
+        const auth = firebase.auth();
+        const database = firebase.database();
+    </script>
+    
+    <style>
+        /* ===== ROOT VARIABLES ===== */
+        :root {
+            --primary: #4A1942;
+            --primary-light: #6B2D5F;
+            --primary-dark: #2E0F28;
+            --secondary: #C9A84C;
+            --secondary-light: #E8CD7A;
+            --accent: #2C3E50;
+            --background: #FDF8F0;
+            --card-bg: #FFFFFF;
+            --text-dark: #2C1A24;
+            --text-muted: #7A6A72;
+            --shadow: 0 20px 60px rgba(74, 25, 66, 0.15);
+            --shadow-hover: 0 25px 80px rgba(74, 25, 66, 0.25);
+            --border-radius: 16px;
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            --success: #2D8F5C;
+            --danger: #C0392B;
+            --warning: #E67E22;
+        }
+
+        /* ===== BODY & BACKGROUND ===== */
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #FDF8F0 0%, #EDE8E0 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            margin: 0;
+            position: relative;
+        }
+
+        body::before {
+            content: '✝';
+            position: fixed;
+            font-size: 400px;
+            color: rgba(74, 25, 66, 0.03);
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .container {
+            position: relative;
+            z-index: 1;
+            width: 100%;
+            max-width: 480px;
+        }
+
+        .church-brand {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .church-brand .logo-icon {
+            font-size: 48px;
+            color: var(--secondary);
+            background: var(--primary);
+            width: 80px;
+            height: 80px;
+            line-height: 80px;
+            border-radius: 50%;
+            display: inline-block;
+            margin-bottom: 15px;
+            box-shadow: 0 8px 25px rgba(74, 25, 66, 0.3);
+            transition: var(--transition);
+        }
+
+        .church-brand .logo-icon:hover {
+            transform: scale(1.05) rotate(-5deg);
+        }
+
+        .church-brand h1 {
+            font-family: 'Playfair Display', serif;
+            font-size: 28px;
+            color: var(--primary);
+            letter-spacing: 1px;
+            margin: 0;
+            line-height: 1.2;
+        }
+
+        .church-brand .subtitle {
+            font-size: 14px;
+            color: var(--text-muted);
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            margin-top: 5px;
+            font-weight: 300;
+        }
+
+        .card {
+            background: var(--card-bg);
+            border: none;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+            overflow: hidden;
+            transition: var(--transition);
+        }
+
+        .card:hover {
+            box-shadow: var(--shadow-hover);
+            transform: translateY(-2px);
+        }
+
+        .card-header {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            padding: 28px 30px 22px;
+            border: none;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .card-header::before {
+            content: '✝';
+            position: absolute;
+            font-size: 100px;
+            color: rgba(255, 255, 255, 0.05);
+            right: -20px;
+            top: -30px;
+            transform: rotate(15deg);
+        }
+
+        .card-header h3 {
+            font-family: 'Playfair Display', serif;
+            font-weight: 700;
+            color: white;
+            margin: 0;
+            font-size: 26px;
+            letter-spacing: 1px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .card-header .header-sub {
+            font-size: 13px;
+            color: rgba(255, 255, 255, 0.7);
+            font-weight: 300;
+            margin-top: 4px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .card-body {
+            padding: 35px 30px 30px;
+        }
+
+        .form-label {
+            font-weight: 600;
+            font-size: 14px;
+            color: var(--text-dark);
+            margin-bottom: 6px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .form-label i {
+            color: var(--secondary);
+            font-size: 14px;
+            width: 18px;
+        }
+
+        .input-group {
+            position: relative;
+        }
+
+        .form-control {
+            border: 2px solid #E8DCC8;
+            border-radius: 10px;
+            padding: 12px 16px;
+            font-size: 15px;
+            transition: var(--transition);
+            background: #FDFAF5;
+            color: var(--text-dark);
+            font-weight: 400;
+        }
+
+        .form-control:focus {
+            border-color: var(--secondary);
+            box-shadow: 0 0 0 4px rgba(201, 168, 76, 0.15);
+            background: white;
+        }
+
+        .form-control::placeholder {
+            color: #B0A89C;
+            font-weight: 300;
+            font-size: 14px;
+        }
+
+        .form-control.is-invalid {
+            border-color: var(--danger);
+        }
+
+        .form-control.is-valid {
+            border-color: var(--success);
+        }
+
+        .password-toggle {
+            position: absolute;
+            right: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            color: #B0A89C;
+            cursor: pointer;
+            padding: 5px;
+            transition: var(--transition);
+            z-index: 5;
+        }
+
+        .password-toggle:hover {
+            color: var(--primary);
+        }
+
+        .form-options {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin: 18px 0 22px;
+        }
+
+        .form-check {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .form-check-input {
+            width: 18px;
+            height: 18px;
+            border: 2px solid #D4CEC4;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: var(--transition);
+            flex-shrink: 0;
+        }
+
+        .form-check-input:checked {
+            background-color: var(--primary);
+            border-color: var(--primary);
+        }
+
+        .form-check-label {
+            font-size: 14px;
+            color: var(--text-muted);
+            cursor: pointer;
+        }
+
+        .forgot-link {
+            font-size: 14px;
+            color: var(--primary);
+            text-decoration: none;
+            font-weight: 500;
+            transition: var(--transition);
+        }
+
+        .forgot-link:hover {
+            color: var(--secondary);
+            text-decoration: underline;
+        }
+
+        .btn-login {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            border: none;
+            border-radius: 10px;
+            padding: 14px;
+            font-weight: 600;
+            font-size: 16px;
+            color: white;
+            transition: var(--transition);
+            letter-spacing: 1px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn-login:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(74, 25, 66, 0.35);
+            color: white;
+        }
+
+        .btn-login:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .btn-login i {
+            margin-right: 8px;
+        }
+
+        .divider {
+            display: flex;
+            align-items: center;
+            margin: 25px 0;
+        }
+
+        .divider::before,
+        .divider::after {
+            content: '';
+            flex: 1;
+            border-bottom: 2px solid #E8DCC8;
+        }
+
+        .divider-text {
+            padding: 0 20px;
+            font-size: 13px;
+            color: var(--text-muted);
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        .btn-register {
+            background: transparent;
+            border: 2px solid var(--secondary);
+            border-radius: 10px;
+            padding: 14px;
+            font-weight: 600;
+            font-size: 16px;
+            color: var(--primary);
+            transition: var(--transition);
+            letter-spacing: 1px;
+            text-decoration: none;
+            display: block;
+            text-align: center;
+        }
+
+        .btn-register:hover {
+            background: var(--secondary);
+            color: white;
+            border-color: var(--secondary);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(201, 168, 76, 0.3);
+            text-decoration: none;
+            color: var(--primary-dark);
+        }
+
+        .btn-register i {
+            margin-right: 8px;
+        }
+
+        .extra-links {
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        .extra-links a {
+            color: var(--text-muted);
+            font-size: 13px;
+            text-decoration: none;
+            transition: var(--transition);
+            margin: 0 12px;
+        }
+
+        .extra-links a:hover {
+            color: var(--primary);
+        }
+
+        .extra-links .dot {
+            color: #D4CEC4;
+        }
+
+        .loading-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.5);
+            backdrop-filter: blur(4px);
+            z-index: 9999;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .loading-overlay.show {
+            display: flex;
+        }
+
+        .loading-spinner {
+            background: white;
+            border-radius: 16px;
+            padding: 40px 50px;
+            text-align: center;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            max-width: 400px;
+        }
+
+        .loading-spinner .spinner {
+            width: 50px;
+            height: 50px;
+            border: 4px solid #f0ebe4;
+            border-top-color: var(--secondary);
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            margin: 0 auto 15px;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .loading-spinner h6 {
+            color: var(--primary);
+            font-weight: 600;
+            margin: 0;
+        }
+
+        .loading-spinner small {
+            color: var(--text-muted);
+        }
+
+        .toast-container {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            z-index: 9999;
+        }
+
+        .toast-custom {
+            background: white;
+            border-radius: 12px;
+            padding: 16px 24px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.15);
+            border-left: 4px solid var(--success);
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            animation: slideUp 0.4s ease;
+            margin-top: 10px;
+            min-width: 300px;
+            max-width: 450px;
+        }
+
+        .toast-custom i {
+            font-size: 24px;
+            color: var(--success);
+        }
+
+        .toast-custom .msg h6 {
+            margin: 0;
+            font-weight: 600;
+        }
+
+        .toast-custom .msg small {
+            color: var(--text-muted);
+        }
+
+        .toast-custom.toast-danger {
+            border-left-color: var(--danger);
+        }
+
+        .toast-custom.toast-danger i {
+            color: var(--danger);
+        }
+
+        .toast-custom.toast-warning {
+            border-left-color: var(--warning);
+        }
+
+        .toast-custom.toast-warning i {
+            color: var(--warning);
+        }
+
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .role-badge {
+            display: inline-block;
+            padding: 2px 12px;
+            border-radius: 50px;
+            font-size: 11px;
+            font-weight: 600;
+            margin-top: 2px;
+        }
+
+        .role-badge.admin {
+            background: rgba(74, 25, 66, 0.12);
+            color: var(--primary);
+        }
+
+        .role-badge.driver {
+            background: rgba(201, 168, 76, 0.15);
+            color: #8B7A2A;
+        }
+
+        .role-badge.member {
+            background: rgba(45, 143, 92, 0.12);
+            color: var(--success);
+        }
+
+        @media (max-width: 576px) {
+            .card-body {
+                padding: 25px 20px 25px;
+            }
+            .card-header {
+                padding: 22px 20px 18px;
+            }
+            .card-header h3 {
+                font-size: 22px;
+            }
+            .church-brand h1 {
+                font-size: 22px;
+            }
+            .church-brand .logo-icon {
+                width: 65px;
+                height: 65px;
+                line-height: 65px;
+                font-size: 38px;
+            }
+            .form-options {
+                flex-direction: column;
+                gap: 12px;
+                align-items: flex-start;
+            }
+            .btn-login,
+            .btn-register {
+                font-size: 15px;
+                padding: 12px;
+            }
+            .toast-custom {
+                min-width: unset;
+                max-width: 90vw;
+                padding: 14px 18px;
+            }
+        }
+
+        @media (max-width: 400px) {
+            body {
+                padding: 10px;
+            }
+            .card-body {
+                padding: 20px 15px 20px;
+            }
+            .church-brand .logo-icon {
+                width: 55px;
+                height: 55px;
+                line-height: 55px;
+                font-size: 32px;
+            }
+            .church-brand h1 {
+                font-size: 19px;
+            }
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .container {
+            animation: fadeInUp 0.6s ease-out;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- ===== LOADING OVERLAY ===== -->
+    <div class="loading-overlay" id="loadingOverlay">
+        <div class="loading-spinner">
+            <div class="spinner"></div>
+            <h6>Signing In...</h6>
+            <small>Please wait while we verify your credentials</small>
+        </div>
+    </div>
+
+    <!-- ===== TOAST CONTAINER ===== -->
+    <div class="toast-container" id="toastContainer"></div>
+
+    <div class="container">
+
+        <!-- ===== CHURCH BRANDING ===== -->
+        <div class="church-brand">
+            <div class="logo-icon">
+                <i class="fas fa-church"></i>
+            </div>
+            <h1>CBWCI</h1>
+            <p class="subtitle">Changed By The Word Church International</p>
+        </div>
+
+        <!-- ===== LOGIN CARD ===== -->
+        <div class="card shadow">
+
+            <!-- Card Header -->
+            <div class="card-header text-center">
+                <h3>Welcome Back</h3>
+                <div class="header-sub">Sign in to continue your spiritual journey</div>
+            </div>
+
+            <!-- Card Body -->
+            <div class="card-body">
+
+                <!-- Login Form -->
+                <form id="loginForm">
+
+                    <!-- Email Field -->
+                    <div class="mb-3">
+                        <label class="form-label">
+                            <i class="fas fa-envelope"></i> Email Address
+                        </label>
+                        <input type="email"
+                               class="form-control"
+                               id="emailField"
+                               placeholder="you@email.com"
+                               required
+                               autofocus>
+                        <div class="invalid-feedback" id="emailFeedback">Please enter a valid email</div>
+                    </div>
+
+                    <!-- Password Field -->
+                    <div class="mb-3">
+                        <label class="form-label">
+                            <i class="fas fa-lock"></i> Password
+                        </label>
+                        <div class="input-group">
+                            <input type="password"
+                                   class="form-control"
+                                   placeholder="Enter your password"
+                                   id="passwordField"
+                                   required>
+                            <button type="button"
+                                    class="password-toggle"
+                                    id="togglePassword"
+                                    aria-label="Toggle password visibility">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                        </div>
+                        <div class="invalid-feedback" id="passwordFeedback">Please enter your password</div>
+                    </div>
+
+                    <!-- Remember Me & Forgot Password -->
+                    <div class="form-options">
+                        <div class="form-check">
+                            <input type="checkbox"
+                                   class="form-check-input"
+                                   id="rememberMe">
+                            <label class="form-check-label" for="rememberMe">
+                                Remember me
+                            </label>
+                        </div>
+                        <a href="#" class="forgot-link" id="forgotPasswordLink">
+                            Forgot Password?
+                        </a>
+                    </div>
+
+                    <!-- Login Button -->
+                    <button type="submit" class="btn btn-login w-100" id="loginBtn">
+                        <span class="btn-text">
+                            <i class="fas fa-sign-in-alt"></i> Sign In
+                        </span>
+                        <span class="spinner" style="display:none;">
+                            <i class="fas fa-spinner fa-spin"></i> Signing in...
+                        </span>
+                    </button>
+
+                </form>
+
+                <!-- Divider -->
+                <div class="divider">
+                    <span class="divider-text">or</span>
+                </div>
+
+                <!-- Register Button -->
+                <a href="register.html" class="btn-register">
+                    <i class="fas fa-user-plus"></i> Create New Account
+                </a>
+
+                <!-- Extra Links -->
+                <div class="extra-links">
+                    <a href="index.html">Home</a>
+                    <span class="dot">•</span>
+                    <a href="#">Contact</a>
+                    <span class="dot">•</span>
+                    <a href="sermons.html">Sermons</a>
+                </div>
+
+            </div>
+            <!-- End Card Body -->
+
+        </div>
+        <!-- End Card -->
+
+        <!-- Footer Note -->
+        <p class="text-center mt-4" style="font-size: 13px; color: var(--text-muted); opacity: 0.7;">
+            <i class="fas fa-heart" style="color: var(--secondary);"></i>
+            Changed By The Word Church International &bull; Est. 2020
+        </p>
+
+    </div>
+    <!-- End Container -->
+
+    <!-- ===== BOOTSTRAP JS ===== -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js">
+    </script>
+
+    <!-- ======================================== -->
+    <!-- LOGIN JAVASCRIPT -->
+    <!-- ======================================== -->
+    <script>
+        // ========================================
+        // DOM REFERENCES
+        // ========================================
+        const emailField = document.getElementById('emailField');
+        const passwordField = document.getElementById('passwordField');
+        const loginBtn = document.getElementById('loginBtn');
+        const loginForm = document.getElementById('loginForm');
+        const togglePassword = document.getElementById('togglePassword');
+        const rememberMe = document.getElementById('rememberMe');
+        const forgotPasswordLink = document.getElementById('forgotPasswordLink');
+        const loadingOverlay = document.getElementById('loadingOverlay');
+        const predefinedAdminEmails = new Set([
+            'siyanda_superadmin@cbwci.org',
+            'reverendsekgobela@cbwci.org'
+        ]);
+
+        // ========================================
+        // PASSWORD TOGGLE
+        // ========================================
+        togglePassword.addEventListener('click', function() {
+            const type = passwordField.getAttribute('type') === 'password' ? 'text' : 'password';
+            passwordField.setAttribute('type', type);
+            const icon = this.querySelector('i');
+            icon.classList.toggle('fa-eye');
+            icon.classList.toggle('fa-eye-slash');
+        });
+
+        // ========================================
+        // REMEMBER ME
+        // ========================================
+        if (localStorage.getItem('rememberMe') === 'true') {
+            rememberMe.checked = true;
+            const savedEmail = localStorage.getItem('savedEmail');
+            if (savedEmail) {
+                emailField.value = savedEmail;
+            }
+        }
+
+        rememberMe.addEventListener('change', function() {
+            localStorage.setItem('rememberMe', this.checked);
+            if (this.checked) {
+                localStorage.setItem('savedEmail', emailField.value);
+            } else {
+                localStorage.removeItem('savedEmail');
+            }
+        });
+
+        forgotPasswordLink.addEventListener('click', async function(event) {
+            event.preventDefault();
+            const resetEmail = emailField.value.trim();
+
+            if (!resetEmail) {
+                showToast('Email Required', 'Enter your email address to request a password reset.', 'warning');
+                emailField.focus();
+                return;
+            }
+
+            try {
+                await auth.sendPasswordResetEmail(resetEmail);
+                showToast(
+                    'Password Reset Requested',
+                    'If an account exists for this email, a password reset link has been sent.',
+                    'success'
+                );
+            } catch (error) {
+                console.error('Password reset error:', error);
+                const message = error.code === 'auth/invalid-email'
+                    ? 'Enter a valid email address.'
+                    : error.code === 'auth/network-request-failed'
+                        ? 'Network error. Check your connection and try again.'
+                        : 'Unable to send the reset email right now. Please try again or contact the church admin.';
+                showToast('Password Reset Failed', message, 'danger');
+            }
+        });
+
+        // ========================================
+        // SHOW TOAST NOTIFICATION
+        // ========================================
+        function showToast(title, message, type = 'success') {
+            const container = document.getElementById('toastContainer');
+            const iconMap = {
+                'success': 'fa-check-circle',
+                'danger': 'fa-exclamation-circle',
+                'warning': 'fa-exclamation-triangle',
+                'info': 'fa-info-circle'
+            };
+            const colorMap = {
+                'success': 'var(--success)',
+                'danger': 'var(--danger)',
+                'warning': '#E67E22',
+                'info': '#2980B9'
+            };
+
+            const toast = document.createElement('div');
+            toast.className = `toast-custom ${type === 'danger' ? 'toast-danger' : ''} ${type === 'warning' ? 'toast-warning' : ''}`;
+            toast.innerHTML = `
+                <i class="fas ${iconMap[type] || 'fa-check-circle'}" style="color: ${colorMap[type] || 'var(--success)'};"></i>
+                <div class="msg">
+                    <h6>${title}</h6>
+                    <small>${message}</small>
+                </div>
+            `;
+
+            container.appendChild(toast);
+
+            setTimeout(() => {
+                toast.style.opacity = '0';
+                toast.style.transform = 'translateX(50px)';
+                setTimeout(() => toast.remove(), 400);
+            }, 5000);
+        }
+
+        window.showToast = showToast;
+
+        // ========================================
+        // CHECK USER ROLE
+        // ========================================
+        async function checkUserRole(uid) {
+
+            try {
+
+                const authUser = auth.currentUser;
+
+                if (!authUser) {
+                    throw new Error("No authenticated Firebase user.");
+                }
+
+                const isPredefinedAdmin = predefinedAdminEmails.has(
+                    (authUser.email || '').trim().toLowerCase()
+                );
+
+                console.log("=================================");
+                console.log("🔍 CHECKING USER ROLE");
+                console.log("UID:", uid);
+                console.log("Email:", authUser.email);
+                console.log("=================================");
+
+
+                // =====================================================
+                // 1. CHECK DRIVERS/{UID}
+                // =====================================================
+
+                let snapshot =
+                    await database
+                        .ref("drivers/" + uid)
+                        .once("value");
+
+
+                if (snapshot.exists()) {
+
+                    const driverData = snapshot.val();
+
+                    console.log("🚕 Driver found by UID:", driverData);
+
+                    return {
+                        role: "driver",
+                        status: driverData.status || "active",
+                        credentialsActive:
+                            driverData.credentialsActive !== false,
+                        data: driverData
+                    };
+                }
+
+
+                // =====================================================
+                // 2. CHECK CBWCI/DRIVERS/{UID}
+                // =====================================================
+
+                snapshot =
+                    await database
+                        .ref("cbwci/drivers/" + uid)
+                        .once("value");
+
+
+                if (snapshot.exists()) {
+
+                    const driverData = snapshot.val();
+
+                    console.log(
+                        "🚕 Driver found in cbwci/drivers:",
+                        driverData
+                    );
+
+                    return {
+                        role: "driver",
+                        status: driverData.status || "active",
+                        credentialsActive:
+                            driverData.credentialsActive !== false,
+                        data: driverData
+                    };
+                }
+
+
+                // =====================================================
+                // 3. SEARCH DRIVERS BY EMAIL
+                // =====================================================
+                // Important because the driver database key may not be
+                // the same UID Firebase Authentication is returning.
+                // =====================================================
+
+                const driversSnapshot =
+                    await database
+                        .ref("drivers")
+                        .once("value");
+
+
+                if (driversSnapshot.exists()) {
+
+                    const drivers = driversSnapshot.val();
+
+                    for (const [driverId, driverData]
+                        of Object.entries(drivers)) {
+
+                        if (
+                            driverData.email &&
+                            authUser.email &&
+                            driverData.email
+                                .toLowerCase()
+                                .trim() ===
+                            authUser.email
+                                .toLowerCase()
+                                .trim()
+                        ) {
+
+                            console.log(
+                                "🚕 Driver found by email:",
+                                driverId,
+                                driverData
+                            );
+
+                            return {
+                                role: "driver",
+                                status:
+                                    driverData.status || "active",
+                                credentialsActive:
+                                    driverData.credentialsActive !== false,
+                                data: driverData
+                            };
+                        }
+                    }
+                }
+
+
+                // =====================================================
+                // 4. CHECK CANONICAL CBWCI USER BEFORE LEGACY USERS
+                // =====================================================
+
+                let userData = null;
+                let userSnapshot =
+                    await database
+                        .ref("cbwci/users/" + uid)
+                        .once("value");
+
+                if (userSnapshot.exists()) {
+                    userData = userSnapshot.val();
+                }
+
+                if (!userData && authUser.email) {
+                    const usersSnapshot = await database
+                        .ref("cbwci/users")
+                        .once("value");
+                    const users = usersSnapshot.val();
+                    if (users) {
+                        const normalizedEmail = authUser.email.trim().toLowerCase();
+                        userData = Object.values(users).find(profile =>
+                            typeof profile.email === "string" &&
+                            profile.email.trim().toLowerCase() === normalizedEmail
+                        ) || null;
+                    }
+                }
+
+                if (!userData) {
+                    userSnapshot = await database
+                        .ref("users/" + uid)
+                        .once("value");
+                    if (userSnapshot.exists()) {
+                        userData = userSnapshot.val();
+                    }
+                }
+
+                if (userData) {
+                    const storedRole = typeof userData.role === "string"
+                        ? userData.role.toLowerCase().trim()
+                        : "member";
+                    const userRole = userData.isPredefined === true || isPredefinedAdmin
+                        ? "admin"
+                        : storedRole;
+
+                    console.log("👤 User profile found:", userData);
+
+                    return {
+                        role: userRole || "member",
+                        status: userData.status || "active",
+                        credentialsActive: userData.credentialsActive !== false,
+                        data: userData
+                    };
+                }
+
+
+                // =====================================================
+                // 6. CHECK CBWCI/MEMBERS/{UID}
+                // =====================================================
+
+                snapshot =
+                    await database
+                        .ref("cbwci/members/" + uid)
+                        .once("value");
+
+
+                if (snapshot.exists()) {
+
+                    const memberData = snapshot.val();
+
+                    console.log(
+                        "👤 Member found:",
+                        memberData
+                    );
+
+                    return {
+                        role: isPredefinedAdmin ? "admin" : memberData.role || "member",
+
+                        status:
+                            memberData.status || "active",
+
+                        data:
+                            memberData
+                    };
+                }
+
+
+                // =====================================================
+                // NOTHING FOUND
+                // =====================================================
+
+                console.error(
+                    "❌ No profile found for authenticated account:",
+                    uid,
+                    authUser.email
+                );
+
+                if (isPredefinedAdmin) {
+                    return {
+                        role: "admin",
+                        status: "active",
+                        data: { email: authUser.email, isPredefined: true }
+                    };
+                }
+
+                // DO NOT silently turn an unknown account into a member.
+
+                return {
+                    role: null,
+                    status: "unknown",
+                    data: null
+                };
+
+
+            } catch (error) {
+
+                console.error(
+                    "❌ Error checking user role:",
+                    error
+                );
+
+                throw error;
+            }
+        }
+
+        function getClientDashboardUrl(role) {
+            const normalizedRole = (role || '').toLowerCase().trim().replace(/[\s-]+/g, '_');
+            switch (normalizedRole) {
+                case 'driver':
+                    return 'Drivers_Dashboard.html';
+                case 'admin':
+                case 'administrator':
+                case 'super_admin':
+                case 'superadmin':
+                    return 'Admin/Dashboard.html';
+                case 'member':
+                    return 'profile.html';
+                case 'followup':
+                case 'follow_up':
+                    return 'followup.html';
+                default:
+                    return null;
+            }
+        }
+
+        // ========================================
+        // LOGIN FUNCTION
+        // ========================================
+        async function handleLogin(email, password) {
+            try {
+                loadingOverlay.classList.add('show');
+                
+                loginBtn.disabled = true;
+                loginBtn.querySelector('.btn-text').style.display = 'none';
+                loginBtn.querySelector('.spinner').style.display = 'inline';
+
+                console.log('🔐 Attempting login for:', email);
+
+                // ✅ Step 1: Sign in with Firebase Auth
+                const userCredential = await auth.signInWithEmailAndPassword(email, password);
+                const user = userCredential.user;
+                console.log('✅ User authenticated:', user.uid);
+
+                // ✅ Step 2: Check user role
+                const roleData = await checkUserRole(user.uid);
+                console.log('📊 Role data:', roleData);
+
+                // ✅ Step 3: Handle driver-specific cases
+                if (roleData.role === 'driver') {
+                    if (roleData.status === 'suspended' || roleData.credentialsActive === false) {
+                        showToast(
+                            'Account Suspended', 
+                            'Your driver account has been suspended. Please contact the church admin for assistance.',
+                            'danger'
+                        );
+                        await auth.signOut();
+                        loadingOverlay.classList.remove('show');
+                        resetLoginButton();
+                        return;
+                    }
+                    if (roleData.status === 'pending') {
+                        showToast(
+                            'Account Pending Approval', 
+                            'Your driver account is pending approval. You will be notified once approved by the admin.',
+                            'warning'
+                        );
+                        await auth.signOut();
+                        loadingOverlay.classList.remove('show');
+                        resetLoginButton();
+                        return;
+                    }
+                }
+
+                // ✅ Step 4: Check if account is inactive (for members)
+                if (roleData.status === 'inactive') {
+                    showToast(
+                        'Account Deactivated',
+                        'Your account has been deactivated. Please contact the church admin.',
+                        'warning'
+                    );
+                    await auth.signOut();
+                    loadingOverlay.classList.remove('show');
+                    resetLoginButton();
+                    return;
+                }
+
+                // ✅ Step 5: Get user name
+                let userName = 'User';
+                if (roleData.data) {
+                    userName = roleData.data.fullName || roleData.data.name || roleData.data.displayName || email.split('@')[0];
+                } else {
+                    userName = email.split('@')[0];
+                }
+
+                // ✅ Step 6: Establish a Flask session when running through Flask.
+                // Live Server and file previews cannot create a Flask session.
+                let redirectUrl;
+                const isStaticPreview = window.location.protocol === 'file:' || window.location.port === '5500';
+
+                if (isStaticPreview) {
+                    redirectUrl = getClientDashboardUrl(roleData.role);
+                } else {
+                    const authResponse = await fetch('/auth/status', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ idToken: await user.getIdToken(), next: new URLSearchParams(location.search).get('next') || '' })
+                    });
+                    const contentType = authResponse.headers.get('content-type') || '';
+                    let authResult = {};
+
+                    if (contentType.includes('application/json')) {
+                        try {
+                            authResult = await authResponse.json();
+                        } catch (error) {
+                            console.warn('Auth endpoint returned invalid JSON.', error);
+                        }
+                    }
+
+                    if (authResponse.status === 405 || (authResponse.status === 404 && !contentType.includes('application/json'))) {
+                        redirectUrl = getClientDashboardUrl(roleData.role);
+                    } else if (!authResponse.ok || !authResult.success || !authResult.redirect) {
+                        await auth.signOut();
+                        throw new Error(authResult.message || 'Unable to establish your application session.');
+                    } else {
+                        roleData.role = authResult.role;
+                        redirectUrl = authResult.redirect;
+                    }
+                }
+
+                if (!redirectUrl) {
+                    showToast(
+                        'Account Role Not Found',
+                        'Your account does not have an assigned role. Please contact the church admin.',
+                        'warning'
+                    );
+                    await auth.signOut();
+                    loadingOverlay.classList.remove('show');
+                    resetLoginButton();
+                    return;
+                }
+
+                // ✅ Step 7: Store user info in session
+                const sessionData = {
+                    uid: user.uid,
+                    email: user.email,
+                    displayName: userName,
+                    role: roleData.role,
+                    status: roleData.status
+                };
+                
+                // Add driver-specific data if applicable
+                if (roleData.role === 'driver' && roleData.data) {
+                    sessionData.driverData = roleData.data;
+                    sessionData.assignedLocation = roleData.data.route || roleData.data.assignedLocation || 'Not Assigned';
+                    sessionData.vehicle = roleData.data.vehicle || 'N/A';
+                    sessionData.registration = roleData.data.registration || 'N/A';
+                }
+
+                sessionStorage.setItem('cbwci_user', JSON.stringify(sessionData));
+                sessionStorage.setItem('userName', userName);
+                sessionStorage.setItem('userEmail', user.email);
+                sessionStorage.setItem('userRole', roleData.role);
+                sessionStorage.setItem('userUid', user.uid);
+                sessionStorage.setItem('userStatus', roleData.status);
+                
+                if (roleData.role === 'driver') {
+                    sessionStorage.setItem('driverLocation', sessionData.assignedLocation);
+                }
+
+                // ✅ Step 8: Show welcome message
+                const roleLabels = {
+                    'admin': 'Admin',
+                    'super_admin': 'Admin',
+                    'driver': 'Driver',
+                    'followup': 'Follow-Up Team',
+                    'member': 'Member'
+                };
+                const roleDisplay = roleLabels[roleData.role] || 'Member';
+                
+                // Special welcome for drivers
+                let welcomeMessage;
+                if (roleData.role === 'driver') {
+                    welcomeMessage = `Welcome Driver ${userName}! 🚕 Redirecting to your Driver Dashboard...`;
+                } else {
+                    welcomeMessage = `Welcome ${userName}! (${roleDisplay}) Redirecting to your dashboard...`;
+                }
+                
+                showToast('🎉 Welcome Back!', welcomeMessage, 'success');
+
+                // ✅ Step 9: Redirect
+                setTimeout(() => {
+                    window.location.href = redirectUrl;
+                }, 1500);
+
+            } catch (error) {
+                console.error('❌ Login Error:', error);
+                console.error('Error Code:', error.code);
+                console.error('Error Message:', error.message);
+
+                let errorTitle = 'Login Failed';
+                let errorMessage = 'Please check your credentials and try again.';
+                let errorType = 'danger';
+
+                switch (error.code) {
+                    case 'auth/invalid-email':
+                        errorMessage = 'Please enter a valid email address.';
+                        break;
+                    case 'auth/user-disabled':
+                        errorMessage = 'This account has been disabled. Please contact the church admin.';
+                        break;
+                    case 'auth/user-not-found':
+                        errorTitle = 'Account Not Found';
+                        errorMessage = 'No account found with this email. Please create an account first.';
+                        errorType = 'warning';
+                        break;
+                    case 'auth/wrong-password':
+                    case 'auth/invalid-login-credentials':
+                    case 'auth/invalid-credential':
+                        errorTitle = 'Invalid Login Details';
+                        errorMessage = 'The email or password is incorrect. Check both or use Forgot Password? to reset it.';
+                        break;
+                    case 'auth/too-many-requests':
+                        errorMessage = 'Too many failed attempts. Please try again later.';
+                        break;
+                    case 'auth/network-request-failed':
+                        errorMessage = 'Network error. Please check your internet connection.';
+                        break;
+                    default:
+                        errorMessage = error.message;
+                }
+
+                showToast(errorTitle, errorMessage, errorType);
+
+                if (error.code === 'auth/user-not-found' || error.code === 'auth/invalid-email') {
+                    emailField.classList.add('is-invalid');
+                    passwordField.classList.remove('is-invalid');
+                } else if (error.code === 'auth/wrong-password' || error.code === 'auth/invalid-login-credentials' || error.code === 'auth/invalid-credential') {
+                    passwordField.classList.add('is-invalid');
+                    emailField.classList.add('is-invalid');
+                } else {
+                    emailField.classList.add('is-invalid');
+                    passwordField.classList.add('is-invalid');
+                }
+
+                loadingOverlay.classList.remove('show');
+                resetLoginButton();
+            }
+        }
+
+        // ========================================
+        // RESET LOGIN BUTTON
+        // ========================================
+        function resetLoginButton() {
+            loginBtn.disabled = false;
+            loginBtn.querySelector('.btn-text').style.display = 'inline';
+            loginBtn.querySelector('.spinner').style.display = 'none';
+        }
+
+        // ========================================
+        // FORM SUBMISSION
+        // ========================================
+        loginForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            emailField.classList.remove('is-invalid');
+            passwordField.classList.remove('is-invalid');
+
+            const email = emailField.value.trim();
+            const password = passwordField.value;
+
+            if (!email) {
+                emailField.classList.add('is-invalid');
+                showToast('Validation Error', 'Please enter your email address.', 'warning');
+                emailField.focus();
+                return;
+            }
+
+            if (!password) {
+                passwordField.classList.add('is-invalid');
+                showToast('Validation Error', 'Please enter your password.', 'warning');
+                passwordField.focus();
+                return;
+            }
+
+            handleLogin(email, password);
+        });
+
+        // ========================================
+        // KEYBOARD SHORTCUT
+        // ========================================
+        passwordField.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                loginForm.dispatchEvent(new Event('submit'));
+            }
+        });
+
+        // ========================================
+        // CONSOLE BRANDING
+        // ========================================
+        console.log('✝ Welcome to CBWCI Login! ✝');
+        console.log('📖 "The Lord will watch over your coming and going." - Psalm 121:8');
+        console.log('🔐 Firebase Authentication is ready!');
+        console.log('🗄️ Firebase Realtime Database is ready!');
+        console.log('👑 Role-based redirect:');
+        console.log('   • Admins → Admin/Dashboard.html');
+        console.log('   • Drivers → Drivers_Dashboard.html');
+        console.log('   • Follow-Up → followup.html');
+        console.log('   • Members → profile.html');
+        console.log('🚕 Driver status check: Pending → Warning, Suspended → Error, Approved → Login');
+    </script>
+
+</body>
+</html>

@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{{ page_title }} - CBWCI</title>
+  <style>
+    body{margin:0;min-height:100vh;display:flex;align-items:center;justify-content:center;
+         font-family:system-ui,Segoe UI,Arial,sans-serif;background:#230f22;color:#fff;text-align:center}
+    .box{padding:2rem;max-width:420px}
+    h1{margin:0 0 .5rem;font-size:1.8rem}
+    p{opacity:.8;line-height:1.5}
+    a{display:inline-block;margin-top:1rem;padding:.7rem 1.4rem;border-radius:8px;
+      background:#c9a24d;color:#230f22;text-decoration:none;font-weight:600}
+  </style>
+</head>
+<body>
+  <div class="box">
+    <h1>{{ page_title }}</h1>
+    <p>This page is being built and will be available soon.</p>
+    <a href="{{ url_for('home') }}">Back to home</a>
+  </div>
+</body>
+</html>

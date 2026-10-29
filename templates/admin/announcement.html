@@ -1,0 +1,983 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Announcements Management · CBWCI Admin</title>
+    <!-- Bootstrap 5 -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome 6 -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- AOS -->
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+    <!-- Firebase -->
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+
+    <style>
+        :root {
+            --cbwci-purple: #4A1942;
+            --cbwci-purple-light: #6B2D5F;
+            --cbwci-purple-dark: #2E0F28;
+            --cbwci-gold: #C9A84C;
+            --cbwci-gold-light: #E8CD7A;
+            --cbwci-gold-dark: #A8893A;
+            --cbwci-cream: #FDF8F0;
+            --cbwci-dark: #1A0F16;
+            --cbwci-text: #2C1A24;
+            --cbwci-muted: #7A6A72;
+            --shadow: 0 10px 40px rgba(74, 25, 66, 0.12);
+            --shadow-hover: 0 15px 50px rgba(74, 25, 66, 0.2);
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            --success: #2D8F5C;
+            --danger: #C0392B;
+            --warning: #E67E22;
+            --info: #2980B9;
+        }
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body { font-family:'Inter',sans-serif; background:#f5f0eb; color:var(--cbwci-text); padding-top:76px; min-height:100vh; }
+
+        .navbar { background: linear-gradient(135deg, var(--cbwci-purple), var(--cbwci-purple-dark)); padding:10px 0; box-shadow:0 4px 30px rgba(0,0,0,0.3); border-bottom:3px solid var(--cbwci-gold); }
+        .navbar-brand { font-family:'Playfair Display',serif; font-weight:900; font-size:20px; color:#fff!important; letter-spacing:2px; }
+        .navbar-brand .gold { color:var(--cbwci-gold); display:block; font-size:12px; letter-spacing:4px; }
+        .navbar-brand i { color:var(--cbwci-gold); margin-right:10px; }
+        .nav-link { color:rgba(255,255,255,0.8)!important; font-weight:500; font-size:13px; letter-spacing:1px; transition:var(--transition); padding:6px 16px!important; border-radius:8px; }
+        .nav-link:hover { color:var(--cbwci-gold)!important; background:rgba(201,168,76,0.1); }
+        .nav-link.active { color:var(--cbwci-gold)!important; }
+        .navbar .btn-back { background:transparent; border:2px solid rgba(255,255,255,0.2); color:#fff; padding:4px 16px; border-radius:8px; font-weight:600; font-size:12px; transition:var(--transition); text-decoration:none; }
+        .navbar .btn-back:hover { background:rgba(255,255,255,0.1); border-color:#fff; transform:translateY(-2px); color:#fff; }
+        .navbar .btn-logout { background:transparent; border:2px solid rgba(255,255,255,0.2); color:#fff; padding:4px 16px; border-radius:8px; font-weight:600; font-size:12px; transition:var(--transition); text-decoration:none; cursor:pointer; }
+        .navbar .btn-logout:hover { background:var(--danger); border-color:var(--danger); transform:translateY(-2px); color:#fff; }
+        .navbar .admin-badge { background:var(--cbwci-gold); color:var(--cbwci-purple-dark); font-size:10px; font-weight:700; padding:2px 12px; border-radius:50px; margin-left:8px; letter-spacing:1px; }
+
+        .admin-wrapper { padding:10px 0 40px; }
+        .breadcrumb-custom { color:var(--cbwci-muted); font-size:12px; margin-bottom:2px; }
+        .breadcrumb-custom a { color:var(--cbwci-purple); text-decoration:none; transition:var(--transition); }
+        .breadcrumb-custom a:hover { color:var(--cbwci-gold); }
+        .breadcrumb-custom .separator { margin:0 6px; color:var(--cbwci-gold); }
+        .page-title { font-family:'Playfair Display',serif; font-weight:700; color:var(--cbwci-purple); font-size:24px; margin:0; }
+        .page-title i { color:var(--cbwci-gold); }
+        .page-subtitle { color:var(--cbwci-muted); font-size:13px; margin:0; }
+        .welcome-text { color:var(--cbwci-muted); font-size:13px; font-weight:400; }
+        .welcome-text strong { color:var(--cbwci-purple); }
+
+        .admin-sidebar { background:#fff; border-radius:12px; padding:16px 14px; box-shadow:0 2px 12px rgba(0,0,0,0.06); border:1px solid rgba(201,168,76,0.06); position:sticky; top:96px; }
+        .admin-sidebar .sidebar-brand { text-align:center; padding-bottom:12px; border-bottom:2px solid #f5f0eb; margin-bottom:12px; }
+        .admin-sidebar .sidebar-brand .brand-icon { font-size:28px; color:var(--cbwci-gold); }
+        .admin-sidebar .sidebar-brand h6 { font-family:'Playfair Display',serif; font-weight:700; color:var(--cbwci-purple); margin-top:2px; font-size:14px; }
+        .admin-sidebar .sidebar-brand small { color:var(--cbwci-muted); font-size:10px; }
+        .admin-sidebar .sidebar-nav { list-style:none; padding:0; margin:0; }
+        .admin-sidebar .sidebar-nav li { margin-bottom:2px; }
+        .admin-sidebar .sidebar-nav li a { display:flex; align-items:center; gap:8px; padding:8px 12px; border-radius:8px; color:var(--cbwci-text); text-decoration:none; transition:var(--transition); font-weight:500; font-size:12px; }
+        .admin-sidebar .sidebar-nav li a i { width:16px; color:var(--cbwci-muted); transition:var(--transition); font-size:13px; }
+        .admin-sidebar .sidebar-nav li a:hover { background:rgba(74,25,66,0.05); color:var(--cbwci-purple); }
+        .admin-sidebar .sidebar-nav li a.active { background:linear-gradient(135deg,var(--cbwci-purple),var(--cbwci-purple-dark)); color:#fff; box-shadow:0 4px 15px rgba(74,25,66,0.25); }
+        .admin-sidebar .sidebar-nav li a.active i { color:#fff; }
+        .admin-sidebar .sidebar-nav li a .badge-nav { margin-left:auto; background:var(--cbwci-gold); color:var(--cbwci-purple-dark); font-size:9px; padding:1px 8px; border-radius:50px; }
+        .admin-sidebar .sidebar-nav li a .badge-nav-danger { margin-left:auto; background:var(--danger); color:#fff; font-size:9px; padding:1px 8px; border-radius:50px; }
+        .admin-sidebar .sidebar-footer { margin-top:12px; padding-top:12px; border-top:2px solid #f5f0eb; text-align:center; }
+        .admin-sidebar .sidebar-footer small { color:var(--cbwci-muted); font-size:10px; }
+        .admin-sidebar .sidebar-footer i { color:var(--cbwci-gold); }
+
+        .announcements-content { background:#fff; border-radius:12px; padding:18px 20px; box-shadow:0 2px 12px rgba(0,0,0,0.06); border:1px solid rgba(201,168,76,0.06); }
+        .announcements-content .content-header { display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; margin-bottom:16px; padding-bottom:12px; border-bottom:2px solid #f5f0eb; }
+        .announcements-content .content-header h6 { font-weight:700; color:var(--cbwci-purple); margin:0; font-size:15px; }
+        .announcements-content .content-header h6 i { color:var(--cbwci-gold); margin-right:8px; }
+
+        .announcement-stats { display:grid; grid-template-columns:repeat(auto-fit, minmax(120px, 1fr)); gap:10px; margin-bottom:16px; }
+        .announcement-stats .stat-mini { background:#f8f4f0; border-radius:8px; padding:10px 14px; text-align:center; }
+        .announcement-stats .stat-mini .number { font-family:'Playfair Display',serif; font-weight:900; font-size:22px; color:var(--cbwci-purple); }
+        .announcement-stats .stat-mini .label { font-size:11px; color:var(--cbwci-muted); }
+        .announcement-stats .stat-mini .label i { margin-right:4px; }
+        .announcement-stats .stat-mini.published .number { color:var(--success); }
+        .announcement-stats .stat-mini.draft .number { color:var(--warning); }
+        .announcement-stats .stat-mini.scheduled .number { color:var(--info); }
+        .announcement-stats .stat-mini.total .number { color:var(--cbwci-purple); }
+
+        .search-filter-bar { display:flex; gap:10px; flex-wrap:wrap; margin-bottom:16px; }
+        .search-filter-bar .search-box { flex:1; min-width:200px; position:relative; }
+        .search-filter-bar .search-box input { width:100%; padding:8px 14px 8px 36px; border-radius:8px; border:2px solid #E8DCC8; background:#FDFAF5; font-size:13px; transition:var(--transition); }
+        .search-filter-bar .search-box input:focus { border-color:var(--cbwci-gold); outline:none; box-shadow:0 0 0 3px rgba(201,168,76,0.1); }
+        .search-filter-bar .search-box i { position:absolute; left:12px; top:50%; transform:translateY(-50%); color:var(--cbwci-muted); font-size:14px; }
+        .search-filter-bar .filter-group { display:flex; gap:6px; flex-wrap:wrap; }
+        .search-filter-bar .filter-group .filter-btn { padding:6px 14px; border-radius:50px; border:2px solid #E8DCC8; background:transparent; font-size:12px; font-weight:600; color:var(--cbwci-muted); transition:var(--transition); cursor:pointer; }
+        .search-filter-bar .filter-group .filter-btn:hover { border-color:var(--cbwci-purple); color:var(--cbwci-purple); }
+        .search-filter-bar .filter-group .filter-btn.active { background:var(--cbwci-purple); border-color:var(--cbwci-purple); color:#fff; }
+        .search-filter-bar .add-btn { padding:8px 20px; border-radius:8px; background:linear-gradient(135deg,var(--cbwci-gold),var(--cbwci-gold-dark)); border:none; font-weight:600; font-size:13px; color:var(--cbwci-purple-dark); transition:var(--transition); white-space:nowrap; }
+        .search-filter-bar .add-btn:hover { transform:translateY(-2px); box-shadow:0 4px 15px rgba(201,168,76,0.3); }
+
+        .table-container { overflow-x:auto; }
+        .table-container table { width:100%; border-collapse:collapse; font-size:13px; }
+        .table-container table thead th { background:#f8f4f0; padding:10px 12px; text-align:left; font-weight:600; color:var(--cbwci-purple); border-bottom:2px solid #f0ebe4; font-size:12px; text-transform:uppercase; letter-spacing:0.5px; white-space:nowrap; }
+        .table-container table tbody td { padding:10px 12px; border-bottom:1px solid #f5f0eb; vertical-align:middle; }
+        .table-container table tbody tr:hover { background:rgba(74,25,66,0.02); }
+        .status-badge { padding:3px 12px; border-radius:50px; font-size:11px; font-weight:600; }
+        .status-badge.published { background:rgba(45,143,92,0.12); color:var(--success); }
+        .status-badge.draft { background:rgba(230,126,34,0.12); color:var(--warning); }
+        .status-badge.scheduled { background:rgba(41,128,185,0.12); color:var(--info); }
+        .audience-badge { padding:2px 10px; border-radius:50px; font-size:10px; font-weight:600; background:rgba(74,25,66,0.08); color:var(--cbwci-purple); }
+        .audience-badge.specific { background:rgba(201,168,76,0.12); color:var(--cbwci-gold-dark); }
+        .action-btns { display:flex; gap:4px; flex-wrap:wrap; justify-content:center; }
+        .action-btns .btn-action { width:28px; height:28px; border-radius:6px; border:none; display:flex; align-items:center; justify-content:center; font-size:12px; transition:var(--transition); cursor:pointer; }
+        .action-btns .btn-action:hover { transform:scale(1.1); }
+        .action-btns .btn-action.view { background:rgba(41,128,185,0.1); color:var(--info); }
+        .action-btns .btn-action.view:hover { background:var(--info); color:#fff; }
+        .action-btns .btn-action.edit { background:rgba(201,168,76,0.12); color:var(--cbwci-gold-dark); }
+        .action-btns .btn-action.edit:hover { background:var(--cbwci-gold); color:var(--cbwci-purple-dark); }
+        .action-btns .btn-action.delete { background:rgba(192,57,43,0.1); color:var(--danger); }
+        .action-btns .btn-action.delete:hover { background:var(--danger); color:#fff; }
+        .action-btns .btn-action.publish { background:rgba(45,143,92,0.1); color:var(--success); }
+        .action-btns .btn-action.publish:hover { background:var(--success); color:#fff; }
+
+        .pagination-container { display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; margin-top:16px; padding-top:12px; border-top:2px solid #f5f0eb; }
+        .pagination-container .info { font-size:12px; color:var(--cbwci-muted); }
+        .pagination-container .pagination { display:flex; gap:4px; list-style:none; padding:0; margin:0; }
+        .pagination-container .pagination li a { display:flex; align-items:center; justify-content:center; width:30px; height:30px; border-radius:6px; border:2px solid #E8DCC8; color:var(--cbwci-muted); text-decoration:none; font-size:12px; font-weight:600; transition:var(--transition); }
+        .pagination-container .pagination li a:hover { border-color:var(--cbwci-purple); color:var(--cbwci-purple); }
+        .pagination-container .pagination li.active a { background:var(--cbwci-purple); border-color:var(--cbwci-purple); color:#fff; }
+        .pagination-container .pagination li.disabled a { opacity:0.4; cursor:not-allowed; }
+
+        .empty-state { text-align:center; padding:40px 20px; color:var(--cbwci-muted); }
+        .empty-state i { font-size:48px; color:var(--cbwci-gold-light); margin-bottom:12px; display:block; }
+        .empty-state h6 { font-size:16px; color:var(--cbwci-text); margin-bottom:4px; }
+        .empty-state p { font-size:13px; margin:0; }
+
+        .toast-container { position:fixed; bottom:20px; right:20px; z-index:9999; }
+        .toast-custom { background:#fff; border-radius:12px; padding:14px 20px; box-shadow:0 10px 40px rgba(0,0,0,0.15); border-left:4px solid var(--success); display:flex; align-items:center; gap:12px; animation:slideUp 0.4s ease; margin-top:10px; min-width:280px; max-width:420px; }
+        .toast-custom i { font-size:20px; color:var(--success); }
+        .toast-custom .msg h6 { margin:0; font-weight:600; font-size:14px; }
+        .toast-custom .msg small { color:var(--cbwci-muted); font-size:12px; }
+        .toast-custom.toast-danger { border-left-color:var(--danger); }
+        .toast-custom.toast-danger i { color:var(--danger); }
+        .toast-custom.toast-warning { border-left-color:var(--warning); }
+        .toast-custom.toast-warning i { color:var(--warning); }
+        @keyframes slideUp { from { opacity:0; transform:translateY(30px); } to { opacity:1; transform:translateY(0); } }
+
+        .modal-content { border-radius:12px; border:2px solid rgba(201,168,76,0.1); }
+        .modal-header { background:linear-gradient(135deg,var(--cbwci-purple),var(--cbwci-purple-dark)); color:#fff; border-radius:12px 12px 0 0; border-bottom:3px solid var(--cbwci-gold); }
+        .modal-header .btn-close { filter:invert(1); }
+        .modal-body .form-label { font-weight:600; font-size:13px; color:var(--cbwci-text); }
+        .modal-body .form-control, .modal-body .form-select { border:2px solid #E8DCC8; border-radius:8px; padding:8px 14px; font-size:13px; background:#FDFAF5; transition:var(--transition); }
+        .modal-body .form-control:focus, .modal-body .form-select:focus { border-color:var(--cbwci-gold); box-shadow:0 0 0 3px rgba(201,168,76,0.1); }
+        .modal-footer .btn-primary { background:linear-gradient(135deg,var(--cbwci-purple),var(--cbwci-purple-dark)); border:none; padding:8px 24px; font-weight:600; }
+        .modal-footer .btn-primary:hover { transform:translateY(-2px); box-shadow:0 4px 15px rgba(74,25,66,0.3); }
+        .modal-footer .btn-secondary { background:transparent; border:2px solid #E8DCC8; color:var(--cbwci-muted); padding:8px 24px; font-weight:600; }
+        .modal-footer .btn-secondary:hover { border-color:var(--cbwci-purple); color:var(--cbwci-purple); }
+
+        .audience-search-container { border:2px solid #E8DCC8; border-radius:8px; padding:10px; background:#FDFAF5; max-height:200px; overflow-y:auto; }
+        .audience-search-container .search-input { width:100%; padding:6px 12px; border:2px solid #E8DCC8; border-radius:6px; font-size:13px; margin-bottom:8px; background:#fff; }
+        .audience-search-container .audience-list { max-height:120px; overflow-y:auto; }
+        .audience-search-container .audience-item { display:flex; align-items:center; gap:8px; padding:4px 8px; border-radius:4px; cursor:pointer; transition:var(--transition); }
+        .audience-search-container .audience-item:hover { background:rgba(74,25,66,0.05); }
+        .audience-search-container .audience-item input[type="checkbox"] { width:16px; height:16px; accent-color:var(--cbwci-purple); }
+        .audience-search-container .select-all-btn { font-size:12px; color:var(--cbwci-purple); cursor:pointer; padding:4px 12px; border:1px solid var(--cbwci-gold); border-radius:4px; background:transparent; transition:var(--transition); }
+        .audience-search-container .select-all-btn:hover { background:var(--cbwci-gold); color:var(--cbwci-purple-dark); }
+        .selected-count-badge { font-size:12px; color:var(--cbwci-muted); padding:4px 12px; background:#f8f4f0; border-radius:50px; }
+
+        .announcement-preview { background:#f8f4f0; border-radius:8px; padding:16px; margin-top:10px; }
+        .announcement-preview .preview-title { font-weight:700; color:var(--cbwci-purple); font-size:16px; }
+        .announcement-preview .preview-message { color:var(--cbwci-text); font-size:13px; margin-top:4px; }
+        .announcement-preview .preview-meta { font-size:12px; color:var(--cbwci-muted); margin-top:6px; }
+        .announcement-preview .preview-badge { display:inline-block; padding:2px 12px; border-radius:50px; font-size:10px; font-weight:600; background:rgba(74,25,66,0.08); color:var(--cbwci-purple); }
+
+        .badge-count { background:rgba(74,25,66,0.08); padding:4px 14px; border-radius:50px; font-size:12px; color:var(--cbwci-purple); }
+        .loading-spinner { display:flex; align-items:center; justify-content:center; padding:30px 0; flex-direction:column; gap:10px; }
+        .loading-spinner .spinner { width:30px; height:30px; border:3px solid #f0ebe4; border-top-color:var(--cbwci-gold); border-radius:50%; animation:spin 1s linear infinite; }
+        @keyframes spin { 0% { transform:rotate(0deg); } 100% { transform:rotate(360deg); } }
+
+        @media (max-width:992px) { .admin-sidebar { position:relative; top:0; margin-bottom:16px; } .search-filter-bar { flex-direction:column; } .search-filter-bar .search-box { min-width:100%; } .announcement-stats { grid-template-columns:repeat(2,1fr); } }
+        @media (max-width:768px) { body { padding-top:68px; } .page-title { font-size:20px; } .announcements-content { padding:14px; } .table-container table { font-size:12px; } .search-filter-bar .filter-group .filter-btn { flex:1; text-align:center; font-size:11px; padding:4px 10px; } }
+        @media (max-width:576px) { .page-title { font-size:18px; } .announcements-content { padding:12px 10px; } .announcement-stats { grid-template-columns:1fr 1fr; } .announcement-stats .stat-mini .number { font-size:18px; } .status-badge { font-size:10px; padding:2px 8px; } }
+        ::-webkit-scrollbar { width:6px; } ::-webkit-scrollbar-track { background:#f5f0eb; } ::-webkit-scrollbar-thumb { background:var(--cbwci-purple); border-radius:10px; } ::-webkit-scrollbar-thumb:hover { background:var(--cbwci-gold); }
+    </style>
+</head>
+<body>
+
+<!-- ===== NAVBAR ===== -->
+<nav class="navbar navbar-expand-lg fixed-top">
+    <div class="container">
+        <a class="navbar-brand" href="#">
+            <i class="fas fa-church"></i> CBWCI
+            <span class="gold">Changed By The Word</span>
+            <span class="admin-badge"><i class="fas fa-crown"></i> ADMIN</span>
+        </a>
+        <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+            <span class="navbar-toggler-icon" style="filter:invert(1);"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav ms-auto align-items-lg-center">
+                <li class="nav-item"><a class="nav-link" href="#">Home</a></li>
+                <li class="nav-item"><a class="nav-link active" href="#">Admin</a></li>
+                <li class="nav-item"><a class="nav-link" href="/admin/meetings"><i class="fas fa-video"></i> CBWCI Virtual Meeting</a></li>
+                <li class="nav-item"><a class="nav-link" href="#">Profile</a></li>
+                <li class="nav-item ms-lg-2"><a href="#" class="btn btn-back me-2"><i class="fas fa-arrow-left"></i> Back</a></li>
+                <li class="nav-item"><a href="#" class="btn btn-logout" onclick="logoutUser(event)"><i class="fas fa-sign-out-alt"></i> Logout</a></li>
+            </ul>
+        </div>
+    </div>
+</nav>
+
+<!-- ===== ADMIN CONTENT ===== -->
+<section class="admin-wrapper">
+    <div class="container">
+        <div class="row g-3">
+
+            <!-- SIDEBAR -->
+            <div class="col-lg-3" data-aos="fade-right" data-aos-duration="600">
+                <div class="admin-sidebar">
+                    <div class="sidebar-brand">
+                        <div class="brand-icon"><i class="fas fa-crown"></i></div>
+                        <h6>Admin Panel</h6>
+                        <small>CBWCI Church Management</small>
+                    </div>
+                    <ul class="sidebar-nav">
+                        <li><a href="Dashboard.html"><i class="fas fa-chart-pie"></i> Dashboard</a></li>
+                        <li><a href="Members.html"><i class="fas fa-users"></i> Members <span class="badge-nav" id="memberBadge">0</span></a></li>
+                        <li><a href="followup.html"><i class="fas fa-user-plus"></i> Follow-Up <span class="badge-nav-danger" id="followupBadge">0</span></a></li>
+                        <li><a href="Driver.html"><i class="fas fa-taxi"></i> Drivers <span class="badge-nav" id="driverBadge">0</span></a></li>
+                        <li><a href="transport.html"><i class="fas fa-route"></i> Transport</a></li>
+                        <li><a href="announcement.html" class="active"><i class="fas fa-bullhorn"></i> Announcements</a></li>
+                        <li><a href="/admin/meetings"><i class="fas fa-video"></i> CBWCI Virtual Meeting</a></li>
+                        <li><a href="reports.html"><i class="fas fa-file-alt"></i> Reports</a></li>
+                        <li style="margin-top:8px;border-top:1px solid #f5f0eb;padding-top:8px;">
+                            <a href="#" style="color:var(--danger);" onclick="logoutUser(event)"><i class="fas fa-sign-out-alt" style="color:var(--danger);"></i> Logout</a>
+                        </li>
+                    </ul>
+                    <div class="sidebar-footer">
+                        <small><i class="fas fa-shield-alt"></i><br>Logged in as <strong id="adminName">Admin</strong></small>
+                    </div>
+                </div>
+            </div>
+
+            <!-- MAIN -->
+            <div class="col-lg-9">
+
+                <!-- header -->
+                <div data-aos="fade-up" data-aos-duration="600">
+                    <div class="breadcrumb-custom">
+                        <a href="#"><i class="fas fa-home"></i> Home</a>
+                        <span class="separator">/</span>
+                        <a href="#">Admin</a>
+                        <span class="separator">/</span>
+                        <span style="color:var(--cbwci-gold-dark);font-weight:500;">Announcements</span>
+                    </div>
+                    <div class="d-flex flex-wrap justify-content-between align-items-center">
+                        <div>
+                            <h1 class="page-title"><i class="fas fa-bullhorn"></i> Announcements</h1>
+                            <p class="page-subtitle">Create and manage church announcements</p>
+                        </div>
+                        <div class="welcome-text mt-1 mt-md-0">
+                            <span class="badge-count"><i class="fas fa-bullhorn"></i> <span id="publishedCountBadge">0</span> Published</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ANNOUNCEMENTS CONTENT -->
+                <div class="announcements-content mt-2" data-aos="fade-up" data-aos-delay="100">
+                    <div class="content-header">
+                        <h6><i class="fas fa-list"></i> All Announcements</h6>
+                        <span style="font-size:12px;color:var(--cbwci-muted);">
+                            <i class="fas fa-sync-alt"></i> Last updated: <span id="lastUpdated">Just now</span>
+                        </span>
+                    </div>
+
+                    <!-- stats -->
+                    <div class="announcement-stats">
+                        <div class="stat-mini total"><div class="number" id="totalCount">0</div><div class="label"><i class="fas fa-bullhorn"></i> Total</div></div>
+                        <div class="stat-mini published"><div class="number" id="publishedCount">0</div><div class="label"><i class="fas fa-check-circle"></i> Published</div></div>
+                        <div class="stat-mini draft"><div class="number" id="draftCount">0</div><div class="label"><i class="fas fa-pen"></i> Draft</div></div>
+                        <div class="stat-mini scheduled"><div class="number" id="scheduledCount">0</div><div class="label"><i class="fas fa-clock"></i> Scheduled</div></div>
+                    </div>
+
+                    <!-- search & filter -->
+                    <div class="search-filter-bar">
+                        <div class="search-box">
+                            <i class="fas fa-search"></i>
+                            <input type="text" placeholder="Search announcements..." id="searchInput" oninput="filterAnnouncements()">
+                        </div>
+                        <div class="filter-group">
+                            <button class="filter-btn active" onclick="filterAnnouncements('all', this)">All</button>
+                            <button class="filter-btn" onclick="filterAnnouncements('published', this)">Published</button>
+                            <button class="filter-btn" onclick="filterAnnouncements('draft', this)">Draft</button>
+                            <button class="filter-btn" onclick="filterAnnouncements('scheduled', this)">Scheduled</button>
+                        </div>
+                        <button class="add-btn" onclick="openCreateAnnouncementModal()"><i class="fas fa-plus"></i> New Announcement</button>
+                    </div>
+
+                    <!-- table -->
+                    <div class="table-container">
+                        <table>
+                            <thead>
+                                <tr><th>Title</th><th>Audience</th><th>Date</th><th>Status</th><th style="text-align:center;">Actions</th></tr>
+                            </thead>
+                            <tbody id="announcementsTableBody">
+                                <tr><td colspan="5"><div class="loading-spinner"><div class="spinner"></div><p style="color:var(--cbwci-muted);font-size:13px;">Loading announcements...</p></div></td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- pagination -->
+                    <div class="pagination-container">
+                        <span class="info" id="paginationInfo">Showing 0 of 0 announcements</span>
+                        <ul class="pagination" id="paginationControls">
+                            <li class="disabled"><a href="#"><i class="fas fa-chevron-left"></i></a></li>
+                            <li class="active"><a href="#">1</a></li>
+                            <li class="disabled"><a href="#"><i class="fas fa-chevron-right"></i></a></li>
+                        </ul>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ===== CREATE ANNOUNCEMENT MODAL ===== -->
+<div class="modal fade" id="createAnnouncementModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title"><i class="fas fa-bullhorn" style="color:var(--cbwci-gold);"></i> Create Announcement</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="createAnnouncementForm">
+                    <div class="mb-3"><label class="form-label"><i class="fas fa-heading"></i> Title <span class="text-danger">*</span></label><input type="text" class="form-control" id="announcementTitle" placeholder="Enter announcement title" required oninput="previewAnnouncement()"></div>
+                    <div class="mb-3"><label class="form-label"><i class="fas fa-align-left"></i> Message <span class="text-danger">*</span></label><textarea class="form-control" id="announcementMessage" rows="4" placeholder="Write your announcement message..." required oninput="previewAnnouncement()"></textarea></div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3"><label class="form-label"><i class="fas fa-users"></i> Audience <span class="text-danger">*</span></label>
+                                <select class="form-select" id="announcementAudience" onchange="toggleAudienceType()">
+                                    <option value="everyone">Everyone (All Members)</option>
+                                    <option value="specific">Specific Members/Groups</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3"><label class="form-label"><i class="fas fa-calendar-alt"></i> Status</label>
+                                <select class="form-select" id="announcementStatus" onchange="toggleScheduleField()">
+                                    <option value="draft">Draft</option>
+                                    <option value="published">Publish Now</option>
+                                    <option value="scheduled">Schedule</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- specific audience -->
+                    <div id="specificAudienceGroup" style="display:none;">
+                        <div class="mb-3">
+                            <label class="form-label"><i class="fas fa-user-tag"></i> Select Members/Groups</label>
+                            <div class="audience-search-container">
+                                <div style="display:flex;gap:8px;align-items:center;margin-bottom:8px;">
+                                    <input type="text" class="search-input" id="audienceSearchInput" placeholder="Search by name or UID..." oninput="filterAudienceList()">
+                                    <button type="button" class="select-all-btn" onclick="toggleSelectAllAudience()"><i class="fas fa-check-double"></i> Select All</button>
+                                </div>
+                                <div class="audience-list" id="audienceList"><div style="padding:10px;text-align:center;color:var(--cbwci-muted);">Loading members...</div></div>
+                                <div style="margin-top:8px;display:flex;justify-content:space-between;align-items:center;">
+                                    <span class="selected-count-badge" id="selectedAudienceCount">0 selected</span>
+                                    <span style="font-size:11px;color:var(--cbwci-muted);"><i class="fas fa-info-circle"></i> Search by name or UID</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- scheduled date -->
+                    <div id="scheduledDateGroup" style="display:none;">
+                        <div class="mb-3"><label class="form-label"><i class="fas fa-calendar-alt"></i> Schedule Date & Time</label><input type="datetime-local" class="form-control" id="scheduledDateTime"></div>
+                    </div>
+
+                    <!-- preview -->
+                    <div class="announcement-preview" id="announcementPreview">
+                        <div class="preview-title">Preview</div>
+                        <div class="preview-message" id="previewMessage">Your announcement preview will appear here...</div>
+                        <div class="preview-meta">
+                            <span class="preview-badge" id="previewAudience">Everyone</span>
+                            <span style="margin-left:8px;" id="previewDate">Just now</span>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary" onclick="createAnnouncement()"><i class="fas fa-save"></i> Save Announcement</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ===== VIEW ANNOUNCEMENT MODAL ===== -->
+<div class="modal fade" id="viewAnnouncementModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title"><i class="fas fa-bullhorn" style="color:var(--cbwci-gold);"></i> Announcement Details</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body" id="viewAnnouncementBody">
+                <div class="text-center mb-3">
+                    <div style="font-size:48px;color:var(--cbwci-gold);"><i class="fas fa-bullhorn"></i></div>
+                    <h5 class="mt-2" id="viewAnnouncementTitle">Announcement Title</h5>
+                    <span class="status-badge published" id="viewAnnouncementStatus">Published</span>
+                </div>
+                <div style="background:#f8f4f0;border-radius:8px;padding:14px;">
+                    <p style="font-size:14px;color:var(--cbwci-text);" id="viewAnnouncementMessage">Announcement message goes here...</p>
+                    <div style="display:flex;justify-content:space-between;padding-top:10px;border-top:1px solid #f0ebe4;margin-top:10px;">
+                        <span style="color:var(--cbwci-muted);font-size:12px;"><i class="fas fa-users"></i> <span id="viewAnnouncementAudience">Everyone</span></span>
+                        <span style="color:var(--cbwci-muted);font-size:12px;"><i class="fas fa-calendar-alt"></i> <span id="viewAnnouncementDate">Today</span></span>
+                    </div>
+                    <div style="margin-top:8px;padding-top:8px;border-top:1px solid #f0ebe4;font-size:11px;color:var(--cbwci-muted);">
+                        <i class="fas fa-id-card"></i> ID: <span id="viewAnnouncementId">-</span>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary" onclick="editAnnouncementFromView()"><i class="fas fa-edit"></i> Edit</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ===== TOAST ===== -->
+<div class="toast-container" id="toastContainer"></div>
+
+<!-- ===== SCRIPTS ===== -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+<script>
+    AOS.init({ duration:600, once:true });
+
+    // ===== FIREBASE =====
+    const firebaseConfig = {
+        apiKey: "AIzaSyBhXS5EOZjEAahTjk8XPd-9PkG3HeKV8bg",
+        authDomain: "cbwci-892de.firebaseapp.com",
+        projectId: "cbwci-892de",
+        storageBucket: "cbwci-892de.firebasestorage.app",
+        messagingSenderId: "187272132769",
+        appId: "1:187272132769:web:63a9fcba465e54867d98e0",
+        databaseURL: "https://cbwci-892de-default-rtdb.firebaseio.com"
+    };
+    if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
+
+    // ===== TOAST =====
+    function showToast(title, message, type='success') {
+        const container = document.getElementById('toastContainer');
+        const iconMap = { success:'fa-check-circle', danger:'fa-exclamation-circle', warning:'fa-exclamation-triangle', info:'fa-info-circle' };
+        const colorMap = { success:'var(--success)', danger:'var(--danger)', warning:'var(--warning)', info:'var(--info)' };
+        const toast = document.createElement('div');
+        toast.className = `toast-custom ${type==='danger'?'toast-danger':''}`;
+        toast.innerHTML = `<i class="fas ${iconMap[type]||'fa-check-circle'}" style="color:${colorMap[type]||'var(--success)'};"></i><div class="msg"><h6>${title}</h6><small>${message}</small></div>`;
+        container.appendChild(toast);
+        setTimeout(() => { toast.style.opacity='0'; toast.style.transform='translateX(50px)'; setTimeout(()=>toast.remove(),400); }, 4000);
+    }
+    window.showToast = showToast;
+
+    // ===== LOGOUT =====
+    function logoutUser(e) {
+        e.preventDefault();
+        if (confirm('Logout?')) {
+            firebase.auth().signOut().then(() => {
+                sessionStorage.clear();
+                showToast('Logged Out', 'See you soon!', 'info');
+                setTimeout(() => window.location.href='login.html', 1500);
+            }).catch(() => showToast('Error', 'Logout failed', 'danger'));
+        }
+    }
+
+    // ===== STATE =====
+    let allAnnouncements = [];
+    let filteredAnnouncements = [];
+    let currentFilter = 'all';
+    let currentSearch = '';
+    let allMembers = [];
+    let selectedAudience = new Set();
+    let currentViewId = null;
+
+    // ===== FIREBASE: FETCH MEMBERS FOR AUDIENCE =====
+    async function fetchMembersForAudience() {
+        try {
+            const snapshot = await firebase.database().ref('cbwci/members').once('value');
+            const data = snapshot.val();
+            if (data) {
+                allMembers = Object.keys(data).map(key => {
+                    const raw = data[key];
+                    return {
+                        uid: key,
+                        name: raw.name || raw.fullName || raw.displayName || 'Unknown Member',
+                        email: raw.email || 'No email',
+                        groups: raw.groups || []
+                    };
+                });
+            } else {
+                allMembers = [];
+            }
+            populateAudienceList();
+        } catch (err) {
+            console.error('Error fetching members for audience:', err);
+        }
+    }
+
+    // ===== FIREBASE: FETCH ANNOUNCEMENTS =====
+    async function fetchAnnouncementsFromFirebase() {
+        try {
+            const snapshot = await firebase.database().ref('cbwci/announcements').once('value');
+            const data = snapshot.val();
+            if (data) {
+                allAnnouncements = Object.keys(data).map(key => {
+                    const raw = data[key];
+                    return {
+                        id: key,
+                        title: raw.title || 'Untitled',
+                        message: raw.message || '',
+                        audience: raw.audience || 'everyone',
+                        audienceLabel: raw.audienceLabel || (raw.audience === 'everyone' ? 'Everyone' : 'Specific'),
+                        audienceList: raw.audienceList || [],
+                        status: raw.status || 'draft',
+                        date: raw.date || new Date().toLocaleDateString('en-ZA'),
+                        time: raw.time || new Date().toLocaleTimeString('en-ZA', { hour:'2-digit', minute:'2-digit' }),
+                        createdAt: raw.createdAt || Date.now(),
+                        scheduledDate: raw.scheduledDate || null
+                    };
+                });
+                // sort by createdAt descending
+                allAnnouncements.sort((a,b) => (b.createdAt || 0) - (a.createdAt || 0));
+            } else {
+                allAnnouncements = [];
+            }
+            document.getElementById('lastUpdated').textContent = new Date().toLocaleString();
+            applyFiltersAndRender();
+            updateStats(allAnnouncements);
+            showToast('Announcements Loaded', `${allAnnouncements.length} announcements loaded.`, 'success');
+        } catch (err) {
+            console.error('Error fetching announcements:', err);
+            showToast('Error', 'Failed to load announcements.', 'danger');
+            document.getElementById('announcementsTableBody').innerHTML = `<tr><td colspan="5"><div class="empty-state"><i class="fas fa-database"></i><h6>Error loading</h6><p>${err.message}</p></div></td></tr>`;
+        }
+    }
+
+    // ===== POPULATE AUDIENCE LIST =====
+    function populateAudienceList() {
+        const container = document.getElementById('audienceList');
+        if (!allMembers.length) {
+            container.innerHTML = '<div style="padding:10px;text-align:center;color:var(--cbwci-muted);">No members found. Add members first.</div>';
+            return;
+        }
+        let html = '';
+        allMembers.forEach(member => {
+            const isChecked = selectedAudience.has(member.uid);
+            html += `
+                <div class="audience-item" onclick="toggleAudienceItem('${member.uid}')">
+                    <input type="checkbox" id="audience_${member.uid}" ${isChecked ? 'checked' : ''} onclick="event.stopPropagation(); toggleAudienceItem('${member.uid}')">
+                    <span class="audience-name">${member.name}</span>
+                    <span class="audience-uid">${member.uid}</span>
+                </div>
+            `;
+        });
+        container.innerHTML = html;
+        updateSelectedCount();
+    }
+
+    // ===== FILTER AUDIENCE LIST =====
+    function filterAudienceList() {
+        const searchTerm = document.getElementById('audienceSearchInput').value.toLowerCase();
+        const container = document.getElementById('audienceList');
+        let filtered = allMembers.filter(m => 
+            m.name.toLowerCase().includes(searchTerm) ||
+            m.uid.toLowerCase().includes(searchTerm)
+        );
+        let html = '';
+        filtered.forEach(member => {
+            const isChecked = selectedAudience.has(member.uid);
+            html += `
+                <div class="audience-item" onclick="toggleAudienceItem('${member.uid}')">
+                    <input type="checkbox" id="audience_${member.uid}" ${isChecked ? 'checked' : ''} onclick="event.stopPropagation(); toggleAudienceItem('${member.uid}')">
+                    <span class="audience-name">${member.name}</span>
+                    <span class="audience-uid">${member.uid}</span>
+                </div>
+            `;
+        });
+        container.innerHTML = html || '<div style="padding:10px;text-align:center;color:var(--cbwci-muted);">No results found</div>';
+        updateSelectedCount();
+    }
+    window.filterAudienceList = filterAudienceList;
+
+    // ===== TOGGLE AUDIENCE ITEM =====
+    function toggleAudienceItem(id) {
+        if (selectedAudience.has(id)) selectedAudience.delete(id);
+        else selectedAudience.add(id);
+        filterAudienceList();
+        updateSelectedCount();
+        previewAnnouncement();
+    }
+    window.toggleAudienceItem = toggleAudienceItem;
+
+    // ===== TOGGLE SELECT ALL =====
+    function toggleSelectAllAudience() {
+        const allIds = allMembers.map(m => m.uid);
+        const allSelected = allIds.every(id => selectedAudience.has(id));
+        if (allSelected) allIds.forEach(id => selectedAudience.delete(id));
+        else allIds.forEach(id => selectedAudience.add(id));
+        filterAudienceList();
+        updateSelectedCount();
+        previewAnnouncement();
+    }
+    window.toggleSelectAllAudience = toggleSelectAllAudience;
+
+    // ===== UPDATE SELECTED COUNT =====
+    function updateSelectedCount() {
+        document.getElementById('selectedAudienceCount').textContent = `${selectedAudience.size} selected`;
+    }
+
+    // ===== TOGGLE AUDIENCE TYPE =====
+    function toggleAudienceType() {
+        const audience = document.getElementById('announcementAudience').value;
+        document.getElementById('specificAudienceGroup').style.display = audience === 'specific' ? 'block' : 'none';
+        if (audience === 'specific' && !allMembers.length) fetchMembersForAudience();
+        previewAnnouncement();
+    }
+    window.toggleAudienceType = toggleAudienceType;
+
+    // ===== TOGGLE SCHEDULE =====
+    function toggleScheduleField() {
+        const status = document.getElementById('announcementStatus').value;
+        document.getElementById('scheduledDateGroup').style.display = status === 'scheduled' ? 'block' : 'none';
+    }
+    window.toggleScheduleField = toggleScheduleField;
+
+    // ===== PREVIEW =====
+    function previewAnnouncement() {
+        const title = document.getElementById('announcementTitle').value || 'Preview';
+        const message = document.getElementById('announcementMessage').value || 'Your announcement preview will appear here...';
+        const audience = document.getElementById('announcementAudience').value;
+        let audienceLabel = 'Everyone';
+        if (audience === 'specific' && selectedAudience.size > 0) {
+            const names = [];
+            selectedAudience.forEach(id => {
+                const member = allMembers.find(m => m.uid === id);
+                if (member) names.push(member.name);
+            });
+            audienceLabel = names.join(', ') || 'Specific Members';
+        } else if (audience === 'specific') {
+            audienceLabel = 'No one selected';
+        }
+        document.querySelector('#announcementPreview .preview-title').textContent = title;
+        document.getElementById('previewMessage').textContent = message;
+        document.getElementById('previewAudience').textContent = audienceLabel;
+        document.getElementById('previewDate').textContent = new Date().toLocaleDateString('en-ZA', { year:'numeric', month:'long', day:'numeric' });
+    }
+    window.previewAnnouncement = previewAnnouncement;
+
+    // ===== OPEN CREATE MODAL =====
+    function openCreateAnnouncementModal() {
+        document.getElementById('createAnnouncementForm').reset();
+        document.getElementById('specificAudienceGroup').style.display = 'none';
+        document.getElementById('scheduledDateGroup').style.display = 'none';
+        selectedAudience.clear();
+        if (!allMembers.length) fetchMembersForAudience();
+        previewAnnouncement();
+        const modal = new bootstrap.Modal(document.getElementById('createAnnouncementModal'));
+        modal.show();
+    }
+    window.openCreateAnnouncementModal = openCreateAnnouncementModal;
+
+    // ===== CREATE ANNOUNCEMENT =====
+    async function createAnnouncement() {
+        const title = document.getElementById('announcementTitle').value.trim();
+        const message = document.getElementById('announcementMessage').value.trim();
+        const audience = document.getElementById('announcementAudience').value;
+        const status = document.getElementById('announcementStatus').value;
+        const scheduledDate = document.getElementById('scheduledDateTime').value;
+
+        if (!title || !message) {
+            showToast('Error', 'Please fill in all required fields.', 'danger');
+            return;
+        }
+
+        let audienceLabel = 'Everyone';
+        let audienceList = [];
+        if (audience === 'specific' && selectedAudience.size > 0) {
+            const names = [];
+            selectedAudience.forEach(id => {
+                const member = allMembers.find(m => m.uid === id);
+                if (member) {
+                    names.push(member.name);
+                    audienceList.push(id);
+                }
+            });
+            audienceLabel = names.join(', ') || 'Specific Members';
+        } else if (audience === 'specific') {
+            showToast('Error', 'Please select at least one member.', 'danger');
+            return;
+        } else if (audience === 'everyone') {
+            audienceList = allMembers.map(m => m.uid);
+        }
+
+        const announcementData = {
+            title,
+            message,
+            audience,
+            audienceLabel,
+            audienceList,
+            status,
+            date: new Date().toLocaleDateString('en-ZA'),
+            time: new Date().toLocaleTimeString('en-ZA', { hour:'2-digit', minute:'2-digit' }),
+            createdAt: Date.now(),
+            scheduledDate: status === 'scheduled' ? scheduledDate : null
+        };
+
+        try {
+            const ref = firebase.database().ref('cbwci/announcements').push();
+            await ref.set(announcementData);
+            bootstrap.Modal.getInstance(document.getElementById('createAnnouncementModal')).hide();
+            showToast('Announcement Created', `"${title}" has been saved.`, 'success');
+            if (status === 'published') {
+                showToast('📢 Published', `"${title}" is now visible to members.`, 'info');
+            }
+            await fetchAnnouncementsFromFirebase();
+        } catch (err) {
+            console.error(err);
+            showToast('Error', 'Failed to create announcement.', 'danger');
+        }
+    }
+    window.createAnnouncement = createAnnouncement;
+
+    // ===== RENDER TABLE =====
+    function renderAnnouncementsTable(data) {
+        const tbody = document.getElementById('announcementsTableBody');
+        if (!data || data.length === 0) {
+            tbody.innerHTML = `<tr><td colspan="5"><div class="empty-state"><i class="fas fa-bullhorn"></i><h6>No Announcements</h6><p>Create your first announcement to share with members.</p><button class="add-btn" style="margin-top:12px;padding:8px 24px;" onclick="openCreateAnnouncementModal()"><i class="fas fa-plus"></i> Create First Announcement</button></div></td></tr>`;
+            return;
+        }
+        let html = '';
+        data.forEach(a => {
+            const statusClass = a.status || 'draft';
+            const statusLabels = { published:'Published', draft:'Draft', scheduled:'Scheduled' };
+            const audienceClass = a.audience === 'specific' ? 'specific' : '';
+            html += `<tr>
+                <td><div style="font-weight:600;color:var(--cbwci-purple);">${a.title}</div><div style="font-size:12px;color:var(--cbwci-muted);max-width:250px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${a.message.substring(0,60)}${a.message.length>60?'...':''}</div></td>
+                <td><span class="audience-badge ${audienceClass}"><i class="fas ${a.audience==='everyone'?'fa-globe':'fa-users'}"></i> ${a.audienceLabel||'Everyone'}</span></td>
+                <td style="font-size:13px;"><div>${a.date||'N/A'}</div><div style="font-size:11px;color:var(--cbwci-muted);">${a.time||''}</div></td>
+                <td><span class="status-badge ${statusClass}">${statusLabels[statusClass]||statusClass}</span></td>
+                <td style="text-align:center;"><div class="action-btns">
+                    <button class="btn-action view" onclick="viewAnnouncement('${a.id}')" title="View"><i class="fas fa-eye"></i></button>
+                    <button class="btn-action edit" onclick="editAnnouncement('${a.id}')" title="Edit"><i class="fas fa-edit"></i></button>
+                    ${a.status === 'draft' ? `<button class="btn-action publish" onclick="publishAnnouncement('${a.id}')" title="Publish"><i class="fas fa-check"></i></button>` : ''}
+                    <button class="btn-action delete" onclick="deleteAnnouncement('${a.id}')" title="Delete"><i class="fas fa-trash"></i></button>
+                </div></td>
+            </tr>`;
+        });
+        tbody.innerHTML = html;
+        document.getElementById('paginationInfo').textContent = `Showing ${data.length} of ${allAnnouncements.length} announcements`;
+    }
+
+    // ===== UPDATE STATS =====
+    function updateStats(data) {
+        const total = data.length;
+        const published = data.filter(a => a.status === 'published').length;
+        const draft = data.filter(a => a.status === 'draft').length;
+        const scheduled = data.filter(a => a.status === 'scheduled').length;
+        document.getElementById('totalCount').textContent = total;
+        document.getElementById('publishedCount').textContent = published;
+        document.getElementById('draftCount').textContent = draft;
+        document.getElementById('scheduledCount').textContent = scheduled;
+        document.getElementById('publishedCountBadge').textContent = published;
+    }
+
+    // ===== APPLY FILTERS =====
+    function applyFiltersAndRender() {
+        let data = [...allAnnouncements];
+        if (currentFilter !== 'all') {
+            data = data.filter(a => a.status === currentFilter);
+        }
+        if (currentSearch.trim()) {
+            const q = currentSearch.trim().toLowerCase();
+            data = data.filter(a => 
+                a.title.toLowerCase().includes(q) ||
+                a.message.toLowerCase().includes(q)
+            );
+        }
+        filteredAnnouncements = data;
+        renderAnnouncementsTable(data);
+    }
+
+    function filterAnnouncements(filter, btn) {
+        if (btn) {
+            document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            currentFilter = filter;
+        } else {
+            currentSearch = document.getElementById('searchInput').value;
+        }
+        applyFiltersAndRender();
+    }
+    window.filterAnnouncements = filterAnnouncements;
+
+    document.getElementById('searchInput').addEventListener('input', function() {
+        currentSearch = this.value;
+        applyFiltersAndRender();
+    });
+
+    // ===== VIEW =====
+    function viewAnnouncement(id) {
+        const a = allAnnouncements.find(item => item.id === id);
+        if (!a) { showToast('Error', 'Not found.', 'danger'); return; }
+        currentViewId = id;
+        document.getElementById('viewAnnouncementTitle').textContent = a.title;
+        document.getElementById('viewAnnouncementMessage').textContent = a.message;
+        document.getElementById('viewAnnouncementAudience').textContent = a.audienceLabel || 'Everyone';
+        document.getElementById('viewAnnouncementDate').textContent = `${a.date||'N/A'} ${a.time||''}`;
+        document.getElementById('viewAnnouncementId').textContent = a.id;
+        const statusLabels = { published:'Published', draft:'Draft', scheduled:'Scheduled' };
+        const statusEl = document.getElementById('viewAnnouncementStatus');
+        statusEl.textContent = statusLabels[a.status] || a.status;
+        statusEl.className = `status-badge ${a.status}`;
+        const modal = new bootstrap.Modal(document.getElementById('viewAnnouncementModal'));
+        modal.show();
+    }
+    window.viewAnnouncement = viewAnnouncement;
+
+    // ===== EDIT =====
+    function editAnnouncement(id) {
+        const a = allAnnouncements.find(item => item.id === id);
+        if (!a) { showToast('Error', 'Not found.', 'danger'); return; }
+        showToast('Edit Mode', `Editing "${a.title}". Use the form to update.`, 'info');
+        // Pre-fill form
+        document.getElementById('announcementTitle').value = a.title;
+        document.getElementById('announcementMessage').value = a.message;
+        document.getElementById('announcementAudience').value = a.audience || 'everyone';
+        document.getElementById('announcementStatus').value = a.status || 'draft';
+        if (a.audience === 'specific' && a.audienceList) {
+            selectedAudience = new Set(a.audienceList);
+            document.getElementById('specificAudienceGroup').style.display = 'block';
+            if (!allMembers.length) fetchMembersForAudience();
+            else filterAudienceList();
+        } else {
+            selectedAudience.clear();
+            document.getElementById('specificAudienceGroup').style.display = 'none';
+        }
+        if (a.status === 'scheduled' && a.scheduledDate) {
+            document.getElementById('scheduledDateTime').value = a.scheduledDate;
+            document.getElementById('scheduledDateGroup').style.display = 'block';
+        } else {
+            document.getElementById('scheduledDateGroup').style.display = 'none';
+        }
+        previewAnnouncement();
+        const modal = new bootstrap.Modal(document.getElementById('createAnnouncementModal'));
+        const btn = document.querySelector('#createAnnouncementModal .btn-primary');
+        btn.textContent = 'Update Announcement';
+        btn.onclick = function() { updateAnnouncement(id); };
+        modal.show();
+    }
+    window.editAnnouncement = editAnnouncement;
+
+    // ===== UPDATE =====
+    async function updateAnnouncement(id) {
+        const title = document.getElementById('announcementTitle').value.trim();
+        const message = document.getElementById('announcementMessage').value.trim();
+        const audience = document.getElementById('announcementAudience').value;
+        const status = document.getElementById('announcementStatus').value;
+        const scheduledDate = document.getElementById('scheduledDateTime').value;
+
+        if (!title || !message) {
+            showToast('Error', 'Please fill in all required fields.', 'danger');
+            return;
+        }
+
+        let audienceLabel = 'Everyone';
+        let audienceList = [];
+        if (audience === 'specific' && selectedAudience.size > 0) {
+            const names = [];
+            selectedAudience.forEach(uid => {
+                const member = allMembers.find(m => m.uid === uid);
+                if (member) { names.push(member.name); audienceList.push(uid); }
+            });
+            audienceLabel = names.join(', ') || 'Specific Members';
+        } else if (audience === 'specific') {
+            showToast('Error', 'Please select at least one member.', 'danger');
+            return;
+        } else if (audience === 'everyone') {
+            audienceList = allMembers.map(m => m.uid);
+        }
+
+        const updateData = {
+            title, message, audience, audienceLabel, audienceList, status,
+            date: new Date().toLocaleDateString('en-ZA'),
+            time: new Date().toLocaleTimeString('en-ZA', { hour:'2-digit', minute:'2-digit' }),
+            updatedAt: Date.now(),
+            scheduledDate: status === 'scheduled' ? scheduledDate : null
+        };
+
+        try {
+            await firebase.database().ref(`cbwci/announcements/${id}`).update(updateData);
+            bootstrap.Modal.getInstance(document.getElementById('createAnnouncementModal')).hide();
+            const btn = document.querySelector('#createAnnouncementModal .btn-primary');
+            btn.textContent = 'Save Announcement';
+            btn.onclick = createAnnouncement;
+            showToast('Updated', `"${title}" has been updated.`, 'success');
+            await fetchAnnouncementsFromFirebase();
+        } catch (err) {
+            showToast('Error', 'Failed to update: ' + err.message, 'danger');
+        }
+    }
+
+    // ===== EDIT FROM VIEW =====
+    function editAnnouncementFromView() {
+        if (currentViewId) {
+            bootstrap.Modal.getInstance(document.getElementById('viewAnnouncementModal')).hide();
+            editAnnouncement(currentViewId);
+        }
+    }
+    window.editAnnouncementFromView = editAnnouncementFromView;
+
+    // ===== PUBLISH =====
+    async function publishAnnouncement(id) {
+        const a = allAnnouncements.find(item => item.id === id);
+        if (!a) return;
+        if (!confirm(`Publish "${a.title}"? It will be visible to members.`)) return;
+        try {
+            await firebase.database().ref(`cbwci/announcements/${id}`).update({ status: 'published', publishedAt: Date.now() });
+            showToast('📢 Published', `"${a.title}" is now live.`, 'success');
+            await fetchAnnouncementsFromFirebase();
+        } catch (err) {
+            showToast('Error', 'Failed to publish.', 'danger');
+        }
+    }
+    window.publishAnnouncement = publishAnnouncement;
+
+    // ===== DELETE =====
+    async function deleteAnnouncement(id) {
+        const a = allAnnouncements.find(item => item.id === id);
+        if (!a) return;
+        if (!confirm(`Delete "${a.title}"? This cannot be undone.`)) return;
+        try {
+            await firebase.database().ref(`cbwci/announcements/${id}`).remove();
+            showToast('Deleted', `"${a.title}" has been removed.`, 'danger');
+            await fetchAnnouncementsFromFirebase();
+        } catch (err) {
+            showToast('Error', 'Failed to delete.', 'danger');
+        }
+    }
+    window.deleteAnnouncement = deleteAnnouncement;
+
+    // ===== AUTH =====
+    firebase.auth().onAuthStateChanged(user => {
+        if (user) {
+            console.log('✅ Admin logged in:', user.uid);
+            document.getElementById('adminName').textContent = user.displayName || 'Admin';
+            fetchAnnouncementsFromFirebase();
+            fetchMembersForAudience();
+        } else {
+            showToast('Not Logged In', 'Please log in to access announcements.', 'warning');
+            setTimeout(() => window.location.href='login.html', 2000);
+        }
+    });
+
+    console.log('%c✝ CBWCI - Announcements ✝', 'font-size:18px;color:#C9A84C;font-weight:bold;');
+    console.log('📢 Live announcements from Firebase Realtime Database');
+</script>
+</body>
+</html>

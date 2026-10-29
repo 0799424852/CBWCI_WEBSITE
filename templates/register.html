@@ -1,0 +1,1529 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Register - CBWCI</title>
+    
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <!-- Font Awesome Icons -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
+    
+    <style>
+        /* ===== ROOT VARIABLES ===== */
+        :root {
+            --primary: #8B1E2B;
+            --primary-light: #A82838;
+            --primary-dark: #5E1520;
+            --secondary: #D4AF37;
+            --secondary-light: #E8C84A;
+            --accent: #2C3E50;
+            --background: #F8F5F0;
+            --card-bg: #FFFFFF;
+            --text-dark: #1A1A1A;
+            --text-muted: #6C757D;
+            --shadow: 0 20px 60px rgba(139, 30, 43, 0.15);
+            --shadow-hover: 0 25px 80px rgba(139, 30, 43, 0.25);
+            --border-radius: 16px;
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            --success: #2D8F5C;
+            --error: #C0392B;
+        }
+
+        /* ===== BODY & BACKGROUND ===== */
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #F8F5F0 0%, #EDE8E0 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            margin: 0;
+            position: relative;
+        }
+
+        body::before {
+            content: '✝';
+            position: fixed;
+            font-size: 400px;
+            color: rgba(139, 30, 43, 0.03);
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        /* ===== MAIN CONTAINER ===== */
+        .container {
+            position: relative;
+            z-index: 1;
+            width: 100%;
+            max-width: 520px;
+        }
+
+        /* ===== CHURCH BRANDING ===== */
+        .church-brand {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .church-brand .logo-icon {
+            font-size: 42px;
+            color: var(--secondary);
+            background: var(--primary);
+            width: 75px;
+            height: 75px;
+            line-height: 75px;
+            border-radius: 50%;
+            display: inline-block;
+            margin-bottom: 12px;
+            box-shadow: 0 8px 25px rgba(139, 30, 43, 0.3);
+            transition: var(--transition);
+        }
+
+        .church-brand .logo-icon:hover {
+            transform: scale(1.05) rotate(-5deg);
+        }
+
+        .church-brand h1 {
+            font-family: 'Playfair Display', serif;
+            font-size: 26px;
+            color: var(--primary);
+            letter-spacing: 1px;
+            margin: 0;
+            line-height: 1.2;
+        }
+
+        .church-brand .subtitle {
+            font-size: 13px;
+            color: var(--text-muted);
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            margin-top: 4px;
+            font-weight: 300;
+        }
+
+        /* ===== CARD STYLING ===== */
+        .card {
+            background: var(--card-bg);
+            border: none;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+            overflow: hidden;
+            transition: var(--transition);
+        }
+
+        .card:hover {
+            box-shadow: var(--shadow-hover);
+            transform: translateY(-2px);
+        }
+
+        /* ===== CARD HEADER ===== */
+        .card-header {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            padding: 24px 30px 20px;
+            border: none;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .card-header::before {
+            content: '✝';
+            position: absolute;
+            font-size: 90px;
+            color: rgba(255, 255, 255, 0.05);
+            right: -15px;
+            top: -25px;
+            transform: rotate(15deg);
+        }
+
+        .card-header h3 {
+            font-family: 'Playfair Display', serif;
+            font-weight: 700;
+            color: white;
+            margin: 0;
+            font-size: 24px;
+            letter-spacing: 1px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .card-header .header-sub {
+            font-size: 13px;
+            color: rgba(255, 255, 255, 0.75);
+            font-weight: 300;
+            margin-top: 4px;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* ===== CARD BODY ===== */
+        .card-body {
+            padding: 30px 30px 28px;
+        }
+
+        /* ===== PROGRESS STEPS ===== */
+        .progress-steps {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 28px;
+            position: relative;
+            padding: 0 5px;
+        }
+
+        .progress-steps::before {
+            content: '';
+            position: absolute;
+            top: 18px;
+            left: 30px;
+            right: 30px;
+            height: 2px;
+            background: #E8E3DC;
+            z-index: 0;
+        }
+
+        .step {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            position: relative;
+            z-index: 1;
+            flex: 1;
+        }
+
+        .step-circle {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: #E8E3DC;
+            color: #999;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 14px;
+            transition: var(--transition);
+            border: 3px solid transparent;
+        }
+
+        .step.active .step-circle {
+            background: var(--primary);
+            color: white;
+            border-color: var(--secondary);
+            box-shadow: 0 0 0 4px rgba(212, 175, 55, 0.2);
+        }
+
+        .step.completed .step-circle {
+            background: var(--success);
+            color: white;
+        }
+
+        .step-label {
+            font-size: 11px;
+            margin-top: 6px;
+            color: var(--text-muted);
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            text-align: center;
+        }
+
+        .step.active .step-label {
+            color: var(--primary);
+            font-weight: 600;
+        }
+
+        /* ===== FORM SECTIONS ===== */
+        .form-section {
+            display: none;
+            animation: fadeIn 0.4s ease;
+        }
+
+        .form-section.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* ===== FORM FIELDS ===== */
+        .form-label {
+            font-weight: 600;
+            font-size: 14px;
+            color: var(--text-dark);
+            margin-bottom: 5px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .form-label i {
+            color: var(--primary);
+            font-size: 14px;
+            width: 18px;
+        }
+
+        .form-label .required {
+            color: var(--error);
+            font-size: 16px;
+            margin-left: 2px;
+        }
+
+        .form-control, .form-select {
+            border: 2px solid #E8E3DC;
+            border-radius: 10px;
+            padding: 11px 16px;
+            font-size: 14px;
+            transition: var(--transition);
+            background: #FAF8F6;
+            color: var(--text-dark);
+        }
+
+        .form-control:focus, .form-select:focus {
+            border-color: var(--secondary);
+            box-shadow: 0 0 0 4px rgba(212, 175, 55, 0.15);
+            background: white;
+        }
+
+        .form-control::placeholder {
+            color: #B0A89C;
+            font-weight: 300;
+            font-size: 13px;
+        }
+
+        .form-control.is-valid {
+            border-color: var(--success);
+        }
+
+        .form-control.is-invalid {
+            border-color: var(--error);
+        }
+
+        .invalid-feedback {
+            font-size: 12px;
+            color: var(--error);
+            margin-top: 4px;
+        }
+
+        /* ===== PASSWORD STRENGTH ===== */
+        .password-strength {
+            margin-top: 8px;
+        }
+
+        .strength-bar {
+            height: 4px;
+            background: #E8E3DC;
+            border-radius: 4px;
+            overflow: hidden;
+            margin-bottom: 4px;
+        }
+
+        .strength-bar .fill {
+            height: 100%;
+            width: 0%;
+            transition: var(--transition);
+            border-radius: 4px;
+        }
+
+        .strength-text {
+            font-size: 12px;
+            color: var(--text-muted);
+        }
+
+        /* ===== PASSWORD TOGGLE ===== */
+        .password-toggle {
+            position: absolute;
+            right: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            color: #B0A89C;
+            cursor: pointer;
+            padding: 5px;
+            transition: var(--transition);
+            z-index: 5;
+        }
+
+        .password-toggle:hover {
+            color: var(--primary);
+        }
+
+        /* ===== TERMS CHECKBOX ===== */
+        .terms-check {
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+            margin: 18px 0 22px;
+        }
+
+        .terms-check input[type="checkbox"] {
+            width: 20px;
+            height: 20px;
+            border: 2px solid #D4CEC4;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: var(--transition);
+            flex-shrink: 0;
+            margin-top: 1px;
+            accent-color: var(--primary);
+        }
+
+        .terms-check input[type="checkbox"]:checked {
+            background-color: var(--primary);
+            border-color: var(--primary);
+        }
+
+        .terms-check label {
+            font-size: 13px;
+            color: var(--text-muted);
+            line-height: 1.5;
+        }
+
+        .terms-check label a {
+            color: var(--primary);
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        .terms-check label a:hover {
+            color: var(--secondary);
+            text-decoration: underline;
+        }
+
+        /* ===== BUTTONS ===== */
+        .btn-primary-custom {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            border: none;
+            border-radius: 10px;
+            padding: 13px;
+            font-weight: 600;
+            font-size: 15px;
+            color: white;
+            transition: var(--transition);
+            letter-spacing: 0.5px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn-primary-custom:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(139, 30, 43, 0.35);
+            color: white;
+        }
+
+        .btn-primary-custom:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .btn-secondary-custom {
+            background: transparent;
+            border: 2px solid #D4CEC4;
+            border-radius: 10px;
+            padding: 13px;
+            font-weight: 600;
+            font-size: 15px;
+            color: var(--text-muted);
+            transition: var(--transition);
+        }
+
+        .btn-secondary-custom:hover {
+            border-color: var(--primary);
+            color: var(--primary);
+            background: rgba(139, 30, 43, 0.05);
+        }
+
+        .btn-success-custom {
+            background: var(--success);
+            border: none;
+            border-radius: 10px;
+            padding: 13px;
+            font-weight: 600;
+            font-size: 15px;
+            color: white;
+            transition: var(--transition);
+        }
+
+        .btn-success-custom:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(45, 143, 92, 0.35);
+            color: white;
+        }
+
+        /* ===== DIVIDER ===== */
+        .divider {
+            display: flex;
+            align-items: center;
+            margin: 22px 0;
+        }
+
+        .divider::before,
+        .divider::after {
+            content: '';
+            flex: 1;
+            border-bottom: 2px solid #E8E3DC;
+        }
+
+        .divider-text {
+            padding: 0 20px;
+            font-size: 12px;
+            color: var(--text-muted);
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        /* ===== LOGIN LINK ===== */
+        .login-link {
+            text-align: center;
+            font-size: 14px;
+            color: var(--text-muted);
+        }
+
+        .login-link a {
+            color: var(--primary);
+            text-decoration: none;
+            font-weight: 600;
+            transition: var(--transition);
+        }
+
+        .login-link a:hover {
+            color: var(--secondary);
+            text-decoration: underline;
+        }
+
+        /* ===== TOAST ===== */
+        .toast-container {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            z-index: 9998;
+        }
+
+        .toast-custom {
+            background: white;
+            border-radius: 12px;
+            padding: 16px 24px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.15);
+            border-left: 4px solid var(--success);
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            animation: slideUp 0.4s ease;
+            margin-top: 10px;
+            min-width: 300px;
+            max-width: 450px;
+        }
+
+        .toast-custom i {
+            font-size: 24px;
+            color: var(--success);
+        }
+
+        .toast-custom .msg h6 {
+            margin: 0;
+            font-weight: 600;
+        }
+
+        .toast-custom .msg small {
+            color: var(--text-muted);
+        }
+
+        .toast-custom.toast-danger {
+            border-left-color: var(--error);
+        }
+
+        .toast-custom.toast-danger i {
+            color: var(--error);
+        }
+
+        .toast-custom.toast-warning {
+            border-left-color: #E67E22;
+        }
+
+        .toast-custom.toast-warning i {
+            color: #E67E22;
+        }
+
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* ===== RESPONSIVE ===== */
+        @media (max-width: 576px) {
+            .card-body {
+                padding: 22px 18px 22px;
+            }
+            .card-header {
+                padding: 20px 18px 16px;
+            }
+            .card-header h3 {
+                font-size: 20px;
+            }
+            .church-brand h1 {
+                font-size: 20px;
+            }
+            .church-brand .logo-icon {
+                width: 60px;
+                height: 60px;
+                line-height: 60px;
+                font-size: 34px;
+            }
+            .progress-steps {
+                padding: 0;
+            }
+            .step-label {
+                font-size: 9px;
+            }
+            .step-circle {
+                width: 30px;
+                height: 30px;
+                font-size: 12px;
+            }
+            .form-actions {
+                flex-direction: column;
+                gap: 10px;
+            }
+            .form-actions .btn {
+                width: 100%;
+            }
+        }
+
+        @media (max-width: 400px) {
+            body {
+                padding: 10px;
+            }
+            .card-body {
+                padding: 18px 14px 18px;
+            }
+        }
+
+        /* ===== ANIMATIONS ===== */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .container {
+            animation: fadeInUp 0.6s ease-out;
+        }
+
+        /* ===== SUCCESS OVERLAY ===== */
+        .success-overlay {
+            display: none;
+            text-align: center;
+            padding: 20px 0;
+        }
+
+        .success-overlay.show {
+            display: block;
+        }
+
+        .success-overlay .icon {
+            font-size: 64px;
+            color: var(--success);
+            margin-bottom: 15px;
+        }
+
+        .success-overlay h4 {
+            color: var(--text-dark);
+            margin-bottom: 8px;
+        }
+
+        .success-overlay p {
+            color: var(--text-muted);
+            font-size: 14px;
+        }
+
+        /* ===== LOADING OVERLAY ===== */
+        .loading-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.5);
+            backdrop-filter: blur(4px);
+            z-index: 9999;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .loading-overlay.show {
+            display: flex;
+        }
+
+        .loading-spinner {
+            background: white;
+            border-radius: 16px;
+            padding: 40px 50px;
+            text-align: center;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+
+        .loading-spinner .spinner {
+            width: 50px;
+            height: 50px;
+            border: 4px solid #f0ebe4;
+            border-top-color: var(--secondary);
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            margin: 0 auto 15px;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .loading-spinner h6 {
+            color: var(--primary);
+            font-weight: 600;
+            margin: 0;
+        }
+
+        .loading-spinner small {
+            color: var(--text-muted);
+        }
+    </style>
+</head>
+<body>
+
+    <!-- ===== LOADING OVERLAY ===== -->
+    <div class="loading-overlay" id="loadingOverlay">
+        <div class="loading-spinner">
+            <div class="spinner"></div>
+            <h6>Creating Your Account...</h6>
+            <small>Please wait while we save your information</small>
+        </div>
+    </div>
+
+    <!-- ===== TOAST CONTAINER ===== -->
+    <div class="toast-container" id="toastContainer"></div>
+
+    <div class="container">
+
+        <!-- ===== CHURCH BRANDING ===== -->
+        <div class="church-brand">
+            <div class="logo-icon">
+                <i class="fas fa-church"></i>
+            </div>
+            <h1>CBWCI</h1>
+            <p class="subtitle">Changed By The Word Church International</p>
+        </div>
+
+        <!-- ===== REGISTER CARD ===== -->
+        <div class="card shadow">
+
+            <!-- Card Header -->
+            <div class="card-header text-center">
+                <h3>Join Our Family</h3>
+                <div class="header-sub">Create your account to connect with our community</div>
+            </div>
+
+            <!-- Card Body -->
+            <div class="card-body">
+
+                <!-- ===== PROGRESS STEPS ===== -->
+                <div class="progress-steps">
+                    <div class="step active" id="step1Indicator">
+                        <div class="step-circle">1</div>
+                        <span class="step-label">Personal</span>
+                    </div>
+                    <div class="step" id="step2Indicator">
+                        <div class="step-circle">2</div>
+                        <span class="step-label">Church</span>
+                    </div>
+                    <div class="step" id="step3Indicator">
+                        <div class="step-circle">3</div>
+                        <span class="step-label">Security</span>
+                    </div>
+                </div>
+
+                <!-- ===== FORM ===== -->
+                <form id="registerForm" novalidate>
+
+                    <!-- ===== SECTION 1: PERSONAL INFO ===== -->
+                    <div class="form-section active" id="section1">
+                        <div class="row g-3">
+                            <div class="col-12">
+                                <label class="form-label">
+                                    <i class="fas fa-user"></i> Full Name <span class="required">*</span>
+                                </label>
+                                <input type="text"
+                                       class="form-control"
+                                       placeholder="e.g., John M. Doe"
+                                       id="fullName"
+                                       required>
+                                <div class="invalid-feedback">Please enter your full name</div>
+                            </div>
+
+                            <div class="col-12">
+                                <label class="form-label">
+                                    <i class="fas fa-envelope"></i> Email Address <span class="required">*</span>
+                                </label>
+                                <input type="email"
+                                       class="form-control"
+                                       placeholder="you@email.com"
+                                       id="email"
+                                       required>
+                                <div class="invalid-feedback">Please enter a valid email address</div>
+                            </div>
+
+                            <div class="col-12">
+                                <label class="form-label">
+                                    <i class="fas fa-phone"></i> Phone Number <span class="required">*</span>
+                                </label>
+                                <input type="tel"
+                                       class="form-control"
+                                       placeholder="+27 82 123 4567"
+                                       id="phone"
+                                       required>
+                                <div class="invalid-feedback">Please enter a valid phone number</div>
+                            </div>
+
+                            <div class="col-12">
+                                <label class="form-label">
+                                    <i class="fas fa-calendar-alt"></i> Date of Birth
+                                </label>
+                                <input type="date"
+                                       class="form-control"
+                                       id="dob">
+                            </div>
+                        </div>
+
+                        <div class="form-actions d-flex gap-2 mt-4">
+                            <button type="button" class="btn btn-secondary-custom w-50" disabled>
+                                <i class="fas fa-arrow-left"></i> Back
+                            </button>
+                            <button type="button" class="btn btn-primary-custom w-50" onclick="nextStep(2)">
+                                Next <i class="fas fa-arrow-right"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- ===== SECTION 2: CHURCH INFO ===== -->
+                    <div class="form-section" id="section2">
+                        <div class="row g-3">
+                            <div class="col-12">
+                                <label class="form-label">
+                                    <i class="fas fa-map-marker-alt"></i> Location / Area <span class="required">*</span>
+                                </label>
+                                <select class="form-select" id="location" required>
+                                    <option value="">Select your area...</option>
+                                    <option value="Sonheuwel">Sonheuwel</option>
+                                    <option value="West Acres">West Acres</option>
+                                    <option value="Stonehenge">Stonehenge</option>
+                                    <option value="Belladonna">Belladonna</option>
+                                    <option value="Mataffin">Mataffin</option>
+                                    <option value="Nelspruit Town CBD">Nelspruit Town CBD</option>
+                                    <option value="Msholozi">Msholozi</option>
+                                    <option value="WhiteRiver">WhiteRiver</option>
+                                    <option value="Ngodini">Ngodini</option>
+                                    <option value="HazyView">HazyView</option>
+                                    <option value="Other">Other (Please specify)</option>
+                                </select>
+                                <div class="invalid-feedback">Please select your location</div>
+                            </div>
+
+                            <div class="col-12" id="otherLocationDiv" style="display:none;">
+                                <label class="form-label">
+                                    <i class="fas fa-map-pin"></i> Specify Location
+                                </label>
+                                <input type="text"
+                                       class="form-control"
+                                       placeholder="Enter your location"
+                                       id="otherLocation">
+                            </div>
+
+                            <div class="col-12">
+                                <label class="form-label">
+                                    <i class="fas fa-users"></i> How did you hear about us?
+                                </label>
+                                <select class="form-select" id="heardFrom">
+                                    <option value="">Select...</option>
+                                    <option value="Friend">Friend / Family</option>
+                                    <option value="Social Media">Social Media</option>
+                                    <option value="Flyer">Flyer / Poster</option>
+                                    <option value="Taxi">Taxi Service</option>
+                                    <option value="Online">Online Search</option>
+                                    <option value="Other">Other</option>
+                                </select>
+                            </div>
+
+                            <div class="col-12">
+                                <label class="form-label">
+                                    <i class="fas fa-taxi"></i> Need Taxi Service?
+                                </label>
+                                <select class="form-select" id="needsTaxi">
+                                    <option value="no">No, I'll arrange my own transport</option>
+                                    <option value="yes">Yes, I need a church taxi</option>
+                                    <option value="maybe">Maybe, I'll decide later</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="form-actions d-flex gap-2 mt-4">
+                            <button type="button" class="btn btn-secondary-custom w-50" onclick="prevStep(1)">
+                                <i class="fas fa-arrow-left"></i> Back
+                            </button>
+                            <button type="button" class="btn btn-primary-custom w-50" onclick="nextStep(3)">
+                                Next <i class="fas fa-arrow-right"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- ===== SECTION 3: SECURITY ===== -->
+                    <div class="form-section" id="section3">
+                        <div class="row g-3">
+                            <div class="col-12">
+                                <label class="form-label">
+                                    <i class="fas fa-lock"></i> Create Password <span class="required">*</span>
+                                </label>
+                                <div class="input-group">
+                                    <input type="password"
+                                           class="form-control"
+                                           placeholder="Min 8 characters"
+                                           id="password"
+                                           required
+                                           minlength="8">
+                                    <button type="button"
+                                            class="password-toggle"
+                                            onclick="togglePasswordVisibility('password')"
+                                            aria-label="Toggle password visibility">
+                                        <i class="fas fa-eye"></i>
+                                    </button>
+                                </div>
+                                <div class="password-strength">
+                                    <div class="strength-bar">
+                                        <div class="fill" id="strengthFill"></div>
+                                    </div>
+                                    <span class="strength-text" id="strengthText">Enter a strong password</span>
+                                </div>
+                                <div class="invalid-feedback">Password must be at least 8 characters</div>
+                            </div>
+
+                            <div class="col-12">
+                                <label class="form-label">
+                                    <i class="fas fa-check-circle"></i> Confirm Password <span class="required">*</span>
+                                </label>
+                                <div class="input-group">
+                                    <input type="password"
+                                           class="form-control"
+                                           placeholder="Confirm your password"
+                                           id="confirmPassword"
+                                           required>
+                                    <button type="button"
+                                            class="password-toggle"
+                                            onclick="togglePasswordVisibility('confirmPassword')"
+                                            aria-label="Toggle password visibility">
+                                        <i class="fas fa-eye"></i>
+                                    </button>
+                                </div>
+                                <div class="invalid-feedback" id="passwordMatchError">Passwords do not match</div>
+                            </div>
+
+                            <!-- Terms -->
+                            <div class="col-12">
+                                <div class="terms-check">
+                                    <input type="checkbox" id="termsCheck" required>
+                                    <label for="termsCheck">
+                                        I agree to the
+                                        <a href="#" data-bs-toggle="modal" data-bs-target="#termsModal">Terms of Service</a>
+                                        and
+                                        <a href="#" data-bs-toggle="modal" data-bs-target="#privacyModal">Privacy Policy</a>.
+                                        I understand that my data will be used for church communication and ministry purposes.
+                                    </label>
+                                </div>
+                                <div class="invalid-feedback" id="termsError">You must agree to the terms</div>
+                            </div>
+                        </div>
+
+                        <div class="form-actions d-flex gap-2 mt-3">
+                            <button type="button" class="btn btn-secondary-custom w-50" onclick="prevStep(2)">
+                                <i class="fas fa-arrow-left"></i> Back
+                            </button>
+                            <button type="submit" class="btn btn-success-custom w-50" id="registerBtn">
+                                <span class="btn-text">
+                                    <i class="fas fa-user-plus"></i> Create Account
+                                </span>
+                                <span class="spinner" style="display:none;">
+                                    <i class="fas fa-spinner fa-spin"></i> Creating...
+                                </span>
+                            </button>
+                        </div>
+                    </div>
+
+                </form>
+
+                <!-- ===== SUCCESS MESSAGE ===== -->
+                <div class="success-overlay" id="successOverlay">
+                    <div class="icon">
+                        <i class="fas fa-check-circle"></i>
+                    </div>
+                    <h4>🎉 Registration Successful!</h4>
+                    <p>Welcome to the CBWCI family! A confirmation email has been sent to your inbox.</p>
+                    <a href="login.html" class="btn btn-primary-custom w-100 mt-3">
+                        <i class="fas fa-sign-in-alt"></i> Go to Login
+                    </a>
+                </div>
+
+                <!-- ===== DIVIDER ===== -->
+                <div class="divider">
+                    <span class="divider-text">Already a member?</span>
+                </div>
+
+                <!-- ===== LOGIN LINK ===== -->
+                <div class="login-link">
+                    <i class="fas fa-arrow-right" style="color: var(--secondary);"></i>
+                    <a href="login.html">Sign in to your account</a>
+                </div>
+
+            </div>
+            <!-- End Card Body -->
+
+        </div>
+        <!-- End Card -->
+
+        <!-- Footer -->
+        <p class="text-center mt-4" style="font-size: 12px; color: var(--text-muted); opacity: 0.7;">
+            <i class="fas fa-heart" style="color: var(--primary);"></i>
+            Changed By The Word Church International &bull; Est. 2020
+        </p>
+
+    </div>
+
+    <!-- ===== MODALS (Terms & Privacy) ===== -->
+    <!-- Terms Modal -->
+    <div class="modal fade" id="termsModal" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header" style="background: var(--primary); color: white;">
+                    <h5 class="modal-title"><i class="fas fa-file-contract"></i> Terms of Service</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body" style="max-height: 400px; overflow-y: auto;">
+                    <p><strong>Welcome to CBWCI Community!</strong></p>
+                    <p>By registering, you agree to:</p>
+                    <ul>
+                        <li>Treat all members with love and respect</li>
+                        <li>Use the platform for church-related activities</li>
+                        <li>Keep your login credentials secure</li>
+                        <li>Receive church announcements and updates</li>
+                        <li>Not share inappropriate content</li>
+                    </ul>
+                    <p><em>"Let all things be done with love." - 1 Corinthians 16:14</em></p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary-custom" data-bs-dismiss="modal">I Understand</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Privacy Modal -->
+    <div class="modal fade" id="privacyModal" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header" style="background: var(--primary); color: white;">
+                    <h5 class="modal-title"><i class="fas fa-shield-alt"></i> Privacy Policy</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body" style="max-height: 400px; overflow-y: auto;">
+                    <p><strong>Your privacy matters to us.</strong></p>
+                    <p>CBWCI collects your information to:</p>
+                    <ul>
+                        <li>Send you church updates and announcements</li>
+                        <li>Coordinate taxi services and follow-ups</li>
+                        <li>Connect you with ministry groups</li>
+                    </ul>
+                    <p>We will <strong>never</strong> sell or share your data with third parties.</p>
+                    <p>You can opt-out of communications at any time.</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary-custom" data-bs-dismiss="modal">I Agree</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== BOOTSTRAP JS ===== -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js">
+    </script>
+
+    <!-- ======================================== -->
+    <!-- FIREBASE IMPORT MAP (REALTIME DATABASE) -->
+    <!-- ======================================== -->
+    <script type="importmap">
+    {
+        "imports": {
+            "firebase/app": "https://www.gstatic.com/firebasejs/11.3.0/firebase-app.js",
+            "firebase/auth": "https://www.gstatic.com/firebasejs/11.3.0/firebase-auth.js",
+            "firebase/database": "https://www.gstatic.com/firebasejs/11.3.0/firebase-database.js"
+        }
+    }
+    </script>
+
+    <!-- ======================================== -->
+    <!-- CUSTOM JAVASCRIPT WITH REALTIME DATABASE -->
+    <!-- ======================================== -->
+    <script type="module">
+        // ========================================
+        // 1. IMPORT FIREBASE MODULES
+        // ========================================
+        import { initializeApp } from "firebase/app";
+        import { 
+            getAuth, 
+            createUserWithEmailAndPassword, 
+            sendEmailVerification,
+            signOut
+        } from "firebase/auth";
+        import { 
+            getDatabase, 
+            ref, 
+            set, 
+            serverTimestamp,
+            get,
+            child
+        } from "firebase/database";
+
+        // ========================================
+        // 2. FIREBASE CONFIGURATION
+        // ========================================
+        const firebaseConfig = {
+            apiKey: "AIzaSyBhXS5EOZjEAahTjk8XPd-9PkG3HeKV8bg",
+            authDomain: "cbwci-892de.firebaseapp.com",
+            projectId: "cbwci-892de",
+            storageBucket: "cbwci-892de.firebasestorage.app",
+            messagingSenderId: "187272132769",
+            appId: "1:187272132769:web:63a9fcba465e54867d98e0",
+            databaseURL: "https://cbwci-892de-default-rtdb.firebaseio.com"
+        };
+
+        // ========================================
+        // 3. INITIALIZE FIREBASE
+        // ========================================
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getDatabase(app);
+
+        console.log('✅ Firebase initialized with Realtime Database!');
+
+        // ========================================
+        // 4. STEP NAVIGATION
+        // ========================================
+        let currentStep = 1;
+        const totalSteps = 3;
+
+        window.nextStep = function(step) {
+            if (!validateSection(currentStep)) {
+                return;
+            }
+
+            document.getElementById(`section${currentStep}`).classList.remove('active');
+            document.getElementById(`step${currentStep}Indicator`).classList.remove('active');
+            document.getElementById(`step${currentStep}Indicator`).classList.add('completed');
+
+            currentStep = step;
+
+            document.getElementById(`section${currentStep}`).classList.add('active');
+            document.getElementById(`step${currentStep}Indicator`).classList.add('active');
+
+            document.querySelector('.card').scrollIntoView({ behavior: 'smooth', block: 'start' });
+        };
+
+        window.prevStep = function(step) {
+            document.getElementById(`section${currentStep}`).classList.remove('active');
+            document.getElementById(`step${currentStep}Indicator`).classList.remove('active');
+
+            currentStep = step;
+
+            document.getElementById(`section${currentStep}`).classList.add('active');
+            document.getElementById(`step${currentStep}Indicator`).classList.add('active');
+        };
+
+        // ========================================
+        // 5. FORM VALIDATION
+        // ========================================
+        function validateSection(section) {
+            const sectionEl = document.getElementById(`section${section}`);
+            const inputs = sectionEl.querySelectorAll('input[required], select[required]');
+            let valid = true;
+
+            inputs.forEach(input => {
+                if (!input.value || input.value === '') {
+                    input.classList.add('is-invalid');
+                    valid = false;
+                } else {
+                    input.classList.remove('is-invalid');
+                    input.classList.add('is-valid');
+                }
+            });
+
+            if (section === 3) {
+                const password = document.getElementById('password');
+                const confirmPassword = document.getElementById('confirmPassword');
+                const termsCheck = document.getElementById('termsCheck');
+
+                if (password.value.length < 8) {
+                    password.classList.add('is-invalid');
+                    valid = false;
+                } else {
+                    password.classList.remove('is-invalid');
+                    password.classList.add('is-valid');
+                }
+
+                if (confirmPassword.value !== password.value || confirmPassword.value === '') {
+                    confirmPassword.classList.add('is-invalid');
+                    document.getElementById('passwordMatchError').style.display = 'block';
+                    valid = false;
+                } else {
+                    confirmPassword.classList.remove('is-invalid');
+                    document.getElementById('passwordMatchError').style.display = 'none';
+                }
+
+                if (!termsCheck.checked) {
+                    document.getElementById('termsError').style.display = 'block';
+                    valid = false;
+                } else {
+                    document.getElementById('termsError').style.display = 'none';
+                }
+            }
+
+            return valid;
+        }
+
+        // ========================================
+        // 6. PASSWORD STRENGTH CHECKER
+        // ========================================
+        document.getElementById('password').addEventListener('input', function() {
+            const password = this.value;
+            const fill = document.getElementById('strengthFill');
+            const text = document.getElementById('strengthText');
+
+            let strength = 0;
+            let color = '#E8E3DC';
+            let message = 'Enter a strong password';
+
+            if (password.length >= 8) strength += 25;
+            if (password.match(/[a-z]/)) strength += 25;
+            if (password.match(/[A-Z]/)) strength += 25;
+            if (password.match(/[0-9!@#$%^&*]/)) strength += 25;
+
+            if (strength <= 25) {
+                color = '#C0392B';
+                message = 'Weak - Add more characters, numbers, and symbols';
+            } else if (strength <= 50) {
+                color = '#E67E22';
+                message = 'Fair - Add uppercase letters and symbols';
+            } else if (strength <= 75) {
+                color = '#F1C40F';
+                message = 'Good - Almost there!';
+            } else {
+                color = '#2D8F5C';
+                message = 'Strong - Great password!';
+            }
+
+            fill.style.width = strength + '%';
+            fill.style.background = color;
+            text.textContent = message;
+            text.style.color = color;
+        });
+
+        // ========================================
+        // 7. PASSWORD TOGGLE
+        // ========================================
+        window.togglePasswordVisibility = function(fieldId) {
+            const field = document.getElementById(fieldId);
+            const type = field.getAttribute('type') === 'password' ? 'text' : 'password';
+            field.setAttribute('type', type);
+
+            const toggleBtn = field.parentElement.querySelector('.password-toggle i');
+            toggleBtn.classList.toggle('fa-eye');
+            toggleBtn.classList.toggle('fa-eye-slash');
+        };
+
+        // ========================================
+        // 8. LOCATION "OTHER" FIELD TOGGLE
+        // ========================================
+        document.getElementById('location').addEventListener('change', function() {
+            const otherDiv = document.getElementById('otherLocationDiv');
+            if (this.value === 'Other') {
+                otherDiv.style.display = 'block';
+                document.getElementById('otherLocation').required = true;
+            } else {
+                otherDiv.style.display = 'none';
+                document.getElementById('otherLocation').required = false;
+            }
+        });
+
+        // ========================================
+        // 9. REAL-TIME PASSWORD MATCH CHECK
+        // ========================================
+        document.getElementById('confirmPassword').addEventListener('input', function() {
+            const password = document.getElementById('password').value;
+            const matchError = document.getElementById('passwordMatchError');
+
+            if (this.value && this.value !== password) {
+                this.classList.add('is-invalid');
+                matchError.style.display = 'block';
+            } else {
+                this.classList.remove('is-invalid');
+                matchError.style.display = 'none';
+            }
+        });
+
+        // ========================================
+        // 10. SHOW TOAST NOTIFICATION
+        // ========================================
+        function showToast(title, message, type = 'success') {
+            const container = document.getElementById('toastContainer');
+            const iconMap = {
+                'success': 'fa-check-circle',
+                'danger': 'fa-exclamation-circle',
+                'warning': 'fa-exclamation-triangle',
+                'info': 'fa-info-circle'
+            };
+            const colorMap = {
+                'success': 'var(--success)',
+                'danger': 'var(--error)',
+                'warning': '#E67E22',
+                'info': '#2980B9'
+            };
+
+            const toast = document.createElement('div');
+            toast.className = `toast-custom ${type === 'danger' ? 'toast-danger' : ''} ${type === 'warning' ? 'toast-warning' : ''}`;
+            toast.innerHTML = `
+                <i class="fas ${iconMap[type] || 'fa-check-circle'}" style="color: ${colorMap[type] || 'var(--success)'};"></i>
+                <div class="msg">
+                    <h6>${title}</h6>
+                    <small>${message}</small>
+                </div>
+            `;
+
+            container.appendChild(toast);
+
+            setTimeout(() => {
+                toast.style.opacity = '0';
+                toast.style.transform = 'translateX(50px)';
+                setTimeout(() => toast.remove(), 400);
+            }, 6000);
+        }
+
+        window.showToast = showToast;
+
+        // ========================================
+        // 11. CHECK IF USER EXISTS IN REALTIME DATABASE
+        // ========================================
+        async function checkUserExists(uid) {
+            try {
+                const userRef = ref(db, `users/${uid}`);
+                const snapshot = await get(userRef);
+                return snapshot.exists();
+            } catch (error) {
+                console.error('❌ Error checking user:', error);
+                return false;
+            }
+        }
+
+        // ========================================
+        // 12. FORM SUBMISSION WITH REALTIME DATABASE
+        // ========================================
+        document.getElementById('registerForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+
+            // Validate all sections
+            let allValid = true;
+            for (let i = 1; i <= totalSteps; i++) {
+                if (!validateSection(i)) {
+                    allValid = false;
+                    if (i !== currentStep) {
+                        document.getElementById(`section${currentStep}`).classList.remove('active');
+                        document.getElementById(`step${currentStep}Indicator`).classList.remove('active');
+                        currentStep = i;
+                        document.getElementById(`section${currentStep}`).classList.add('active');
+                        document.getElementById(`step${currentStep}Indicator`).classList.add('active');
+                    }
+                    break;
+                }
+            }
+
+            if (!allValid) {
+                return;
+            }
+
+            // Get form values
+            const name = document.getElementById('fullName').value.trim();
+            const email = document.getElementById('email').value.trim();
+            const phone = document.getElementById('phone').value.trim();
+            const dob = document.getElementById('dob').value;
+            const location = document.getElementById('location').value;
+            const otherLocation = document.getElementById('otherLocation').value;
+            const heardFrom = document.getElementById('heardFrom').value;
+            const needsTaxi = document.getElementById('needsTaxi').value;
+            const password = document.getElementById('password').value;
+
+            // Show loading overlay
+            document.getElementById('loadingOverlay').classList.add('show');
+
+            // Disable submit button
+            const btn = document.getElementById('registerBtn');
+            btn.disabled = true;
+            btn.querySelector('.btn-text').style.display = 'none';
+            btn.querySelector('.spinner').style.display = 'inline';
+
+            try {
+                // ✅ STEP 1: Create user in Firebase Authentication
+                const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+                const user = userCredential.user;
+                console.log('✅ User created in Auth:', user.uid);
+
+                // ✅ STEP 2: Send email verification
+                try {
+                    await sendEmailVerification(user);
+                    console.log('📧 Verification email sent to:', email);
+                } catch (emailError) {
+                    console.warn('⚠️ Email verification not sent:', emailError.message);
+                }
+
+                // ✅ STEP 3: Save user data to Realtime Database
+                const finalLocation = location === 'Other' ? otherLocation : location;
+                const now = new Date().toISOString();
+
+                await set(ref(db, `users/${user.uid}`), {
+                    uid: user.uid,
+                    name: name,
+                    email: email,
+                    phone: phone,
+                    dateOfBirth: dob || '',
+                    location: finalLocation,
+                    heardFrom: heardFrom || '',
+                    needsTaxi: needsTaxi,
+                    role: 'member',
+                    status: 'active',
+                    createdAt: now,
+                    updatedAt: now
+                });
+
+                console.log('✅ User data saved to Realtime Database:', {
+                    name,
+                    email,
+                    phone,
+                    location: finalLocation,
+                    needsTaxi
+                });
+
+                // ✅ STEP 4: Store user info in session
+                sessionStorage.setItem('userName', name);
+                sessionStorage.setItem('userEmail', email);
+                sessionStorage.setItem('userUid', user.uid);
+
+                // ✅ STEP 5: Show success message
+                document.getElementById('registerForm').style.display = 'none';
+                document.querySelector('.progress-steps').style.display = 'none';
+                document.getElementById('successOverlay').classList.add('show');
+
+                showToast(
+                    '🎉 Registration Successful!',
+                    'Welcome to CBWCI! Please check your email to verify your account.',
+                    'success'
+                );
+
+            } catch (error) {
+                console.error('❌ Registration Error:', error);
+                console.error('Error Code:', error.code);
+                console.error('Error Message:', error.message);
+
+                let errorMessage = 'Registration failed. Please try again.';
+                let errorType = 'danger';
+
+                switch (error.code) {
+                    case 'auth/email-already-in-use':
+                        errorMessage = 'This email is already registered. Please <a href="login.html" style="color: var(--secondary); text-decoration: underline;">login</a> or use a different email.';
+                        errorType = 'warning';
+                        break;
+                    case 'auth/invalid-email':
+                        errorMessage = 'Please enter a valid email address.';
+                        break;
+                    case 'auth/weak-password':
+                        errorMessage = 'Password is too weak. Please use at least 8 characters with letters and numbers.';
+                        break;
+                    case 'auth/network-request-failed':
+                        errorMessage = 'Network error. Please check your internet connection.';
+                        break;
+                    case 'auth/operation-not-allowed':
+                        errorMessage = 'Email/Password sign-in is not enabled. Please contact the church admin.';
+                        break;
+                    default:
+                        errorMessage = error.message;
+                }
+
+                showToast('❌ Registration Failed', errorMessage, errorType);
+
+                // Re-enable the button
+                btn.disabled = false;
+                btn.querySelector('.btn-text').style.display = 'inline';
+                btn.querySelector('.spinner').style.display = 'none';
+
+            } finally {
+                // Hide loading overlay
+                document.getElementById('loadingOverlay').classList.remove('show');
+            }
+        });
+
+        // ========================================
+        // 13. INPUT CLEANUP
+        // ========================================
+        document.querySelectorAll('input, select').forEach(el => {
+            el.addEventListener('input', function() {
+                this.classList.remove('is-invalid', 'is-valid');
+            });
+            el.addEventListener('change', function() {
+                this.classList.remove('is-invalid', 'is-valid');
+            });
+        });
+
+        // ========================================
+        // 14. KEYBOARD SHORTCUTS
+        // ========================================
+        document.addEventListener('keydown', function(e) {
+            if (e.ctrlKey && e.key === 'Enter') {
+                document.getElementById('registerForm').dispatchEvent(new Event('submit'));
+            }
+        });
+
+        // ========================================
+        // 15. CONSOLE WELCOME
+        // ========================================
+        console.log('✝ Welcome to CBWCI Registration! ✝');
+        console.log('📖 "Therefore, if anyone is in Christ, the new creation has come." - 2 Corinthians 5:17');
+        console.log('🗄️ Using Firebase Realtime Database');
+        console.log('🔐 Firebase Authentication is ready!');
+    </script>
+
+</body>
+</html>

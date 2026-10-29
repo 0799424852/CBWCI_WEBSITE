@@ -1,0 +1,1491 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CBWCI - Changed By The Word Church International</title>
+    
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <!-- Font Awesome Icons -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- AOS Animation Library -->
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+    
+    <style>
+        /* ===== CBWCI BRAND COLORS ===== */
+        :root {
+            --cbwci-purple: #4A1942;
+            --cbwci-purple-light: #6B2D5F;
+            --cbwci-purple-dark: #2E0F28;
+            --cbwci-gold: #C9A84C;
+            --cbwci-gold-light: #E8CD7A;
+            --cbwci-gold-dark: #A8893A;
+            --cbwci-cream: #FDF8F0;
+            --cbwci-dark: #1A0F16;
+            --cbwci-text: #2C1A24;
+            --cbwci-muted: #7A6A72;
+            --shadow: 0 10px 40px rgba(74, 25, 66, 0.15);
+            --shadow-hover: 0 15px 50px rgba(74, 25, 66, 0.25);
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        /* ===== GLOBAL ===== */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--cbwci-cream);
+            color: var(--cbwci-text);
+            overflow-x: hidden;
+        }
+
+        /* ===== SCROLLBAR ===== */
+        ::-webkit-scrollbar {
+            width: 10px;
+        }
+        ::-webkit-scrollbar-track {
+            background: var(--cbwci-cream);
+        }
+        ::-webkit-scrollbar-thumb {
+            background: var(--cbwci-purple);
+            border-radius: 10px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--cbwci-gold);
+        }
+
+        /* ===== NAVBAR ===== */
+        .navbar {
+            background: rgba(74, 25, 66, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 12px 0;
+            box-shadow: 0 4px 30px rgba(0,0,0,0.2);
+            transition: var(--transition);
+            border-bottom: 3px solid var(--cbwci-gold);
+        }
+
+        .navbar.scrolled {
+            padding: 8px 0;
+            background: rgba(46, 15, 40, 0.98);
+        }
+
+        .navbar-brand {
+            font-family: 'Playfair Display', serif;
+            font-weight: 900;
+            font-size: 20px;
+            color: white !important;
+            letter-spacing: 2px;
+        }
+
+        .navbar-brand .gold {
+            color: var(--cbwci-gold);
+            display: block;
+            font-size: 14px;
+            letter-spacing: 4px;
+        }
+
+        .navbar-brand i {
+            color: var(--cbwci-gold);
+            margin-right: 10px;
+        }
+
+        .nav-link {
+            color: rgba(255,255,255,0.8) !important;
+            font-weight: 500;
+            font-size: 14px;
+            letter-spacing: 1px;
+            transition: var(--transition);
+            padding: 8px 18px !important;
+            border-radius: 8px;
+            position: relative;
+        }
+
+        .nav-link:hover {
+            color: var(--cbwci-gold) !important;
+            background: rgba(201, 168, 76, 0.1);
+        }
+
+        .nav-link .badge {
+            background: var(--cbwci-gold);
+            color: var(--cbwci-purple-dark);
+            font-size: 10px;
+            padding: 2px 8px;
+            border-radius: 20px;
+            margin-left: 5px;
+        }
+
+        .nav-link.active {
+            color: var(--cbwci-gold) !important;
+        }
+
+        /* Account Dropdown */
+        .dropdown-menu {
+            background: var(--cbwci-purple-dark) !important;
+            border: 1px solid rgba(201,168,76,0.2) !important;
+            border-radius: 12px !important;
+            padding: 8px 0 !important;
+            min-width: 200px !important;
+        }
+
+        .dropdown-menu .dropdown-item {
+            color: rgba(255,255,255,0.8) !important;
+            padding: 10px 20px !important;
+            font-size: 14px !important;
+            transition: var(--transition) !important;
+        }
+
+        .dropdown-menu .dropdown-item:hover {
+            background: rgba(201,168,76,0.15) !important;
+            color: var(--cbwci-gold) !important;
+        }
+
+        .dropdown-menu .dropdown-item i {
+            margin-right: 10px;
+            color: var(--cbwci-gold);
+            width: 20px;
+        }
+
+        .dropdown-menu .dropdown-divider {
+            border-color: rgba(255,255,255,0.08) !important;
+        }
+
+        .dropdown-menu .dropdown-item.requires-login {
+            color: rgba(255,255,255,0.5) !important;
+        }
+
+        .dropdown-menu .dropdown-item.requires-login i {
+            color: rgba(201,168,76,0.4);
+        }
+
+        .dropdown-menu .dropdown-item.requires-login:hover {
+            background: transparent !important;
+            color: rgba(255,255,255,0.5) !important;
+        }
+
+        /* ===== HERO SECTION ===== */
+        .hero {
+            min-height: 100vh;
+            background-color: #101223;
+            background-image: linear-gradient(rgba(15, 18, 35, 0.72), rgba(35, 15, 34, 0.78)), url("/static/img/church-hero.jpeg");
+            background-position: center;
+            background-size: contain;
+            background-repeat: no-repeat;
+            position: relative;
+            display: flex;
+            align-items: center;
+            padding: 100px 0 80px;
+            overflow: hidden;
+        }
+
+        .hero::before {
+            content: '✝';
+            position: absolute;
+            font-size: 600px;
+            color: rgba(201, 168, 76, 0.04);
+            right: -100px;
+            bottom: -200px;
+            transform: rotate(15deg);
+        }
+
+        .hero::after {
+            content: '';
+            position: absolute;
+            top: -300px;
+            right: -300px;
+            width: 700px;
+            height: 700px;
+            background: radial-gradient(circle, rgba(201, 168, 76, 0.06) 0%, transparent 70%);
+            border-radius: 50%;
+        }
+
+        .hero .container {
+            position: relative;
+            z-index: 1;
+        }
+
+        .hero-badge {
+            display: inline-block;
+            background: rgba(201, 168, 76, 0.15);
+            border: 1px solid rgba(201, 168, 76, 0.3);
+            padding: 6px 20px;
+            border-radius: 50px;
+            color: var(--cbwci-gold-light);
+            font-size: 12px;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            margin-bottom: 20px;
+        }
+
+        .hero h1 {
+            font-family: 'Playfair Display', serif;
+            font-weight: 900;
+            font-size: 62px;
+            color: white;
+            line-height: 1.1;
+            margin-bottom: 15px;
+        }
+
+        .hero h1 .gold {
+            color: var(--cbwci-gold);
+        }
+
+        .hero h1 .highlight {
+            background: linear-gradient(135deg, var(--cbwci-gold), var(--cbwci-gold-light));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .hero p {
+            color: rgba(255,255,255,0.8);
+            font-size: 18px;
+            line-height: 1.8;
+            max-width: 550px;
+            margin-bottom: 30px;
+            font-weight: 300;
+        }
+
+        .hero .btn-primary-hero {
+            background: linear-gradient(135deg, var(--cbwci-gold), var(--cbwci-gold-dark));
+            border: none;
+            padding: 16px 40px;
+            border-radius: 12px;
+            font-weight: 700;
+            font-size: 16px;
+            color: var(--cbwci-purple-dark);
+            transition: var(--transition);
+            letter-spacing: 1px;
+            margin-right: 15px;
+        }
+
+        .hero .btn-primary-hero:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 40px rgba(201, 168, 76, 0.3);
+        }
+
+        .hero .btn-secondary-hero {
+            background: transparent;
+            border: 2px solid rgba(255,255,255,0.3);
+            padding: 16px 35px;
+            border-radius: 12px;
+            font-weight: 600;
+            font-size: 16px;
+            color: white;
+            transition: var(--transition);
+        }
+
+        .hero .btn-secondary-hero:hover {
+            background: rgba(255,255,255,0.1);
+            border-color: white;
+            transform: translateY(-3px);
+        }
+
+        .hero-stats {
+            display: flex;
+            gap: 50px;
+            margin-top: 50px;
+        }
+
+        .hero-stats .stat h3 {
+            color: var(--cbwci-gold);
+            font-family: 'Playfair Display', serif;
+            font-weight: 900;
+            font-size: 36px;
+            margin-bottom: 0;
+        }
+
+        .hero-stats .stat p {
+            color: rgba(255,255,255,0.6);
+            font-size: 13px;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            margin: 0;
+        }
+
+        /* Hero Image */
+        .hero-image-wrapper {
+            position: relative;
+        }
+
+        .hero-image-wrapper .floating-card {
+            position: absolute;
+            background: rgba(255,255,255,0.1);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 16px;
+            padding: 16px 24px;
+            color: white;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            animation: float 6s ease-in-out infinite;
+        }
+
+        .floating-card.card-1 {
+            top: 10%;
+            right: -10%;
+            animation-delay: 0s;
+        }
+
+        .floating-card.card-2 {
+            bottom: 20%;
+            left: -10%;
+            animation-delay: 2s;
+        }
+
+        .floating-card i {
+            font-size: 28px;
+            color: var(--cbwci-gold);
+        }
+
+        .floating-card .text small {
+            display: block;
+            font-size: 11px;
+            opacity: 0.7;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-15px); }
+        }
+
+        /* ===== SECTION TITLES ===== */
+        .section-title {
+            font-family: 'Playfair Display', serif;
+            font-weight: 700;
+            font-size: 40px;
+            color: var(--cbwci-purple);
+            margin-bottom: 10px;
+        }
+
+        .section-title .gold {
+            color: var(--cbwci-gold);
+        }
+
+        .section-subtitle {
+            color: var(--cbwci-muted);
+            font-size: 16px;
+            max-width: 600px;
+            margin: 0 auto 40px;
+        }
+
+        .section-divider {
+            width: 80px;
+            height: 4px;
+            background: linear-gradient(90deg, var(--cbwci-gold), var(--cbwci-gold-light));
+            margin: 0 auto 20px;
+            border-radius: 4px;
+        }
+
+        /* ===== FEATURES / SERVICES ===== */
+        .features-section {
+            padding: 80px 0;
+            background: white;
+        }
+
+        .feature-card {
+            background: var(--cbwci-cream);
+            border-radius: 16px;
+            padding: 35px 28px;
+            transition: var(--transition);
+            border: 1px solid rgba(201, 168, 76, 0.1);
+            height: 100%;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .feature-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--cbwci-gold), var(--cbwci-gold-light));
+            transform: scaleX(0);
+            transition: var(--transition);
+        }
+
+        .feature-card:hover::before {
+            transform: scaleX(1);
+        }
+
+        .feature-card:hover {
+            transform: translateY(-8px);
+            box-shadow: var(--shadow-hover);
+            border-color: var(--cbwci-gold);
+        }
+
+        .feature-card .icon {
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, var(--cbwci-purple), var(--cbwci-purple-dark));
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 18px;
+            color: var(--cbwci-gold);
+            font-size: 26px;
+        }
+
+        .feature-card h5 {
+            font-weight: 700;
+            font-size: 18px;
+            color: var(--cbwci-purple);
+            margin-bottom: 10px;
+        }
+
+        .feature-card p {
+            color: var(--cbwci-muted);
+            font-size: 14px;
+            line-height: 1.7;
+            margin-bottom: 15px;
+        }
+
+        .feature-card .learn-more {
+            color: var(--cbwci-gold-dark);
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 14px;
+            transition: var(--transition);
+        }
+
+        .feature-card .learn-more:hover {
+            color: var(--cbwci-purple);
+        }
+
+        /* ===== ABOUT SECTION ===== */
+        .about-section {
+            padding: 80px 0;
+            background: var(--cbwci-cream);
+        }
+
+        .about-section .about-image {
+            border-radius: 16px;
+            background: linear-gradient(135deg, var(--cbwci-purple), var(--cbwci-purple-dark));
+            padding: 60px 40px;
+            text-align: center;
+            color: white;
+            min-height: 350px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .about-section .about-image::before {
+            content: '✝';
+            position: absolute;
+            font-size: 200px;
+            color: rgba(201, 168, 76, 0.06);
+            bottom: -40px;
+            right: -20px;
+        }
+
+        .about-section .about-image i {
+            font-size: 64px;
+            color: var(--cbwci-gold);
+            margin-bottom: 20px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .about-section .about-image h3 {
+            font-family: 'Playfair Display', serif;
+            position: relative;
+            z-index: 1;
+        }
+
+        .about-section .about-image p {
+            opacity: 0.8;
+            position: relative;
+            z-index: 1;
+            max-width: 300px;
+        }
+
+        .about-section .about-content h4 {
+            font-family: 'Playfair Display', serif;
+            color: var(--cbwci-purple);
+            font-weight: 700;
+        }
+
+        .about-section .about-content .highlight-text {
+            color: var(--cbwci-gold-dark);
+            font-weight: 600;
+        }
+
+        .about-section .about-content ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        .about-section .about-content ul li {
+            padding: 8px 0;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            color: var(--cbwci-text);
+        }
+
+        .about-section .about-content ul li i {
+            color: var(--cbwci-gold);
+            font-size: 18px;
+            width: 24px;
+        }
+
+        /* ===== LOCATIONS SECTION ===== */
+        .locations-section {
+            padding: 80px 0;
+            background: white;
+        }
+
+        .location-pill {
+            display: inline-block;
+            background: var(--cbwci-cream);
+            border: 1px solid rgba(201, 168, 76, 0.2);
+            padding: 12px 24px;
+            border-radius: 50px;
+            margin: 6px;
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--cbwci-text);
+            transition: var(--transition);
+        }
+
+        .location-pill:hover {
+            background: var(--cbwci-purple);
+            color: white;
+            border-color: var(--cbwci-purple);
+            transform: translateY(-3px);
+            box-shadow: var(--shadow);
+        }
+
+        .location-pill i {
+            color: var(--cbwci-gold);
+            margin-right: 8px;
+        }
+
+        .location-pill:hover i {
+            color: white;
+        }
+
+        /* ===== UPCOMING EVENTS ===== */
+        .events-section {
+            padding: 80px 0;
+            background: var(--cbwci-cream);
+        }
+
+        .event-card {
+            background: white;
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: var(--shadow);
+            transition: var(--transition);
+            height: 100%;
+            border-left: 4px solid var(--cbwci-gold);
+        }
+
+        .event-card:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--shadow-hover);
+        }
+
+        .event-card .event-body {
+            padding: 24px;
+        }
+
+        .event-card .event-date {
+            display: inline-block;
+            background: var(--cbwci-purple);
+            color: white;
+            padding: 4px 16px;
+            border-radius: 50px;
+            font-size: 12px;
+            font-weight: 600;
+            letter-spacing: 1px;
+        }
+
+        .event-card h5 {
+            margin-top: 12px;
+            font-weight: 700;
+            color: var(--cbwci-purple);
+        }
+
+        .event-card p {
+            color: var(--cbwci-muted);
+            font-size: 14px;
+            line-height: 1.6;
+        }
+
+        .event-card .event-meta {
+            font-size: 13px;
+            color: var(--cbwci-muted);
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+
+        .event-card .event-meta i {
+            color: var(--cbwci-gold);
+            margin-right: 6px;
+        }
+
+        /* ===== CTA SECTION ===== */
+        .cta-section {
+            padding: 80px 0;
+            background: linear-gradient(135deg, var(--cbwci-purple-dark), var(--cbwci-purple));
+            position: relative;
+            overflow: hidden;
+        }
+
+        .cta-section::before {
+            content: '✝';
+            position: absolute;
+            font-size: 300px;
+            color: rgba(201, 168, 76, 0.04);
+            right: -50px;
+            bottom: -100px;
+        }
+
+        .cta-section h2 {
+            font-family: 'Playfair Display', serif;
+            color: white;
+            font-weight: 700;
+            font-size: 40px;
+        }
+
+        .cta-section p {
+            color: rgba(255,255,255,0.7);
+            font-size: 18px;
+            max-width: 500px;
+            margin: 0 auto;
+        }
+
+        .cta-section .btn-cta {
+            background: var(--cbwci-gold);
+            border: none;
+            padding: 16px 45px;
+            border-radius: 12px;
+            font-weight: 700;
+            font-size: 16px;
+            color: var(--cbwci-purple-dark);
+            transition: var(--transition);
+            letter-spacing: 1px;
+        }
+
+        .cta-section .btn-cta:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 40px rgba(201, 168, 76, 0.3);
+        }
+
+        /* ===== FOOTER ===== */
+        .footer {
+            background: var(--cbwci-dark);
+            color: rgba(255,255,255,0.7);
+            padding: 60px 0 30px;
+        }
+
+        .footer h5 {
+            color: white;
+            font-family: 'Playfair Display', serif;
+            font-weight: 700;
+            margin-bottom: 20px;
+        }
+
+        .footer .brand-footer {
+            font-family: 'Playfair Display', serif;
+            font-weight: 900;
+            font-size: 22px;
+            color: white;
+        }
+
+        .footer .brand-footer .gold {
+            color: var(--cbwci-gold);
+        }
+
+        .footer .social-links a {
+            display: inline-block;
+            width: 40px;
+            height: 40px;
+            background: rgba(255,255,255,0.05);
+            border-radius: 50%;
+            text-align: center;
+            line-height: 40px;
+            color: rgba(255,255,255,0.6);
+            transition: var(--transition);
+            margin-right: 8px;
+        }
+
+        .footer .social-links a:hover {
+            background: var(--cbwci-gold);
+            color: var(--cbwci-dark);
+            transform: translateY(-3px);
+        }
+
+        .footer ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        .footer ul li {
+            padding: 6px 0;
+        }
+
+        .footer ul li a {
+            color: rgba(255,255,255,0.6);
+            text-decoration: none;
+            transition: var(--transition);
+            font-size: 14px;
+        }
+
+        .footer ul li a:hover {
+            color: var(--cbwci-gold);
+            padding-left: 8px;
+        }
+
+        .footer .footer-bottom {
+            border-top: 1px solid rgba(255,255,255,0.05);
+            padding-top: 20px;
+            margin-top: 40px;
+            text-align: center;
+            font-size: 13px;
+            opacity: 0.6;
+        }
+
+        .footer .footer-bottom .heart {
+            color: var(--cbwci-gold);
+        }
+
+        /* ===== TOAST NOTIFICATION ===== */
+        .toast-container {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            z-index: 9999;
+        }
+
+        .toast-custom {
+            background: white;
+            border-radius: 12px;
+            padding: 16px 24px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.15);
+            border-left: 4px solid var(--warning);
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            animation: slideUp 0.4s ease;
+            margin-top: 10px;
+            min-width: 300px;
+            max-width: 450px;
+        }
+
+        .toast-custom i {
+            font-size: 24px;
+            color: var(--warning);
+        }
+
+        .toast-custom .msg h6 {
+            margin: 0;
+            font-weight: 600;
+        }
+
+        .toast-custom .msg small {
+            color: var(--cbwci-muted);
+        }
+
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* ===== RESPONSIVE ===== */
+        @media (max-width: 992px) {
+            .hero h1 {
+                font-size: 44px;
+            }
+            .hero .hero-stats {
+                gap: 30px;
+            }
+            .floating-card {
+                display: none !important;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .hero {
+                padding: 120px 0 60px;
+                text-align: center;
+            }
+            .hero h1 {
+                font-size: 34px;
+            }
+            .hero p {
+                font-size: 16px;
+                margin: 0 auto 25px;
+            }
+            .hero .hero-badge {
+                font-size: 10px;
+            }
+            .hero-stats {
+                justify-content: center;
+            }
+            .hero .btn-primary-hero,
+            .hero .btn-secondary-hero {
+                display: block;
+                width: 100%;
+                margin: 8px 0;
+            }
+            .section-title {
+                font-size: 30px;
+            }
+            .about-section .about-image {
+                min-height: 200px;
+                padding: 30px;
+                margin-bottom: 30px;
+            }
+            .navbar-brand {
+                font-size: 16px;
+            }
+            .cta-section h2 {
+                font-size: 30px;
+            }
+            .dropdown-menu {
+                background: var(--cbwci-purple-dark) !important;
+                border: 1px solid rgba(201,168,76,0.2) !important;
+                border-radius: 12px !important;
+                padding: 8px 0 !important;
+                min-width: 200px !important;
+            }
+        }
+
+        @media (max-width: 576px) {
+            .hero h1 {
+                font-size: 28px;
+            }
+            .hero-stats {
+                flex-direction: column;
+                gap: 15px;
+                align-items: center;
+            }
+            .section-title {
+                font-size: 26px;
+            }
+            .location-pill {
+                font-size: 12px;
+                padding: 8px 16px;
+            }
+            .toast-custom {
+                min-width: unset;
+                max-width: 90vw;
+                padding: 14px 18px;
+            }
+        }
+
+        /* ===== ANIMATIONS ===== */
+        [data-aos] {
+            opacity: 0;
+            transition-property: opacity, transform;
+        }
+        [data-aos].aos-animate {
+            opacity: 1;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- ======================================== -->
+    <!-- NAVBAR -->
+    <!-- ======================================== -->
+    <nav class="navbar navbar-expand-lg fixed-top" id="mainNav">
+        <div class="container">
+            <a class="navbar-brand" href="index.html">
+                <i class="fas fa-church"></i>
+                CBWCI
+                <span class="gold">Changed By The Word</span>
+            </a>
+            <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon" style="filter: invert(1);"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto align-items-lg-center">
+                    <li class="nav-item">
+                        <a class="nav-link active" href="index.html">Home</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#about">About</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#features">Ministries</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#events">Events</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#locations">Locations</a>
+                    </li>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown">
+                            <i class="fas fa-user"></i> Account
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-end">
+                            <li>
+                                <a class="dropdown-item" href="login.html">
+                                    <i class="fas fa-sign-in-alt"></i> Login
+                                </a>
+                            </li>
+                            <li>
+                                <a class="dropdown-item" href="register.html">
+                                    <i class="fas fa-user-plus"></i> Register
+                                </a>
+                            </li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li>
+                                <a class="dropdown-item" href="taxi.html">
+                                    <i class="fas fa-taxi"></i> Book Taxi
+                                    <span style="font-size: 10px; color: rgba(201,168,76,0.5); margin-left: 8px;">🔒</span>
+                                </a>
+                            </li>
+                            <li>
+                                <a class="dropdown-item requires-login" href="#" onclick="requireLogin(event, 'Follow-Up')">
+                                    <i class="fas fa-users"></i> Follow-Up
+                                    <span style="font-size: 10px; color: rgba(201,168,76,0.5); margin-left: 8px;">🔒</span>
+                                </a>
+                            </li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- ======================================== -->
+    <!-- HERO SECTION -->
+    <!-- ======================================== -->
+    <section class="hero" id="home">
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col-lg-6" data-aos="fade-right" data-aos-duration="1000">
+                    <div class="hero-badge">
+                        <i class="fas fa-cross"></i> Walking in Glory
+                    </div>
+                    <h1>
+                        <span class="highlight">Change,</span><br>
+                        Dominate and <br>
+                        <span class="gold">Walk in Glory</span>
+                    </h1>
+                    <p>
+                        Welcome to Changed By The Word Church International — 
+                        a family of believers transformed by God's Word, 
+                        dominating in faith, and walking in His glory.
+                    </p>
+                    <div>
+                        <a href="register.html" class="btn btn-primary-hero">
+                            <i class="fas fa-user-plus"></i> Join Our Family
+                        </a>
+                        <a href="#about" class="btn btn-secondary-hero">
+                            <i class="fas fa-play-circle"></i> Learn More
+                        </a>
+                    </div>
+                    <div class="hero-stats">
+                        <div class="stat">
+                            <h3>2,500+</h3>
+                            <p>Members Worldwide</p>
+                        </div>
+                        <div class="stat">
+                            <h3>10+</h3>
+                            <p>Locations Serving</p>
+                        </div>
+                        <div class="stat">
+                            <h3>15+</h3>
+                            <p>Ministries Active</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-6 d-none d-lg-block" data-aos="fade-left" data-aos-duration="1000">
+                    <div class="hero-image-wrapper text-center">
+                        <div style="background: linear-gradient(135deg, rgba(201,168,76,0.1), rgba(74,25,66,0.3)); border-radius: 20px; padding: 40px; border: 1px solid rgba(201,168,76,0.2);">
+                            <i class="fas fa-church" style="font-size: 120px; color: var(--cbwci-gold); opacity: 0.6;"></i>
+                            <h3 style="color: white; font-family: 'Playfair Display', serif; margin-top: 20px;">
+                                <span style="color: var(--cbwci-gold);">✝</span> CBWCI
+                            </h3>
+                            <p style="color: rgba(255,255,255,0.5);">"Change, Dominate and Walk in Glory"</p>
+                        </div>
+                        <!-- Floating Cards -->
+                        <div class="floating-card card-1">
+                            <i class="fas fa-users"></i>
+                            <div class="text">
+                                <strong>Live Service</strong>
+                                <small>Join us this Sunday</small>
+                            </div>
+                        </div>
+                        <div class="floating-card card-2">
+                            <i class="fas fa-video"></i>
+                            <div class="text">
+                                <strong>CBWCI Virtual Meeting</strong>
+                                <small>Connect online</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ======================================== -->
+    <!-- FEATURES / MINISTRIES SECTION -->
+    <!-- ======================================== -->
+    <section class="features-section" id="features">
+        <div class="container">
+            <div class="text-center" data-aos="fade-up">
+                <div class="section-divider"></div>
+                <h2 class="section-title">Our <span class="gold">Ministries</span></h2>
+                <p class="section-subtitle">
+                    Serving our community through various ministries designed to help you grow in faith and connect with others.
+                </p>
+            </div>
+
+            <div class="row g-4">
+                <!-- Feature 1: Virtual Meetings -->
+                <div class="col-md-6 col-lg-4" data-aos="fade-up" data-aos-delay="100">
+                    <div class="feature-card">
+                        <div class="icon">
+                            <i class="fas fa-video"></i>
+                        </div>
+                        <h5>Live Stream &amp; Virtual Meetings</h5>
+                        <p>Join our services from anywhere! Watch live sermons and connect with our community through CBWCI Virtual Meetings.</p>
+                        <a href="#" class="learn-more" onclick="requireLogin(event, 'Join Live Stream')">Join Live <i class="fas fa-arrow-right"></i></a>
+                    </div>
+                </div>
+
+                <!-- Feature 2: Follow-Up -->
+                <div class="col-md-6 col-lg-4" data-aos="fade-up" data-aos-delay="200">
+                    <div class="feature-card">
+                        <div class="icon">
+                            <i class="fas fa-phone-alt"></i>
+                        </div>
+                        <h5>Evangelism Follow-Up</h5>
+                        <p>Automated follow-up system to connect with visitors, track invitations, and build lasting relationships with new believers.</p>
+                        <a href="#" class="learn-more" onclick="requireLogin(event, 'Start Follow-Up')">Start Follow-Up <i class="fas fa-arrow-right"></i></a>
+                    </div>
+                </div>
+
+                <!-- Feature 3: Taxi Service -->
+                <div class="col-md-6 col-lg-4" data-aos="fade-up" data-aos-delay="300">
+                    <div class="feature-card">
+                        <div class="icon">
+                            <i class="fas fa-taxi"></i>
+                        </div>
+                        <h5>Church Taxi Service</h5>
+                        <p>Book a ride to church! Our registered drivers will pick you up from your location. Safe, reliable, and free transport.</p>
+                        <a href="taxi.html" class="learn-more">Book a Ride <i class="fas fa-arrow-right"></i></a>
+                    </div>
+                </div>
+
+                <!-- Feature 4: Announcements -->
+                <div class="col-md-6 col-lg-4" data-aos="fade-up" data-aos-delay="400">
+                    <div class="feature-card">
+                        <div class="icon">
+                            <i class="fas fa-bullhorn"></i>
+                        </div>
+                        <h5>Church Announcements</h5>
+                        <p>Stay updated with the latest news, events, and special programs happening at CBWCI. Never miss an important update.</p>
+                        <a href="#" class="learn-more" onclick="requireLogin(event, 'View Announcements')">View Announcements <i class="fas fa-arrow-right"></i></a>
+                    </div>
+                </div>
+
+                <!-- Feature 5: Member Registration -->
+                <div class="col-md-6 col-lg-4" data-aos="fade-up" data-aos-delay="500">
+                    <div class="feature-card">
+                        <div class="icon">
+                            <i class="fas fa-user-check"></i>
+                        </div>
+                        <h5>Member Portal</h5>
+                        <p>Register as a member, update your profile, connect with your ministry group, and access exclusive church resources.</p>
+                        <a href="register.html" class="learn-more">Register Now <i class="fas fa-arrow-right"></i></a>
+                    </div>
+                </div>
+
+                <!-- Feature 6: Sermons -->
+                <div class="col-md-6 col-lg-4" data-aos="fade-up" data-aos-delay="600">
+                    <div class="feature-card">
+                        <div class="icon">
+                            <i class="fas fa-bible"></i>
+                        </div>
+                        <h5>Sermon Library</h5>
+                        <p>Access our growing library of powerful sermons, teachings, and worship experiences. Be inspired and transformed by God's Word.</p>
+                        <a href="sermons.html" class="learn-more">Watch Sermons <i class="fas fa-arrow-right"></i></a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ======================================== -->
+    <!-- ABOUT SECTION -->
+    <!-- ======================================== -->
+    <section class="about-section" id="about">
+        <div class="container">
+            <div class="row align-items-center g-5">
+                <div class="col-lg-5" data-aos="fade-right">
+                    <div class="about-image">
+                        <i class="fas fa-church"></i>
+                        <h3>Changed By The Word</h3>
+                        <p>"Change, Dominate and Walk in Glory"</p>
+                        <div style="margin-top: 20px; display: flex; gap: 20px; justify-content: center; position: relative; z-index: 1;">
+                            <span style="background: rgba(201,168,76,0.2); padding: 4px 16px; border-radius: 50px; font-size: 12px; border: 1px solid rgba(201,168,76,0.3);">✝ Faith</span>
+                            <span style="background: rgba(201,168,76,0.2); padding: 4px 16px; border-radius: 50px; font-size: 12px; border: 1px solid rgba(201,168,76,0.3);">✝ Love</span>
+                            <span style="background: rgba(201,168,76,0.2); padding: 4px 16px; border-radius: 50px; font-size: 12px; border: 1px solid rgba(201,168,76,0.3);">✝ Glory</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-7" data-aos="fade-left">
+                    <div class="about-content">
+                        <div class="section-divider" style="margin: 0 0 20px 0;"></div>
+                        <h4>Welcome to CBWCI Family</h4>
+                        <p style="font-size: 16px; line-height: 1.8; color: var(--cbwci-text);">
+                            At <span class="highlight-text">Changed By The Word Church International</span>, 
+                            we believe that the Word of God has the power to transform lives, 
+                            bring healing, and set people free. Our mission is to spread the 
+                            Gospel of Jesus Christ and make disciples of all nations.
+                        </p>
+                        <ul>
+                            <li><i class="fas fa-check-circle"></i> Powerful worship experiences</li>
+                            <li><i class="fas fa-check-circle"></i> Life-changing teachings</li>
+                            <li><i class="fas fa-check-circle"></i> Loving community</li>
+                            <li><i class="fas fa-check-circle"></i> Outreach and evangelism</li>
+                        </ul>
+                        <a href="register.html" class="btn btn-primary-hero" style="margin-top: 15px;">
+                            <i class="fas fa-handshake"></i> Join Our Family
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ======================================== -->
+    <!-- LOCATIONS SECTION -->
+    <!-- ======================================== -->
+    <section class="locations-section" id="locations">
+        <div class="container">
+            <div class="text-center" data-aos="fade-up">
+                <div class="section-divider"></div>
+                <h2 class="section-title">Our <span class="gold">Locations</span></h2>
+                <p class="section-subtitle">
+                    We serve the following areas with our church taxi service. Select your location to book a ride.
+                </p>
+            </div>
+
+            <div class="text-center" data-aos="fade-up" data-aos-delay="100">
+                <div style="max-width: 800px; margin: 0 auto;">
+                    <span class="location-pill"><i class="fas fa-map-marker-alt"></i> Sonheuwel</span>
+                    <span class="location-pill"><i class="fas fa-map-marker-alt"></i> West Acres</span>
+                    <span class="location-pill"><i class="fas fa-map-marker-alt"></i> Stonehenge</span>
+                    <span class="location-pill"><i class="fas fa-map-marker-alt"></i> Belladonna</span>
+                    <span class="location-pill"><i class="fas fa-map-marker-alt"></i> Mataffin</span>
+                    <span class="location-pill"><i class="fas fa-map-marker-alt"></i> Nelspruit Town CBD</span>
+                    <span class="location-pill"><i class="fas fa-map-marker-alt"></i> Msholozi</span>
+                    <span class="location-pill"><i class="fas fa-map-marker-alt"></i> WhiteRiver</span>
+                    <span class="location-pill"><i class="fas fa-map-marker-alt"></i> Ngodini</span>
+                    <span class="location-pill"><i class="fas fa-map-marker-alt"></i> HazyView</span>
+                </div>
+
+                <div style="margin-top: 30px;">
+                    <a href="taxi.html" class="btn btn-primary-hero">
+                        <i class="fas fa-taxi"></i> Book Your Ride Now
+                    </a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ======================================== -->
+    <!-- EVENTS SECTION -->
+    <!-- ======================================== -->
+    <section class="events-section" id="events">
+        <div class="container">
+            <div class="text-center" data-aos="fade-up">
+                <div class="section-divider"></div>
+                <h2 class="section-title">Upcoming <span class="gold">Events</span></h2>
+                <p class="section-subtitle">
+                    Join us for these upcoming events and experience the presence of God.
+                </p>
+            </div>
+
+            <div class="row g-4">
+                <div class="col-md-4" data-aos="fade-up" data-aos-delay="100">
+                    <div class="event-card">
+                        <div class="event-body">
+                            <span class="event-date">This Sunday</span>
+                            <h5>Sunday Service</h5>
+                            <p>Join us for an empowering worship experience. Come expecting a life-changing encounter with God.</p>
+                            <div class="event-meta">
+                                <span><i class="fas fa-clock"></i> 10:00 AM &amp; 13:30 PM</span>
+                                <span><i class="fas fa-map-marker-alt"></i> CBWCI Sanctuary</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-4" data-aos="fade-up" data-aos-delay="200">
+                    <div class="event-card">
+                        <div class="event-body">
+                            <span class="event-date">Wednesday</span>
+                            <h5>Midweek Service</h5>
+                            <p>Powerful prayer, worship, and Word. A midweek spiritual boost for your faith journey.</p>
+                            <div class="event-meta">
+                                <span><i class="fas fa-clock"></i> 6:30 PM</span>
+                                <span><i class="fas fa-map-marker-alt"></i> CBWCI Sanctuary</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-4" data-aos="fade-up" data-aos-delay="300">
+                    <div class="event-card">
+                        <div class="event-body">
+                            <span class="event-date">Monthly</span>
+                            <h5>Community Outreach</h5>
+                            <p>Join us as we reach out to our community with love, food, and the Gospel of Jesus Christ.</p>
+                            <div class="event-meta">
+                                <span><i class="fas fa-clock"></i> 8:00 AM</span>
+                                <span><i class="fas fa-map-marker-alt"></i> Various Locations</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ======================================== -->
+    <!-- CTA SECTION -->
+    <!-- ======================================== -->
+    <section class="cta-section">
+        <div class="container text-center" data-aos="zoom-in">
+            <h2>Ready to <span style="color: var(--cbwci-gold);">Change, Dominate</span> and Walk in Glory?</h2>
+            <p>Join the CBWCI family today and experience the transformative power of God's Word.</p>
+            <div style="margin-top: 30px; display: flex; gap: 15px; justify-content: center; flex-wrap: wrap;">
+                <a href="register.html" class="btn btn-cta">
+                    <i class="fas fa-user-plus"></i> Register Now
+                </a>
+                <a href="#" class="btn btn-secondary-hero" style="border: 2px solid rgba(255,255,255,0.3); color: white; padding: 16px 45px; border-radius: 12px; text-decoration: none; font-weight: 600; transition: var(--transition);" onclick="requireLogin(event, 'Watch Live Stream')">
+                    <i class="fas fa-play-circle"></i> Watch Live
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- ======================================== -->
+    <!-- FOOTER -->
+    <!-- ======================================== -->
+    <footer class="footer">
+        <div class="container">
+            <div class="row g-4">
+                <div class="col-lg-4">
+                    <div class="brand-footer">
+                        <i class="fas fa-church" style="color: var(--cbwci-gold);"></i>
+                        CBWCI
+                        <span class="gold">Changed By The Word</span>
+                    </div>
+                    <p style="margin-top: 15px; font-size: 14px; max-width: 300px;">
+                        "Change, Dominate and Walk in Glory" — A church family transformed by the Word of God.
+                    </p>
+                    <div class="social-links">
+                        <a href="#"><i class="fab fa-facebook-f"></i></a>
+                        <a href="#"><i class="fab fa-youtube"></i></a>
+                        <a href="#"><i class="fab fa-instagram"></i></a>
+                        <a href="#"><i class="fab fa-twitter"></i></a>
+                        <a href="#"><i class="fab fa-tiktok"></i></a>
+                    </div>
+                </div>
+                <div class="col-lg-2 col-6">
+                    <h5>Quick Links</h5>
+                    <ul>
+                        <li><a href="index.html">Home</a></li>
+                        <li><a href="#about">About</a></li>
+                        <li><a href="#events">Events</a></li>
+                        <li><a href="#locations">Locations</a></li>
+                    </ul>
+                </div>
+                <div class="col-lg-2 col-6">
+                    <h5>Ministries</h5>
+                    <ul>
+                        <li><a href="#">Worship</a></li>
+                        <li><a href="#">Youth</a></li>
+                        <li><a href="#">Children</a></li>
+                        <li><a href="#">Outreach</a></li>
+                    </ul>
+                </div>
+                <div class="col-lg-4">
+                    <h5>Contact Us</h5>
+                    <ul>
+                        <li><i class="fas fa-map-marker-alt" style="color: var(--cbwci-gold); width: 20px;"></i> Nelspruit, South Africa</li>
+                        <li><i class="fas fa-phone" style="color: var(--cbwci-gold); width: 20px;"></i> +27 82 123 4567</li>
+                        <li><i class="fas fa-envelope" style="color: var(--cbwci-gold); width: 20px;"></i> info@cbwci.org</li>
+                        <li><i class="fas fa-clock" style="color: var(--cbwci-gold); width: 20px;"></i> Sunday 10:00 - 13:30</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>
+                    <span class="heart">♥</span> 2026 Changed By The Word Church International. 
+                    All rights reserved. <span class="heart">♥</span>
+                    <br>
+                    <small>"Change, Dominate and Walk in Glory"</small>
+                </p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- ======================================== -->
+    <!-- TOAST CONTAINER -->
+    <!-- ======================================== -->
+    <div class="toast-container" id="toastContainer"></div>
+
+    <!-- ======================================== -->
+    <!-- SCRIPTS -->
+    <!-- ======================================== -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js">
+    </script>
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js">
+    </script>
+    <script>
+        // ========================================
+        // INITIALIZE AOS ANIMATIONS
+        // ========================================
+        AOS.init({
+            duration: 800,
+            once: true,
+            offset: 100
+        });
+
+        // ========================================
+        // NAVBAR SCROLL EFFECT
+        // ========================================
+        window.addEventListener('scroll', function() {
+            const navbar = document.getElementById('mainNav');
+            if (window.scrollY > 50) {
+                navbar.classList.add('scrolled');
+            } else {
+                navbar.classList.remove('scrolled');
+            }
+        });
+
+        // ========================================
+        // SMOOTH SCROLL FOR NAV LINKS
+        // ========================================
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function(e) {
+                const href = this.getAttribute('href');
+                if (href !== '#') {
+                    e.preventDefault();
+                    const target = document.querySelector(href);
+                    if (target) {
+                        const offsetTop = target.offsetTop - 80;
+                        window.scrollTo({
+                            top: offsetTop,
+                            behavior: 'smooth'
+                        });
+                    }
+                }
+            });
+        });
+
+        // ========================================
+        // REQUIRE LOGIN - Show Toast Message
+        // ========================================
+        function requireLogin(event, actionName) {
+            event.preventDefault();
+            showToast(
+                '🔒 Login Required',
+                `Please login to access "${actionName}". <a href="login.html" style="color: var(--cbwci-gold); font-weight: 600; text-decoration: underline;">Login Now</a>`,
+                'warning'
+            );
+            return false;
+        }
+
+        // ========================================
+        // SHOW TOAST NOTIFICATION
+        // ========================================
+        function showToast(title, message, type = 'warning') {
+            const container = document.getElementById('toastContainer');
+            
+            const toast = document.createElement('div');
+            toast.className = 'toast-custom';
+            toast.innerHTML = `
+                <i class="fas ${type === 'warning' ? 'fa-exclamation-triangle' : 'fa-info-circle'}"></i>
+                <div class="msg">
+                    <h6>${title}</h6>
+                    <small>${message}</small>
+                </div>
+            `;
+            
+            container.appendChild(toast);
+            
+            setTimeout(() => {
+                toast.style.opacity = '0';
+                toast.style.transform = 'translateX(50px)';
+                setTimeout(() => toast.remove(), 400);
+            }, 6000);
+        }
+
+        // ========================================
+        // COUNTER ANIMATION FOR STATS
+        // ========================================
+        function animateCounter(element, target, suffix = '') {
+            let current = 0;
+            const increment = target / 60;
+            const timer = setInterval(() => {
+                current += increment;
+                if (current >= target) {
+                    current = target;
+                    clearInterval(timer);
+                }
+                element.textContent = Math.floor(current) + suffix;
+            }, 20);
+        }
+
+        // Trigger counter when stats come into view
+        const statsObserver = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    const statNumbers = entry.target.querySelectorAll('.stat h3');
+                    statNumbers.forEach((stat, index) => {
+                        const targets = [2500, 10, 15];
+                        animateCounter(stat, targets[index], '+');
+                    });
+                    statsObserver.unobserve(entry.target);
+                }
+            });
+        }, { threshold: 0.5 });
+
+        const statsSection = document.querySelector('.hero-stats');
+        if (statsSection) {
+            statsObserver.observe(statsSection);
+        }
+
+        // ========================================
+        // CONSOLE BRANDING
+        // ========================================
+        console.log('%c✝ CBWCI - Changed By The Word Church International ✝', 'font-size: 20px; color: #C9A84C; font-weight: bold;');
+        console.log('%c"Change, Dominate and Walk in Glory"', 'font-size: 14px; color: #4A1942; font-style: italic;');
+        console.log('%c📖 Jeremiah 29:11 - "For I know the plans I have for you..."', 'font-size: 12px; color: #7A6A72;');
+        console.log('🚀 Welcome to CBWCI! Need help? Contact us at info@cbwci.org');
+    </script>
+
+</body>
+</html>

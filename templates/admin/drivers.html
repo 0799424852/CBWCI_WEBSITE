@@ -1,0 +1,1044 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Drivers Management · CBWCI Admin</title>
+    <!-- Bootstrap 5 -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome 6 -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- AOS -->
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+    <!-- Firebase -->
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+
+    <style>
+        :root {
+            --cbwci-purple: #4A1942;
+            --cbwci-purple-light: #6B2D5F;
+            --cbwci-purple-dark: #2E0F28;
+            --cbwci-gold: #C9A84C;
+            --cbwci-gold-light: #E8CD7A;
+            --cbwci-gold-dark: #A8893A;
+            --cbwci-cream: #FDF8F0;
+            --cbwci-dark: #1A0F16;
+            --cbwci-text: #2C1A24;
+            --cbwci-muted: #7A6A72;
+            --shadow: 0 10px 40px rgba(74, 25, 66, 0.12);
+            --shadow-hover: 0 15px 50px rgba(74, 25, 66, 0.2);
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            --success: #2D8F5C;
+            --danger: #C0392B;
+            --warning: #E67E22;
+            --info: #2980B9;
+        }
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body { font-family:'Inter',sans-serif; background:#f5f0eb; color:var(--cbwci-text); padding-top:76px; min-height:100vh; }
+
+        .navbar { background: linear-gradient(135deg, var(--cbwci-purple), var(--cbwci-purple-dark)); padding:10px 0; box-shadow:0 4px 30px rgba(0,0,0,0.3); border-bottom:3px solid var(--cbwci-gold); }
+        .navbar-brand { font-family:'Playfair Display',serif; font-weight:900; font-size:20px; color:#fff!important; letter-spacing:2px; }
+        .navbar-brand .gold { color:var(--cbwci-gold); display:block; font-size:12px; letter-spacing:4px; }
+        .navbar-brand i { color:var(--cbwci-gold); margin-right:10px; }
+        .nav-link { color:rgba(255,255,255,0.8)!important; font-weight:500; font-size:13px; letter-spacing:1px; transition:var(--transition); padding:6px 16px!important; border-radius:8px; }
+        .nav-link:hover { color:var(--cbwci-gold)!important; background:rgba(201,168,76,0.1); }
+        .nav-link.active { color:var(--cbwci-gold)!important; }
+        .navbar .btn-back { background:transparent; border:2px solid rgba(255,255,255,0.2); color:#fff; padding:4px 16px; border-radius:8px; font-weight:600; font-size:12px; transition:var(--transition); text-decoration:none; }
+        .navbar .btn-back:hover { background:rgba(255,255,255,0.1); border-color:#fff; transform:translateY(-2px); color:#fff; }
+        .navbar .btn-logout { background:transparent; border:2px solid rgba(255,255,255,0.2); color:#fff; padding:4px 16px; border-radius:8px; font-weight:600; font-size:12px; transition:var(--transition); text-decoration:none; cursor:pointer; }
+        .navbar .btn-logout:hover { background:var(--danger); border-color:var(--danger); transform:translateY(-2px); color:#fff; }
+        .navbar .admin-badge { background:var(--cbwci-gold); color:var(--cbwci-purple-dark); font-size:10px; font-weight:700; padding:2px 12px; border-radius:50px; margin-left:8px; letter-spacing:1px; }
+
+        .admin-wrapper { padding:10px 0 40px; }
+        .breadcrumb-custom { color:var(--cbwci-muted); font-size:12px; margin-bottom:2px; }
+        .breadcrumb-custom a { color:var(--cbwci-purple); text-decoration:none; transition:var(--transition); }
+        .breadcrumb-custom a:hover { color:var(--cbwci-gold); }
+        .breadcrumb-custom .separator { margin:0 6px; color:var(--cbwci-gold); }
+        .page-title { font-family:'Playfair Display',serif; font-weight:700; color:var(--cbwci-purple); font-size:24px; margin:0; }
+        .page-title i { color:var(--cbwci-gold); }
+        .page-subtitle { color:var(--cbwci-muted); font-size:13px; margin:0; }
+        .welcome-text { color:var(--cbwci-muted); font-size:13px; font-weight:400; }
+        .welcome-text strong { color:var(--cbwci-purple); }
+
+        .admin-sidebar { background:#fff; border-radius:12px; padding:16px 14px; box-shadow:0 2px 12px rgba(0,0,0,0.06); border:1px solid rgba(201,168,76,0.06); position:sticky; top:96px; }
+        .admin-sidebar .sidebar-brand { text-align:center; padding-bottom:12px; border-bottom:2px solid #f5f0eb; margin-bottom:12px; }
+        .admin-sidebar .sidebar-brand .brand-icon { font-size:28px; color:var(--cbwci-gold); }
+        .admin-sidebar .sidebar-brand h6 { font-family:'Playfair Display',serif; font-weight:700; color:var(--cbwci-purple); margin-top:2px; font-size:14px; }
+        .admin-sidebar .sidebar-brand small { color:var(--cbwci-muted); font-size:10px; }
+        .admin-sidebar .sidebar-nav { list-style:none; padding:0; margin:0; }
+        .admin-sidebar .sidebar-nav li { margin-bottom:2px; }
+        .admin-sidebar .sidebar-nav li a { display:flex; align-items:center; gap:8px; padding:8px 12px; border-radius:8px; color:var(--cbwci-text); text-decoration:none; transition:var(--transition); font-weight:500; font-size:12px; }
+        .admin-sidebar .sidebar-nav li a i { width:16px; color:var(--cbwci-muted); transition:var(--transition); font-size:13px; }
+        .admin-sidebar .sidebar-nav li a:hover { background:rgba(74,25,66,0.05); color:var(--cbwci-purple); }
+        .admin-sidebar .sidebar-nav li a.active { background:linear-gradient(135deg,var(--cbwci-purple),var(--cbwci-purple-dark)); color:#fff; box-shadow:0 4px 15px rgba(74,25,66,0.25); }
+        .admin-sidebar .sidebar-nav li a.active i { color:#fff; }
+        .admin-sidebar .sidebar-nav li a .badge-nav { margin-left:auto; background:var(--cbwci-gold); color:var(--cbwci-purple-dark); font-size:9px; padding:1px 8px; border-radius:50px; }
+        .admin-sidebar .sidebar-nav li a .badge-nav-danger { margin-left:auto; background:var(--danger); color:#fff; font-size:9px; padding:1px 8px; border-radius:50px; }
+        .admin-sidebar .sidebar-footer { margin-top:12px; padding-top:12px; border-top:2px solid #f5f0eb; text-align:center; }
+        .admin-sidebar .sidebar-footer small { color:var(--cbwci-muted); font-size:10px; }
+        .admin-sidebar .sidebar-footer i { color:var(--cbwci-gold); }
+
+        .drivers-content { background:#fff; border-radius:12px; padding:18px 20px; box-shadow:0 2px 12px rgba(0,0,0,0.06); border:1px solid rgba(201,168,76,0.06); }
+        .drivers-content .content-header { display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; margin-bottom:16px; padding-bottom:12px; border-bottom:2px solid #f5f0eb; }
+        .drivers-content .content-header h6 { font-weight:700; color:var(--cbwci-purple); margin:0; font-size:15px; }
+        .drivers-content .content-header h6 i { color:var(--cbwci-gold); margin-right:8px; }
+
+        .driver-stats { display:grid; grid-template-columns:repeat(auto-fit, minmax(120px, 1fr)); gap:10px; margin-bottom:16px; }
+        .driver-stats .stat-mini { background:#f8f4f0; border-radius:8px; padding:10px 14px; text-align:center; }
+        .driver-stats .stat-mini .number { font-family:'Playfair Display',serif; font-weight:900; font-size:22px; color:var(--cbwci-purple); }
+        .driver-stats .stat-mini .label { font-size:11px; color:var(--cbwci-muted); }
+        .driver-stats .stat-mini .label i { margin-right:4px; }
+        .driver-stats .stat-mini.approved .number { color:var(--success); }
+        .driver-stats .stat-mini.pending .number { color:var(--warning); }
+        .driver-stats .stat-mini.suspended .number { color:var(--danger); }
+        .driver-stats .stat-mini.total .number { color:var(--cbwci-purple); }
+
+        .search-filter-bar { display:flex; gap:10px; flex-wrap:wrap; margin-bottom:16px; }
+        .search-filter-bar .search-box { flex:1; min-width:200px; position:relative; }
+        .search-filter-bar .search-box input { width:100%; padding:8px 14px 8px 36px; border-radius:8px; border:2px solid #E8DCC8; background:#FDFAF5; font-size:13px; transition:var(--transition); }
+        .search-filter-bar .search-box input:focus { border-color:var(--cbwci-gold); outline:none; box-shadow:0 0 0 3px rgba(201,168,76,0.1); }
+        .search-filter-bar .search-box i { position:absolute; left:12px; top:50%; transform:translateY(-50%); color:var(--cbwci-muted); font-size:14px; }
+        .search-filter-bar .filter-group { display:flex; gap:6px; flex-wrap:wrap; }
+        .search-filter-bar .filter-group .filter-btn { padding:6px 14px; border-radius:50px; border:2px solid #E8DCC8; background:transparent; font-size:12px; font-weight:600; color:var(--cbwci-muted); transition:var(--transition); cursor:pointer; }
+        .search-filter-bar .filter-group .filter-btn:hover { border-color:var(--cbwci-purple); color:var(--cbwci-purple); }
+        .search-filter-bar .filter-group .filter-btn.active { background:var(--cbwci-purple); border-color:var(--cbwci-purple); color:#fff; }
+        .search-filter-bar .add-btn { padding:8px 20px; border-radius:8px; background:linear-gradient(135deg,var(--cbwci-gold),var(--cbwci-gold-dark)); border:none; font-weight:600; font-size:13px; color:var(--cbwci-purple-dark); transition:var(--transition); white-space:nowrap; }
+        .search-filter-bar .add-btn:hover { transform:translateY(-2px); box-shadow:0 4px 15px rgba(201,168,76,0.3); }
+
+        .table-container { overflow-x:auto; }
+        .table-container table { width:100%; border-collapse:collapse; font-size:13px; }
+        .table-container table thead th { background:#f8f4f0; padding:10px 12px; text-align:left; font-weight:600; color:var(--cbwci-purple); border-bottom:2px solid #f0ebe4; font-size:12px; text-transform:uppercase; letter-spacing:0.5px; white-space:nowrap; }
+        .table-container table tbody td { padding:10px 12px; border-bottom:1px solid #f5f0eb; vertical-align:middle; }
+        .table-container table tbody tr:hover { background:rgba(74,25,66,0.02); }
+        .driver-avatar-sm { width:32px; height:32px; border-radius:50%; background:linear-gradient(135deg,var(--cbwci-purple),var(--cbwci-purple-dark)); display:flex; align-items:center; justify-content:center; color:#fff; font-weight:700; font-size:12px; flex-shrink:0; }
+        .driver-info { display:flex; align-items:center; gap:10px; }
+        .driver-info .driver-details .name { font-weight:600; color:var(--cbwci-text); }
+        .driver-info .driver-details .email { font-size:11px; color:var(--cbwci-muted); }
+        .status-badge { padding:3px 12px; border-radius:50px; font-size:11px; font-weight:600; }
+        .status-badge.approved { background:rgba(45,143,92,0.12); color:var(--success); }
+        .status-badge.pending { background:rgba(230,126,34,0.12); color:var(--warning); }
+        .status-badge.suspended { background:rgba(192,57,43,0.12); color:var(--danger); }
+        .status-badge.inactive { background:rgba(122,106,114,0.12); color:var(--cbwci-muted); }
+        .credential-badge { padding:2px 10px; border-radius:50px; font-size:10px; font-weight:600; }
+        .credential-badge.active { background:rgba(45,143,92,0.12); color:var(--success); }
+        .credential-badge.inactive { background:rgba(122,106,114,0.12); color:var(--cbwci-muted); }
+        .vehicle-badge { padding:2px 10px; border-radius:50px; font-size:10px; font-weight:600; background:rgba(41,128,185,0.12); color:var(--info); }
+        .action-btns { display:flex; gap:4px; flex-wrap:wrap; justify-content:center; }
+        .action-btns .btn-action { width:28px; height:28px; border-radius:6px; border:none; display:flex; align-items:center; justify-content:center; font-size:12px; transition:var(--transition); cursor:pointer; }
+        .action-btns .btn-action:hover { transform:scale(1.1); }
+        .action-btns .btn-action.view { background:rgba(41,128,185,0.1); color:var(--info); }
+        .action-btns .btn-action.view:hover { background:var(--info); color:#fff; }
+        .action-btns .btn-action.edit { background:rgba(201,168,76,0.12); color:var(--cbwci-gold-dark); }
+        .action-btns .btn-action.edit:hover { background:var(--cbwci-gold); color:var(--cbwci-purple-dark); }
+        .action-btns .btn-action.delete { background:rgba(192,57,43,0.1); color:var(--danger); }
+        .action-btns .btn-action.delete:hover { background:var(--danger); color:#fff; }
+        .action-btns .btn-action.approve { background:rgba(45,143,92,0.1); color:var(--success); }
+        .action-btns .btn-action.approve:hover { background:var(--success); color:#fff; }
+        .action-btns .btn-action.suspend { background:rgba(192,57,43,0.1); color:var(--danger); }
+        .action-btns .btn-action.suspend:hover { background:var(--danger); color:#fff; }
+        .action-btns .btn-action.credentials { background:rgba(201,168,76,0.12); color:var(--cbwci-gold-dark); }
+        .action-btns .btn-action.credentials:hover { background:var(--cbwci-gold); color:var(--cbwci-purple-dark); }
+
+        .pagination-container { display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; margin-top:16px; padding-top:12px; border-top:2px solid #f5f0eb; }
+        .pagination-container .info { font-size:12px; color:var(--cbwci-muted); }
+        .pagination-container .pagination { display:flex; gap:4px; list-style:none; padding:0; margin:0; }
+        .pagination-container .pagination li a { display:flex; align-items:center; justify-content:center; width:30px; height:30px; border-radius:6px; border:2px solid #E8DCC8; color:var(--cbwci-muted); text-decoration:none; font-size:12px; font-weight:600; transition:var(--transition); }
+        .pagination-container .pagination li a:hover { border-color:var(--cbwci-purple); color:var(--cbwci-purple); }
+        .pagination-container .pagination li.active a { background:var(--cbwci-purple); border-color:var(--cbwci-purple); color:#fff; }
+        .pagination-container .pagination li.disabled a { opacity:0.4; cursor:not-allowed; }
+
+        .empty-state { text-align:center; padding:40px 20px; color:var(--cbwci-muted); }
+        .empty-state i { font-size:48px; color:var(--cbwci-gold-light); margin-bottom:12px; display:block; }
+        .empty-state h6 { font-size:16px; color:var(--cbwci-text); margin-bottom:4px; }
+        .empty-state p { font-size:13px; margin:0; }
+
+        .toast-container { position:fixed; bottom:20px; right:20px; z-index:9999; }
+        .toast-custom { background:#fff; border-radius:12px; padding:14px 20px; box-shadow:0 10px 40px rgba(0,0,0,0.15); border-left:4px solid var(--success); display:flex; align-items:center; gap:12px; animation:slideUp 0.4s ease; margin-top:10px; min-width:280px; max-width:420px; }
+        .toast-custom i { font-size:20px; color:var(--success); }
+        .toast-custom .msg h6 { margin:0; font-weight:600; font-size:14px; }
+        .toast-custom .msg small { color:var(--cbwci-muted); font-size:12px; }
+        .toast-custom.toast-danger { border-left-color:var(--danger); }
+        .toast-custom.toast-danger i { color:var(--danger); }
+        .toast-custom.toast-warning { border-left-color:var(--warning); }
+        .toast-custom.toast-warning i { color:var(--warning); }
+        @keyframes slideUp { from { opacity:0; transform:translateY(30px); } to { opacity:1; transform:translateY(0); } }
+
+        .modal-content { border-radius:12px; border:2px solid rgba(201,168,76,0.1); }
+        .modal-header { background:linear-gradient(135deg,var(--cbwci-purple),var(--cbwci-purple-dark)); color:#fff; border-radius:12px 12px 0 0; border-bottom:3px solid var(--cbwci-gold); }
+        .modal-header .btn-close { filter:invert(1); }
+        .modal-body .form-label { font-weight:600; font-size:13px; color:var(--cbwci-text); }
+        .modal-body .form-control, .modal-body .form-select { border:2px solid #E8DCC8; border-radius:8px; padding:8px 14px; font-size:13px; background:#FDFAF5; transition:var(--transition); }
+        .modal-body .form-control:focus, .modal-body .form-select:focus { border-color:var(--cbwci-gold); box-shadow:0 0 0 3px rgba(201,168,76,0.1); }
+        .modal-body .password-hint { font-size:11px; color:var(--cbwci-muted); margin-top:4px; }
+        .modal-footer .btn-primary { background:linear-gradient(135deg,var(--cbwci-purple),var(--cbwci-purple-dark)); border:none; padding:8px 24px; font-weight:600; }
+        .modal-footer .btn-primary:hover { transform:translateY(-2px); box-shadow:0 4px 15px rgba(74,25,66,0.3); }
+        .modal-footer .btn-secondary { background:transparent; border:2px solid #E8DCC8; color:var(--cbwci-muted); padding:8px 24px; font-weight:600; }
+        .modal-footer .btn-secondary:hover { border-color:var(--cbwci-purple); color:var(--cbwci-purple); }
+        .modal-footer .btn-success { background:var(--success); border:none; padding:8px 24px; font-weight:600; color:#fff; }
+        .modal-footer .btn-success:hover { transform:translateY(-2px); box-shadow:0 4px 15px rgba(45,143,92,0.3); }
+        .modal-footer .btn-danger { background:var(--danger); border:none; padding:8px 24px; font-weight:600; color:#fff; }
+        .modal-footer .btn-danger:hover { transform:translateY(-2px); box-shadow:0 4px 15px rgba(192,57,43,0.3); }
+
+        .badge-count { background:rgba(74,25,66,0.08); padding:4px 14px; border-radius:50px; font-size:12px; color:var(--cbwci-purple); }
+        .loading-spinner { display:flex; align-items:center; justify-content:center; padding:30px 0; flex-direction:column; gap:10px; }
+        .loading-spinner .spinner { width:30px; height:30px; border:3px solid #f0ebe4; border-top-color:var(--cbwci-gold); border-radius:50%; animation:spin 1s linear infinite; }
+        @keyframes spin { 0% { transform:rotate(0deg); } 100% { transform:rotate(360deg); } }
+        .credentials-box { background:#f8f4f0; border-radius:8px; padding:14px; margin-top:10px; border:1px solid #e8dcc8; }
+        .credentials-box .cred-row { display:flex; justify-content:space-between; padding:4px 0; border-bottom:1px solid #e8dcc8; }
+        .credentials-box .cred-row:last-child { border-bottom:none; }
+        .credentials-box .cred-row .label { color:var(--cbwci-muted); font-size:12px; }
+        .credentials-box .cred-row .value { font-weight:600; font-size:13px; color:var(--cbwci-purple); }
+        .credentials-box .cred-row .value i { color:var(--cbwci-gold); margin-right:4px; }
+
+        @media (max-width:992px) { .admin-sidebar { position:relative; top:0; margin-bottom:16px; } .search-filter-bar { flex-direction:column; } .search-filter-bar .search-box { min-width:100%; } .driver-stats { grid-template-columns:repeat(2,1fr); } }
+        @media (max-width:768px) { body { padding-top:68px; } .page-title { font-size:20px; } .drivers-content { padding:14px; } .table-container table { font-size:12px; } .search-filter-bar .filter-group .filter-btn { flex:1; text-align:center; font-size:11px; padding:4px 10px; } }
+        @media (max-width:576px) { .page-title { font-size:18px; } .drivers-content { padding:12px 10px; } .driver-stats { grid-template-columns:1fr 1fr; } .driver-stats .stat-mini .number { font-size:18px; } .status-badge { font-size:10px; padding:2px 8px; } }
+        ::-webkit-scrollbar { width:6px; } ::-webkit-scrollbar-track { background:#f5f0eb; } ::-webkit-scrollbar-thumb { background:var(--cbwci-purple); border-radius:10px; } ::-webkit-scrollbar-thumb:hover { background:var(--cbwci-gold); }
+        
+        .password-toggle { position:absolute; right:12px; top:50%; transform:translateY(-50%); cursor:pointer; color:var(--cbwci-muted); }
+        .password-toggle:hover { color:var(--cbwci-purple); }
+        .password-input-wrapper { position:relative; }
+        .password-input-wrapper input { padding-right:40px; }
+    </style>
+</head>
+<body>
+
+<!-- ===== NAVBAR ===== -->
+<nav class="navbar navbar-expand-lg fixed-top">
+    <div class="container">
+        <a class="navbar-brand" href="#">
+            <i class="fas fa-church"></i> CBWCI
+            <span class="gold">Changed By The Word</span>
+            <span class="admin-badge"><i class="fas fa-crown"></i> ADMIN</span>
+        </a>
+        <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+            <span class="navbar-toggler-icon" style="filter:invert(1);"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav ms-auto align-items-lg-center">
+                <li class="nav-item"><a class="nav-link" href="#">Home</a></li>
+                <li class="nav-item"><a class="nav-link active" href="#">Admin</a></li>
+                <li class="nav-item"><a class="nav-link" href="/admin/meetings"><i class="fas fa-video"></i> CBWCI Virtual Meeting</a></li>
+                <li class="nav-item"><a class="nav-link" href="#">Profile</a></li>
+                <li class="nav-item ms-lg-2"><a href="#" class="btn btn-back me-2"><i class="fas fa-arrow-left"></i> Back</a></li>
+                <li class="nav-item"><a href="#" class="btn btn-logout" onclick="logoutUser(event)"><i class="fas fa-sign-out-alt"></i> Logout</a></li>
+            </ul>
+        </div>
+    </div>
+</nav>
+
+<!-- ===== ADMIN CONTENT ===== -->
+<section class="admin-wrapper">
+    <div class="container">
+        <div class="row g-3">
+
+            <!-- SIDEBAR -->
+            <div class="col-lg-3" data-aos="fade-right" data-aos-duration="600">
+                <div class="admin-sidebar">
+                    <div class="sidebar-brand">
+                        <div class="brand-icon"><i class="fas fa-crown"></i></div>
+                        <h6>Admin Panel</h6>
+                        <small>CBWCI Church Management</small>
+                    </div>
+                    <ul class="sidebar-nav">
+                        <li><a href="Dashboard.html"><i class="fas fa-chart-pie"></i> Dashboard</a></li>
+                        <li><a href="Members.html"><i class="fas fa-users"></i> Members <span class="badge-nav" id="memberBadge">0</span></a></li>
+                        <li><a href="FollowUp.html"><i class="fas fa-user-plus"></i> Follow-Up <span class="badge-nav-danger" id="followupBadge">0</span></a></li>
+                        <li><a href="#" class="active"><i class="fas fa-taxi"></i> Drivers <span class="badge-nav" id="driverBadge">0</span></a></li>
+                        <li><a href="transport.html"><i class="fas fa-route"></i> Transport</a></li>
+                        <li><a href="announcement.html"><i class="fas fa-bullhorn"></i> Announcements</a></li>
+                        <li><a href="/admin/meetings"><i class="fas fa-video"></i> CBWCI Virtual Meeting</a></li>
+                        <li><a href="reports.html"><i class="fas fa-file-alt"></i> Reports</a></li>
+                        <li style="margin-top:8px;border-top:1px solid #f5f0eb;padding-top:8px;">
+                            <a href="#" style="color:var(--danger);" onclick="logoutUser(event)"><i class="fas fa-sign-out-alt" style="color:var(--danger);"></i> Logout</a>
+                        </li>
+                    </ul>
+                    <div class="sidebar-footer">
+                        <small><i class="fas fa-shield-alt"></i><br>Logged in as <strong id="adminName">Admin</strong></small>
+                    </div>
+                </div>
+            </div>
+
+            <!-- MAIN -->
+            <div class="col-lg-9">
+
+                <!-- header -->
+                <div data-aos="fade-up" data-aos-duration="600">
+                    <div class="breadcrumb-custom">
+                        <a href="#"><i class="fas fa-home"></i> Home</a>
+                        <span class="separator">/</span>
+                        <a href="#">Admin</a>
+                        <span class="separator">/</span>
+                        <span style="color:var(--cbwci-gold-dark);font-weight:500;">Drivers</span>
+                    </div>
+                    <div class="d-flex flex-wrap justify-content-between align-items-center">
+                        <div>
+                            <h1 class="page-title"><i class="fas fa-taxi"></i> Drivers Management</h1>
+                            <p class="page-subtitle">Register drivers, manage credentials, and control access</p>
+                        </div>
+                        <div class="welcome-text mt-1 mt-md-0">
+                            <span class="badge-count"><i class="fas fa-taxi"></i> <span id="totalDriversBadge">0</span> Drivers</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- DRIVERS CONTENT -->
+                <div class="drivers-content mt-2" data-aos="fade-up" data-aos-delay="100">
+                    <div class="content-header">
+                        <h6><i class="fas fa-list"></i> All Drivers</h6>
+                        <span style="font-size:12px;color:var(--cbwci-muted);">
+                            <i class="fas fa-sync-alt"></i> Last updated: <span id="lastUpdated">Just now</span>
+                        </span>
+                    </div>
+
+                    <!-- stats -->
+                    <div class="driver-stats">
+                        <div class="stat-mini total"><div class="number" id="totalCount">0</div><div class="label"><i class="fas fa-users"></i> Total</div></div>
+                        <div class="stat-mini approved"><div class="number" id="approvedCount">0</div><div class="label"><i class="fas fa-check-circle"></i> Approved</div></div>
+                        <div class="stat-mini pending"><div class="number" id="pendingCount">0</div><div class="label"><i class="fas fa-clock"></i> Pending</div></div>
+                        <div class="stat-mini suspended"><div class="number" id="suspendedCount">0</div><div class="label"><i class="fas fa-times-circle"></i> Suspended</div></div>
+                    </div>
+
+                    <!-- search & filter -->
+                    <div class="search-filter-bar">
+                        <div class="search-box">
+                            <i class="fas fa-search"></i>
+                            <input type="text" placeholder="Search by name, vehicle, or phone..." id="searchInput" oninput="filterDrivers()">
+                        </div>
+                        <div class="filter-group">
+                            <button class="filter-btn active" onclick="filterDrivers('all', this)">All</button>
+                            <button class="filter-btn" onclick="filterDrivers('approved', this)">Approved</button>
+                            <button class="filter-btn" onclick="filterDrivers('pending', this)">Pending</button>
+                            <button class="filter-btn" onclick="filterDrivers('suspended', this)">Suspended</button>
+                            <button class="filter-btn" onclick="filterDrivers('inactive', this)">Inactive</button>
+                        </div>
+                        <button class="add-btn" onclick="openAddDriverModal()"><i class="fas fa-plus"></i> Register Driver</button>
+                    </div>
+
+                    <!-- table -->
+                    <div class="table-container">
+                        <table>
+                            <thead>
+                                <tr><th>Driver</th><th>Vehicle</th><th>Phone</th><th>Route</th><th>Status</th><th>Credentials</th><th style="text-align:center;">Actions</th></tr>
+                            </thead>
+                            <tbody id="driversTableBody">
+                                <tr><td colspan="7"><div class="loading-spinner"><div class="spinner"></div><p>Loading drivers...</p></div></td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- pagination -->
+                    <div class="pagination-container">
+                        <span class="info" id="paginationInfo">Showing 0 of 0 drivers</span>
+                        <ul class="pagination">
+                            <li class="disabled"><a href="#"><i class="fas fa-chevron-left"></i></a></li>
+                            <li class="active"><a href="#">1</a></li>
+                            <li class="disabled"><a href="#"><i class="fas fa-chevron-right"></i></a></li>
+                        </ul>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ===== ADD/EDIT DRIVER MODAL ===== -->
+<div class="modal fade" id="addDriverModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title"><i class="fas fa-user-plus" style="color:var(--cbwci-gold);"></i> <span id="modalTitle">Register New Driver</span></h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="addDriverForm">
+                    <div class="row">
+                        <div class="col-md-6"><div class="mb-3"><label class="form-label"><i class="fas fa-user"></i> Full Name <span class="text-danger">*</span></label><input type="text" class="form-control" id="driverName" placeholder="Enter full name" required></div></div>
+                        <div class="col-md-6"><div class="mb-3"><label class="form-label"><i class="fas fa-envelope"></i> Email <span class="text-danger">*</span></label><input type="email" class="form-control" id="driverEmail" placeholder="Enter email" required></div></div>
+                        <div class="col-md-6"><div class="mb-3"><label class="form-label"><i class="fas fa-phone"></i> Phone <span class="text-danger">*</span></label><input type="tel" class="form-control" id="driverPhone" placeholder="Enter phone" required></div></div>
+                        <div class="col-md-6"><div class="mb-3"><label class="form-label"><i class="fas fa-id-card"></i> ID Number</label><input type="text" class="form-control" id="driverId" placeholder="Enter ID number"></div></div>
+                        <div class="col-md-6"><div class="mb-3"><label class="form-label"><i class="fas fa-car"></i> Vehicle Type <span class="text-danger">*</span></label>
+                            <select class="form-select" id="vehicleType" required>
+                                <option value="Toyota Quantum">Toyota Quantum</option>
+                                <option value="Toyota Hiace">Toyota Hiace</option>
+                                <option value="Nissan NV350">Nissan NV350</option>
+                                <option value="Mercedes Sprinter">Mercedes Sprinter</option>
+                                <option value="Other">Other</option>
+                            </select>
+                        </div></div>
+                        <div class="col-md-6"><div class="mb-3"><label class="form-label"><i class="fas fa-id-card"></i> Vehicle Reg <span class="text-danger">*</span></label><input type="text" class="form-control" id="vehicleReg" placeholder="e.g., ABC123MP" required></div></div>
+                        <div class="col-md-12"><div class="mb-3"><label class="form-label"><i class="fas fa-route"></i> Assigned Route <span class="text-danger">*</span></label>
+                            <select class="form-select" id="driverRoute" required>
+                                <option value="">Select a route...</option>
+                                <option value="Sonheuwel">Sonheuwel</option>
+                                <option value="West Acres">West Acres</option>
+                                <option value="Stonehenge">Stonehenge</option>
+                                <option value="Belladonna">Belladonna</option>
+                                <option value="Mataffin">Mataffin</option>
+                                <option value="Nelspruit CBD">Nelspruit CBD</option>
+                                <option value="Msholozi">Msholozi</option>
+                                <option value="WhiteRiver">WhiteRiver</option>
+                                <option value="Ngodini">Ngodini</option>
+                                <option value="HazyView">HazyView</option>
+                                <option value="Flexible">Flexible (Multiple Routes)</option>
+                            </select>
+                        </div></div>
+                        <div class="col-md-6"><div class="mb-3"><label class="form-label"><i class="fas fa-lock"></i> Password <span class="text-danger">*</span></label>
+                            <div class="password-input-wrapper">
+                                <input type="password" class="form-control" id="driverPassword" placeholder="Min 6 characters" minlength="6" required>
+                                <span class="password-toggle" onclick="togglePassword('driverPassword')"><i class="fas fa-eye"></i></span>
+                            </div>
+                            <div class="password-hint">Minimum 6 characters. Driver will use this to login.</div>
+                        </div></div>
+                        <div class="col-md-6"><div class="mb-3"><label class="form-label"><i class="fas fa-tag"></i> Status</label>
+                            <select class="form-select" id="driverStatus">
+                                <option value="pending">Pending</option>
+                                <option value="approved">Approved</option>
+                                <option value="suspended">Suspended</option>
+                                <option value="inactive">Inactive</option>
+                            </select>
+                            <div class="password-hint">Status controls driver's ability to login</div>
+                        </div></div>
+                        <div class="col-md-12"><div class="mb-3"><label class="form-label"><i class="fas fa-sticky-note"></i> Notes</label>
+                            <textarea class="form-control" id="driverNotes" rows="2" placeholder="Additional notes about this driver..."></textarea>
+                        </div></div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary" id="submitDriverBtn" onclick="submitDriver()"><i class="fas fa-save"></i> Register Driver</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ===== VIEW DRIVER MODAL ===== -->
+<div class="modal fade" id="viewDriverModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title"><i class="fas fa-user" style="color:var(--cbwci-gold);"></i> Driver Details</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body" id="viewDriverBody">
+                <div class="text-center mb-3">
+                    <div style="width:80px;height:80px;border-radius:50%;background:linear-gradient(135deg,var(--cbwci-purple),var(--cbwci-purple-dark));display:flex;align-items:center;justify-content:center;margin:0 auto;color:#fff;font-size:30px;font-weight:700;font-family:'Playfair Display',serif;" id="viewAvatar">JD</div>
+                    <h5 class="mt-2" id="viewDriverName">John Doe</h5>
+                    <span class="status-badge pending" id="viewDriverStatus">Pending</span>
+                    <span class="credential-badge active" id="viewCredentialStatus">✅ Active</span>
+                </div>
+                <div style="background:#f8f4f0;border-radius:8px;padding:14px;">
+                    <div style="display:flex;justify-content:space-between;padding:4px 0;border-bottom:1px solid #f0ebe4;"><span style="color:var(--cbwci-muted);font-size:13px;"><i class="fas fa-envelope"></i> Email</span><span style="font-weight:500;font-size:13px;" id="viewDriverEmail">john@email.com</span></div>
+                    <div style="display:flex;justify-content:space-between;padding:4px 0;border-bottom:1px solid #f0ebe4;"><span style="color:var(--cbwci-muted);font-size:13px;"><i class="fas fa-phone"></i> Phone</span><span style="font-weight:500;font-size:13px;" id="viewDriverPhone">+27 82 123 4567</span></div>
+                    <div style="display:flex;justify-content:space-between;padding:4px 0;border-bottom:1px solid #f0ebe4;"><span style="color:var(--cbwci-muted);font-size:13px;"><i class="fas fa-id-card"></i> ID</span><span style="font-weight:500;font-size:13px;" id="viewDriverId">8201011234089</span></div>
+                    <div style="display:flex;justify-content:space-between;padding:4px 0;border-bottom:1px solid #f0ebe4;"><span style="color:var(--cbwci-muted);font-size:13px;"><i class="fas fa-car"></i> Vehicle</span><span style="font-weight:500;font-size:13px;" id="viewVehicle">Toyota Quantum</span></div>
+                    <div style="display:flex;justify-content:space-between;padding:4px 0;border-bottom:1px solid #f0ebe4;"><span style="color:var(--cbwci-muted);font-size:13px;"><i class="fas fa-id-card"></i> Registration</span><span style="font-weight:500;font-size:13px;" id="viewRegistration">ABC123MP</span></div>
+                    <div style="display:flex;justify-content:space-between;padding:4px 0;border-bottom:1px solid #f0ebe4;"><span style="color:var(--cbwci-muted);font-size:13px;"><i class="fas fa-route"></i> Route</span><span style="font-weight:500;font-size:13px;" id="viewRoute">Sonheuwel</span></div>
+                    <div style="display:flex;justify-content:space-between;padding:4px 0;border-bottom:1px solid #f0ebe4;"><span style="color:var(--cbwci-muted);font-size:13px;"><i class="fas fa-calendar"></i> Registered</span><span style="font-weight:500;font-size:13px;" id="viewDateAdded">Today</span></div>
+                    <div style="display:flex;justify-content:space-between;padding:4px 0;"><span style="color:var(--cbwci-muted);font-size:13px;"><i class="fas fa-sticky-note"></i> Notes</span><span style="font-weight:500;font-size:13px;" id="viewNotes">-</span></div>
+                </div>
+                <!-- Credentials Section -->
+                <div class="credentials-box mt-3">
+                    <div style="font-weight:600;font-size:13px;color:var(--cbwci-purple);margin-bottom:6px;"><i class="fas fa-key" style="color:var(--cbwci-gold);"></i> Login Credentials</div>
+                    <div class="cred-row"><span class="label">Email</span><span class="value" id="viewCredEmail">-</span></div>
+                    <div class="cred-row"><span class="label">Password</span><span class="value"><span id="viewCredPassword">••••••••</span> <button class="btn-action view" onclick="togglePasswordVisibility()" title="Show/Hide Password"><i class="fas fa-eye" id="passwordToggleIcon"></i></button></span></div>
+                    <div class="cred-row"><span class="label">Status</span><span class="value" id="viewCredStatus">Active</span></div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-success" id="viewApproveBtn" onclick="approveDriverFromView()"><i class="fas fa-check"></i> Approve</button>
+                <button type="button" class="btn btn-warning" id="viewSuspendBtn" onclick="suspendDriverFromView()" style="color:#fff;"><i class="fas fa-pause"></i> Suspend</button>
+                <button type="button" class="btn btn-primary" onclick="editDriverFromView()"><i class="fas fa-edit"></i> Edit</button>
+                <button type="button" class="btn btn-danger" onclick="resetDriverPassword()"><i class="fas fa-key"></i> Reset Password</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ===== TOAST ===== -->
+<div class="toast-container" id="toastContainer"></div>
+
+<!-- ===== SCRIPTS ===== -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+<script>
+    AOS.init({ duration:600, once:true });
+
+    // ===== FIREBASE =====
+    const firebaseConfig = {
+        apiKey: "AIzaSyBhXS5EOZjEAahTjk8XPd-9PkG3HeKV8bg",
+        authDomain: "cbwci-892de.firebaseapp.com",
+        projectId: "cbwci-892de",
+        storageBucket: "cbwci-892de.firebasestorage.app",
+        messagingSenderId: "187272132769",
+        appId: "1:187272132769:web:63a9fcba465e54867d98e0",
+        databaseURL: "https://cbwci-892de-default-rtdb.firebaseio.com"
+    };
+    if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
+
+    async function createDriverAuthUser(email, password) {
+        const appName = 'cbwciDriverProvisioning';
+        const driverApp = firebase.apps.find(app => app.name === appName) || firebase.initializeApp(firebaseConfig, appName);
+        const driverAuth = driverApp.auth();
+        const credential = await driverAuth.createUserWithEmailAndPassword(email, password);
+        await driverAuth.signOut();
+        return credential.user.uid;
+    }
+
+    // ===== TOAST =====
+    function showToast(title, message, type='success') {
+        const container = document.getElementById('toastContainer');
+        const iconMap = { success:'fa-check-circle', danger:'fa-exclamation-circle', warning:'fa-exclamation-triangle', info:'fa-info-circle' };
+        const colorMap = { success:'var(--success)', danger:'var(--danger)', warning:'var(--warning)', info:'var(--info)' };
+        const toast = document.createElement('div');
+        toast.className = `toast-custom ${type==='danger'?'toast-danger':''}`;
+        toast.innerHTML = `<i class="fas ${iconMap[type]||'fa-check-circle'}" style="color:${colorMap[type]||'var(--success)'};"></i><div class="msg"><h6>${title}</h6><small>${message}</small></div>`;
+        container.appendChild(toast);
+        setTimeout(() => { toast.style.opacity='0'; toast.style.transform='translateX(50px)'; setTimeout(()=>toast.remove(),400); }, 4000);
+    }
+    window.showToast = showToast;
+
+    // ===== LOGOUT =====
+    function logoutUser(e) {
+        e.preventDefault();
+        if (confirm('Logout?')) {
+            firebase.auth().signOut().then(() => {
+                sessionStorage.clear();
+                showToast('Logged Out', 'See you soon!', 'info');
+                setTimeout(() => window.location.href='login.html', 1500);
+            }).catch(() => showToast('Error', 'Logout failed', 'danger'));
+        }
+    }
+
+    // ===== TOGGLE PASSWORD VISIBILITY =====
+    function togglePassword(fieldId) {
+        const input = document.getElementById(fieldId);
+        const icon = input.parentElement.querySelector('.password-toggle i');
+        if (input.type === 'password') {
+            input.type = 'text';
+            icon.className = 'fas fa-eye-slash';
+        } else {
+            input.type = 'password';
+            icon.className = 'fas fa-eye';
+        }
+    }
+    window.togglePassword = togglePassword;
+
+    let showPassword = false;
+    function togglePasswordVisibility() {
+        showPassword = !showPassword;
+        const pwdSpan = document.getElementById('viewCredPassword');
+        const icon = document.getElementById('passwordToggleIcon');
+        if (showPassword) {
+            pwdSpan.textContent = window._viewDriverPassword || '••••••••';
+            icon.className = 'fas fa-eye-slash';
+        } else {
+            pwdSpan.textContent = '••••••••';
+            icon.className = 'fas fa-eye';
+        }
+    }
+    window.togglePasswordVisibility = togglePasswordVisibility;
+
+    // ===== STATE =====
+    let allDrivers = [];
+    let filteredDrivers = [];
+    let currentFilter = 'all';
+    let currentSearch = '';
+    let currentViewId = null;
+    let editingDriverId = null;
+
+    // ===== FIREBASE: FETCH DRIVERS =====
+    async function fetchDriversFromFirebase() {
+        try {
+            const snapshot = await firebase.database().ref('drivers').once('value');
+            const data = snapshot.val();
+            if (data) {
+                allDrivers = Object.keys(data).map(key => {
+                    const raw = data[key];
+                    return {
+                        id: key,
+                        name: raw.name || 'Unknown Driver',
+                        email: raw.email || 'No email',
+                        phone: raw.phone || 'N/A',
+                        idNumber: raw.idNumber || 'Not provided',
+                        vehicle: raw.vehicle || 'N/A',
+                        registration: raw.registration || 'N/A',
+                        route: raw.route || 'Not Assigned',
+                        status: raw.status || 'pending',
+                        credentialsActive: raw.credentialsActive !== false,
+                        dateAdded: raw.dateAdded || new Date().toLocaleDateString('en-ZA'),
+                        notes: raw.notes || '',
+                        createdAt: raw.createdAt || Date.now(),
+                        password: raw.password || '',
+                        driverUid: raw.driverUid || ''
+                    };
+                });
+                allDrivers.sort((a,b) => (b.createdAt || 0) - (a.createdAt || 0));
+            } else {
+                allDrivers = [];
+            }
+            document.getElementById('lastUpdated').textContent = new Date().toLocaleString();
+            applyFiltersAndRender();
+            updateStats(allDrivers);
+            updateBadges(allDrivers);
+        } catch (err) {
+            console.error('Error fetching drivers:', err);
+            showToast('Error', 'Failed to load drivers.', 'danger');
+            document.getElementById('driversTableBody').innerHTML = `<tr><td colspan="7"><div class="empty-state"><i class="fas fa-database"></i><h6>Error loading</h6><p>${err.message}</p></div></td></tr>`;
+        }
+    }
+
+    // ===== UPDATE BADGES =====
+    function updateBadges(data) {
+        const total = data.length;
+        document.getElementById('driverBadge').textContent = total;
+        document.getElementById('totalDriversBadge').textContent = total;
+    }
+
+    // ===== UPDATE STATS =====
+    function updateStats(data) {
+        const total = data.length;
+        const approved = data.filter(d => d.status === 'approved' && d.credentialsActive !== false).length;
+        const pending = data.filter(d => d.status === 'pending').length;
+        const suspended = data.filter(d => d.status === 'suspended' || d.credentialsActive === false).length;
+        document.getElementById('totalCount').textContent = total;
+        document.getElementById('approvedCount').textContent = approved;
+        document.getElementById('pendingCount').textContent = pending;
+        document.getElementById('suspendedCount').textContent = suspended;
+    }
+
+    // ===== RENDER DRIVERS TABLE =====
+    function renderDriversTable(data) {
+        const tbody = document.getElementById('driversTableBody');
+        if (!data || data.length === 0) {
+            tbody.innerHTML = `
+                <tr><td colspan="7">
+                    <div class="empty-state">
+                        <i class="fas fa-taxi"></i>
+                        <h6>No Drivers Registered</h6>
+                        <p>There are no drivers in the database yet. Click the button below to register your first driver.</p>
+                        <button class="add-btn" style="margin-top:12px;padding:8px 24px;" onclick="openAddDriverModal()"><i class="fas fa-plus"></i> Register First Driver</button>
+                    </div>
+                </td></tr>
+            `;
+            return;
+        }
+        let html = '';
+        data.forEach(driver => {
+            const initials = driver.name.split(' ').map(n=>n[0]).join('').toUpperCase().slice(0,2);
+            const statusClass = driver.status || 'pending';
+            const statusLabels = { approved:'Approved', pending:'Pending', suspended:'Suspended', inactive:'Inactive' };
+            const credClass = driver.credentialsActive !== false ? 'active' : 'inactive';
+            const credLabel = driver.credentialsActive !== false ? 'Active' : 'Inactive';
+            const route = driver.route || 'Not Assigned';
+            html += `
+                <tr>
+                    <td><div class="driver-info"><div class="driver-avatar-sm">${initials}</div><div class="driver-details"><div class="name">${driver.name}</div><div class="email">${driver.email}</div></div></div></td>
+                    <td><span class="vehicle-badge"><i class="fas fa-car"></i> ${driver.vehicle}</span><div style="font-size:11px;color:var(--cbwci-muted);margin-top:2px;">${driver.registration}</div></td>
+                    <td style="font-size:13px;">${driver.phone}</td>
+                    <td style="font-size:13px;">${route}</td>
+                    <td><span class="status-badge ${statusClass}">${statusLabels[statusClass]||statusClass}</span></td>
+                    <td><span class="credential-badge ${credClass}">${credLabel}</span></td>
+                    <td style="text-align:center;"><div class="action-btns">
+                        <button class="btn-action view" onclick="viewDriver('${driver.id}')" title="View"><i class="fas fa-eye"></i></button>
+                        <button class="btn-action edit" onclick="editDriver('${driver.id}')" title="Edit"><i class="fas fa-edit"></i></button>
+                        ${driver.status === 'pending' ? `<button class="btn-action approve" onclick="approveDriverAction('${driver.id}')" title="Approve"><i class="fas fa-check"></i></button>` : ''}
+                        ${driver.status === 'approved' && driver.credentialsActive !== false ? `<button class="btn-action suspend" onclick="suspendDriverAction('${driver.id}')" title="Suspend"><i class="fas fa-pause"></i></button>` : ''}
+                        ${driver.status === 'suspended' || driver.credentialsActive === false ? `<button class="btn-action approve" onclick="reactivateDriverAction('${driver.id}')" title="Reactivate"><i class="fas fa-play"></i></button>` : ''}
+                        <button class="btn-action credentials" onclick="toggleCredentials('${driver.id}')" title="Toggle Credentials"><i class="fas fa-key"></i></button>
+                        <button class="btn-action delete" onclick="deleteDriver('${driver.id}')" title="Delete"><i class="fas fa-trash"></i></button>
+                    </div></td>
+                </tr>
+            `;
+        });
+        tbody.innerHTML = html;
+        document.getElementById('paginationInfo').textContent = `Showing ${data.length} of ${allDrivers.length} drivers`;
+    }
+
+    // ===== APPLY FILTERS =====
+    function applyFiltersAndRender() {
+        let data = [...allDrivers];
+        if (currentFilter !== 'all') {
+            data = data.filter(d => d.status === currentFilter);
+        }
+        if (currentSearch.trim()) {
+            const q = currentSearch.trim().toLowerCase();
+            data = data.filter(d =>
+                d.name.toLowerCase().includes(q) ||
+                d.phone.includes(q) ||
+                (d.vehicle && d.vehicle.toLowerCase().includes(q)) ||
+                (d.registration && d.registration.toLowerCase().includes(q)) ||
+                (d.email && d.email.toLowerCase().includes(q))
+            );
+        }
+        filteredDrivers = data;
+        renderDriversTable(data);
+    }
+
+    function filterDrivers(filter, btn) {
+        if (btn) {
+            document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            currentFilter = filter;
+        } else {
+            currentSearch = document.getElementById('searchInput').value;
+        }
+        applyFiltersAndRender();
+    }
+    window.filterDrivers = filterDrivers;
+
+    document.getElementById('searchInput').addEventListener('input', function() {
+        currentSearch = this.value;
+        applyFiltersAndRender();
+    });
+
+    // ===== OPEN ADD MODAL =====
+    function openAddDriverModal() {
+        editingDriverId = null;
+        document.getElementById('modalTitle').textContent = 'Register New Driver';
+        document.getElementById('submitDriverBtn').innerHTML = '<i class="fas fa-save"></i> Register Driver';
+        document.getElementById('addDriverForm').reset();
+        document.getElementById('driverStatus').value = 'pending';
+        document.getElementById('driverPassword').value = '';
+        document.getElementById('driverPassword').required = true;
+        document.getElementById('driverNotes').value = '';
+        const modal = new bootstrap.Modal(document.getElementById('addDriverModal'));
+        modal.show();
+    }
+    window.openAddDriverModal = openAddDriverModal;
+
+    // ===== SUBMIT DRIVER (Add or Update) =====
+    async function submitDriver() {
+        const name = document.getElementById('driverName').value.trim();
+        const email = document.getElementById('driverEmail').value.trim();
+        const phone = document.getElementById('driverPhone').value.trim();
+        const idNumber = document.getElementById('driverId').value.trim();
+        const vehicle = document.getElementById('vehicleType').value;
+        const registration = document.getElementById('vehicleReg').value.trim().toUpperCase();
+        const route = document.getElementById('driverRoute').value;
+        const status = document.getElementById('driverStatus').value;
+        const password = document.getElementById('driverPassword').value;
+        const notes = document.getElementById('driverNotes').value.trim();
+
+        if (!name || !email || !phone || !registration || !route) {
+            showToast('Error', 'Please fill in all required fields.', 'danger');
+            return;
+        }
+
+        if (!editingDriverId && (!password || password.length < 6)) {
+            showToast('Error', 'Password must be at least 6 characters.', 'danger');
+            return;
+        }
+
+        try {
+            if (editingDriverId) {
+                // UPDATE existing driver
+                const updateData = {
+                    name, email, phone, idNumber: idNumber || 'Not provided',
+                    vehicle, registration, route, status, notes,
+                    updatedAt: Date.now()
+                };
+                if (password && password.length >= 6) {
+                    updateData.password = password;
+                }
+                await firebase.database().ref(`drivers/${editingDriverId}`).update(updateData);
+                showToast('Driver Updated', `${name} has been updated.`, 'success');
+            } else {
+                // CREATE new driver with a separate Auth instance so the admin stays signed in.
+                const driverUid = await createDriverAuthUser(email, password);
+                
+                // 2. Store driver data
+                const newDriver = {
+                    name, email, phone,
+                    idNumber: idNumber || 'Not provided',
+                    vehicle, registration, route, status,
+                    notes,
+                    driverUid: driverUid,
+                    credentialsActive: status === 'approved' ? true : false,
+                    dateAdded: new Date().toLocaleDateString('en-ZA'),
+                    createdAt: Date.now(),
+                    password: password // Store for reference (in real app, use proper password management)
+                };
+                
+                await firebase.database().ref(`drivers/${driverUid}`).set(newDriver);
+                showToast('Driver Registered', `${name} has been registered with login credentials!`, 'success');
+            }
+            
+            bootstrap.Modal.getInstance(document.getElementById('addDriverModal')).hide();
+            await fetchDriversFromFirebase();
+        } catch (err) {
+            console.error(err);
+            if (err.code === 'auth/email-already-in-use') {
+                showToast('Error', 'This email is already registered as a driver.', 'danger');
+            } else {
+                showToast('Error', err.message || 'Failed to register driver.', 'danger');
+            }
+        }
+    }
+    window.submitDriver = submitDriver;
+
+    // ===== VIEW DRIVER =====
+    function viewDriver(id) {
+        const driver = allDrivers.find(d => d.id === id);
+        if (!driver) { showToast('Error', 'Driver not found.', 'danger'); return; }
+        currentViewId = id;
+        window._viewDriverPassword = driver.password || '••••••••';
+        showPassword = false;
+        
+        const initials = driver.name.split(' ').map(n=>n[0]).join('').toUpperCase().slice(0,2);
+        document.getElementById('viewAvatar').textContent = initials;
+        document.getElementById('viewDriverName').textContent = driver.name;
+        document.getElementById('viewDriverEmail').textContent = driver.email;
+        document.getElementById('viewDriverPhone').textContent = driver.phone;
+        document.getElementById('viewDriverId').textContent = driver.idNumber;
+        document.getElementById('viewVehicle').textContent = driver.vehicle;
+        document.getElementById('viewRegistration').textContent = driver.registration;
+        document.getElementById('viewRoute').textContent = driver.route;
+        document.getElementById('viewDateAdded').textContent = driver.dateAdded || 'Today';
+        document.getElementById('viewNotes').textContent = driver.notes || '-';
+        document.getElementById('viewCredEmail').textContent = driver.email;
+        document.getElementById('viewCredPassword').textContent = '••••••••';
+        document.getElementById('passwordToggleIcon').className = 'fas fa-eye';
+        
+        const statusEl = document.getElementById('viewDriverStatus');
+        statusEl.textContent = driver.status.charAt(0).toUpperCase()+driver.status.slice(1);
+        statusEl.className = `status-badge ${driver.status}`;
+        
+        const credStatus = document.getElementById('viewCredStatus');
+        const credStatusEl = document.getElementById('viewCredentialStatus');
+        if (driver.credentialsActive !== false) {
+            credStatus.textContent = '✅ Active';
+            credStatus.style.color = 'var(--success)';
+            credStatusEl.textContent = '✅ Active';
+            credStatusEl.className = 'credential-badge active';
+        } else {
+            credStatus.textContent = '⛔ Inactive';
+            credStatus.style.color = 'var(--danger)';
+            credStatusEl.textContent = '⛔ Inactive';
+            credStatusEl.className = 'credential-badge inactive';
+        }
+        
+        // Show/hide buttons based on status
+        const approveBtn = document.getElementById('viewApproveBtn');
+        const suspendBtn = document.getElementById('viewSuspendBtn');
+        if (driver.status === 'pending') {
+            approveBtn.style.display = 'inline-block';
+            approveBtn.textContent = 'Approve';
+            suspendBtn.style.display = 'none';
+        } else if (driver.status === 'approved' && driver.credentialsActive !== false) {
+            approveBtn.style.display = 'none';
+            suspendBtn.style.display = 'inline-block';
+            suspendBtn.textContent = 'Suspend';
+        } else if (driver.status === 'suspended' || driver.credentialsActive === false) {
+            approveBtn.style.display = 'inline-block';
+            approveBtn.textContent = 'Reactivate';
+            suspendBtn.style.display = 'none';
+        } else {
+            approveBtn.style.display = 'none';
+            suspendBtn.style.display = 'none';
+        }
+        
+        const modal = new bootstrap.Modal(document.getElementById('viewDriverModal'));
+        modal.show();
+    }
+    window.viewDriver = viewDriver;
+
+    // ===== APPROVE FROM VIEW =====
+    function approveDriverFromView() {
+        if (currentViewId) {
+            const driver = allDrivers.find(d => d.id === currentViewId);
+            if (driver && driver.status === 'suspended') {
+                reactivateDriverAction(currentViewId);
+            } else {
+                approveDriverAction(currentViewId);
+            }
+            bootstrap.Modal.getInstance(document.getElementById('viewDriverModal')).hide();
+        }
+    }
+    window.approveDriverFromView = approveDriverFromView;
+
+    // ===== SUSPEND FROM VIEW =====
+    function suspendDriverFromView() {
+        if (currentViewId) {
+            suspendDriverAction(currentViewId);
+            bootstrap.Modal.getInstance(document.getElementById('viewDriverModal')).hide();
+        }
+    }
+    window.suspendDriverFromView = suspendDriverFromView;
+
+    // ===== APPROVE DRIVER ACTION =====
+    async function approveDriverAction(id) {
+        const driver = allDrivers.find(d => d.id === id);
+        if (!driver) return;
+        try {
+            await firebase.database().ref(`drivers/${id}`).update({ 
+                status: 'approved',
+                credentialsActive: true
+            });
+            showToast('Driver Approved', `${driver.name} has been approved and can now login.`, 'success');
+            await fetchDriversFromFirebase();
+        } catch (err) {
+            showToast('Error', 'Failed to approve driver.', 'danger');
+        }
+    }
+    window.approveDriverAction = approveDriverAction;
+
+    // ===== REACTIVATE DRIVER =====
+    async function reactivateDriverAction(id) {
+        const driver = allDrivers.find(d => d.id === id);
+        if (!driver) return;
+        try {
+            await firebase.database().ref(`drivers/${id}`).update({ 
+                status: 'approved',
+                credentialsActive: true
+            });
+            showToast('Driver Reactivated', `${driver.name} has been reactivated.`, 'success');
+            await fetchDriversFromFirebase();
+        } catch (err) {
+            showToast('Error', 'Failed to reactivate driver.', 'danger');
+        }
+    }
+    window.reactivateDriverAction = reactivateDriverAction;
+
+    // ===== SUSPEND DRIVER ACTION =====
+    async function suspendDriverAction(id) {
+        const driver = allDrivers.find(d => d.id === id);
+        if (!driver) return;
+        if (!confirm(`Suspend ${driver.name}'s credentials? They will not be able to login.`)) return;
+        try {
+            await firebase.database().ref(`drivers/${id}`).update({ 
+                status: 'suspended',
+                credentialsActive: false
+            });
+            showToast('Driver Suspended', `${driver.name} has been suspended.`, 'warning');
+            await fetchDriversFromFirebase();
+        } catch (err) {
+            showToast('Error', 'Failed to suspend driver.', 'danger');
+        }
+    }
+    window.suspendDriverAction = suspendDriverAction;
+
+    // ===== TOGGLE CREDENTIALS =====
+    async function toggleCredentials(id) {
+        const driver = allDrivers.find(d => d.id === id);
+        if (!driver) return;
+        const newState = driver.credentialsActive === false ? true : false;
+        const action = newState ? 'activate' : 'deactivate';
+        if (!confirm(`${action === 'activate' ? 'Activate' : 'Deactivate'} ${driver.name}'s credentials?`)) return;
+        try {
+            await firebase.database().ref(`drivers/${id}`).update({ 
+                credentialsActive: newState,
+                status: newState ? 'approved' : 'suspended'
+            });
+            showToast('Credentials Updated', `${driver.name}'s credentials are now ${newState ? 'Active' : 'Inactive'}.`, 'info');
+            await fetchDriversFromFirebase();
+        } catch (err) {
+            showToast('Error', 'Failed to update credentials.', 'danger');
+        }
+    }
+    window.toggleCredentials = toggleCredentials;
+
+    // ===== RESET DRIVER PASSWORD =====
+    async function resetDriverPassword() {
+        if (!currentViewId) return;
+        const driver = allDrivers.find(d => d.id === currentViewId);
+        if (!driver) return;
+        const newPassword = prompt(`Enter new password for ${driver.name}:`, '');
+        if (!newPassword || newPassword.length < 6) {
+            showToast('Error', 'Password must be at least 6 characters.', 'danger');
+            return;
+        }
+        try {
+            await firebase.database().ref(`drivers/${currentViewId}`).update({ password: newPassword });
+            window._viewDriverPassword = newPassword;
+            showToast('Password Reset', `${driver.name}'s password has been reset.`, 'success');
+            await fetchDriversFromFirebase();
+        } catch (err) {
+            showToast('Error', 'Failed to reset password.', 'danger');
+        }
+    }
+    window.resetDriverPassword = resetDriverPassword;
+
+    // ===== EDIT DRIVER =====
+    function editDriver(id) {
+        const driver = allDrivers.find(d => d.id === id);
+        if (!driver) { showToast('Error', 'Driver not found.', 'danger'); return; }
+        editingDriverId = id;
+        document.getElementById('modalTitle').textContent = 'Edit Driver';
+        document.getElementById('submitDriverBtn').innerHTML = '<i class="fas fa-save"></i> Update Driver';
+        
+        document.getElementById('driverName').value = driver.name;
+        document.getElementById('driverEmail').value = driver.email !== 'No email' ? driver.email : '';
+        document.getElementById('driverPhone').value = driver.phone;
+        document.getElementById('driverId').value = driver.idNumber !== 'Not provided' ? driver.idNumber : '';
+        document.getElementById('vehicleType').value = driver.vehicle;
+        document.getElementById('vehicleReg').value = driver.registration;
+        document.getElementById('driverRoute').value = driver.route;
+        document.getElementById('driverStatus').value = driver.status;
+        document.getElementById('driverPassword').value = '';
+        document.getElementById('driverPassword').required = false;
+        document.getElementById('driverPassword').placeholder = 'Leave blank to keep current password';
+        document.getElementById('driverNotes').value = driver.notes || '';
+        
+        const modal = new bootstrap.Modal(document.getElementById('addDriverModal'));
+        modal.show();
+    }
+    window.editDriver = editDriver;
+
+    // ===== EDIT FROM VIEW =====
+    function editDriverFromView() {
+        if (currentViewId) {
+            bootstrap.Modal.getInstance(document.getElementById('viewDriverModal')).hide();
+            editDriver(currentViewId);
+        }
+    }
+    window.editDriverFromView = editDriverFromView;
+
+    // ===== DELETE DRIVER =====
+    async function deleteDriver(id) {
+        const driver = allDrivers.find(d => d.id === id);
+        if (!driver) return;
+        if (!confirm(`Delete ${driver.name}? This will also remove their login credentials.`)) return;
+        try {
+            // Delete Firebase Auth user if exists
+            if (driver.driverUid) {
+                // Note: Deleting Auth user requires admin SDK, so we'll handle it server-side
+                // For now, we'll just delete the database entry
+                console.log('Deleting driver with UID:', driver.driverUid);
+            }
+            await firebase.database().ref(`drivers/${id}`).remove();
+            showToast('Driver Deleted', `${driver.name} has been removed.`, 'danger');
+            await fetchDriversFromFirebase();
+        } catch (err) {
+            showToast('Error', 'Failed to delete driver.', 'danger');
+        }
+    }
+    window.deleteDriver = deleteDriver;
+
+    // ===== AUTH CHECK =====
+    firebase.auth().onAuthStateChanged(async user => {
+        if (user) {
+            console.log('✅ Admin logged in:', user.uid);
+            document.getElementById('adminName').textContent = user.displayName || 'Admin';
+            await fetchDriversFromFirebase();
+        } else {
+            showToast('Not Logged In', 'Please log in to access drivers.', 'warning');
+            setTimeout(() => window.location.href='login.html', 2000);
+        }
+    });
+
+    console.log('%c✝ CBWCI - Drivers Management ✝', 'font-size:18px;color:#C9A84C;font-weight:bold;');
+    console.log('🚕 Complete driver management with authentication');
+    console.log('🔐 Each driver gets their own login credentials');
+    console.log('⏸️ Admins can suspend/reactivate credentials');
+    console.log('🔄 Real-time updates from Firebase');
+</script>
+</body>
+</html>

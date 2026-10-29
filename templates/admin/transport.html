@@ -1,0 +1,689 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Transport Management · CBWCI Admin</title>
+    <!-- Bootstrap 5 -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome 6 -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- AOS -->
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+    <!-- Firebase -->
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+
+    <style>
+        :root {
+            --cbwci-purple: #4A1942;
+            --cbwci-purple-light: #6B2D5F;
+            --cbwci-purple-dark: #2E0F28;
+            --cbwci-gold: #C9A84C;
+            --cbwci-gold-light: #E8CD7A;
+            --cbwci-gold-dark: #A8893A;
+            --cbwci-cream: #FDF8F0;
+            --cbwci-dark: #1A0F16;
+            --cbwci-text: #2C1A24;
+            --cbwci-muted: #7A6A72;
+            --shadow: 0 10px 40px rgba(74, 25, 66, 0.12);
+            --shadow-hover: 0 15px 50px rgba(74, 25, 66, 0.2);
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            --success: #2D8F5C;
+            --danger: #C0392B;
+            --warning: #E67E22;
+            --info: #2980B9;
+        }
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body { font-family:'Inter',sans-serif; background:#f5f0eb; color:var(--cbwci-text); padding-top:76px; min-height:100vh; }
+
+        .navbar { background: linear-gradient(135deg, var(--cbwci-purple), var(--cbwci-purple-dark)); padding:10px 0; box-shadow:0 4px 30px rgba(0,0,0,0.3); border-bottom:3px solid var(--cbwci-gold); }
+        .navbar-brand { font-family:'Playfair Display',serif; font-weight:900; font-size:20px; color:#fff!important; letter-spacing:2px; }
+        .navbar-brand .gold { color:var(--cbwci-gold); display:block; font-size:12px; letter-spacing:4px; }
+        .navbar-brand i { color:var(--cbwci-gold); margin-right:10px; }
+        .nav-link { color:rgba(255,255,255,0.8)!important; font-weight:500; font-size:13px; letter-spacing:1px; transition:var(--transition); padding:6px 16px!important; border-radius:8px; }
+        .nav-link:hover { color:var(--cbwci-gold)!important; background:rgba(201,168,76,0.1); }
+        .nav-link.active { color:var(--cbwci-gold)!important; }
+        .navbar .btn-back { background:transparent; border:2px solid rgba(255,255,255,0.2); color:#fff; padding:4px 16px; border-radius:8px; font-weight:600; font-size:12px; transition:var(--transition); text-decoration:none; }
+        .navbar .btn-back:hover { background:rgba(255,255,255,0.1); border-color:#fff; transform:translateY(-2px); color:#fff; }
+        .navbar .btn-logout { background:transparent; border:2px solid rgba(255,255,255,0.2); color:#fff; padding:4px 16px; border-radius:8px; font-weight:600; font-size:12px; transition:var(--transition); text-decoration:none; cursor:pointer; }
+        .navbar .btn-logout:hover { background:var(--danger); border-color:var(--danger); transform:translateY(-2px); color:#fff; }
+        .navbar .admin-badge { background:var(--cbwci-gold); color:var(--cbwci-purple-dark); font-size:10px; font-weight:700; padding:2px 12px; border-radius:50px; margin-left:8px; letter-spacing:1px; }
+
+        .admin-wrapper { padding:10px 0 40px; }
+        .breadcrumb-custom { color:var(--cbwci-muted); font-size:12px; margin-bottom:2px; }
+        .breadcrumb-custom a { color:var(--cbwci-purple); text-decoration:none; transition:var(--transition); }
+        .breadcrumb-custom a:hover { color:var(--cbwci-gold); }
+        .breadcrumb-custom .separator { margin:0 6px; color:var(--cbwci-gold); }
+        .page-title { font-family:'Playfair Display',serif; font-weight:700; color:var(--cbwci-purple); font-size:24px; margin:0; }
+        .page-title i { color:var(--cbwci-gold); }
+        .page-subtitle { color:var(--cbwci-muted); font-size:13px; margin:0; }
+        .welcome-text { color:var(--cbwci-muted); font-size:13px; font-weight:400; }
+        .welcome-text strong { color:var(--cbwci-purple); }
+
+        .admin-sidebar { background:#fff; border-radius:12px; padding:16px 14px; box-shadow:0 2px 12px rgba(0,0,0,0.06); border:1px solid rgba(201,168,76,0.06); position:sticky; top:96px; }
+        .admin-sidebar .sidebar-brand { text-align:center; padding-bottom:12px; border-bottom:2px solid #f5f0eb; margin-bottom:12px; }
+        .admin-sidebar .sidebar-brand .brand-icon { font-size:28px; color:var(--cbwci-gold); }
+        .admin-sidebar .sidebar-brand h6 { font-family:'Playfair Display',serif; font-weight:700; color:var(--cbwci-purple); margin-top:2px; font-size:14px; }
+        .admin-sidebar .sidebar-brand small { color:var(--cbwci-muted); font-size:10px; }
+        .admin-sidebar .sidebar-nav { list-style:none; padding:0; margin:0; }
+        .admin-sidebar .sidebar-nav li { margin-bottom:2px; }
+        .admin-sidebar .sidebar-nav li a { display:flex; align-items:center; gap:8px; padding:8px 12px; border-radius:8px; color:var(--cbwci-text); text-decoration:none; transition:var(--transition); font-weight:500; font-size:12px; }
+        .admin-sidebar .sidebar-nav li a i { width:16px; color:var(--cbwci-muted); transition:var(--transition); font-size:13px; }
+        .admin-sidebar .sidebar-nav li a:hover { background:rgba(74,25,66,0.05); color:var(--cbwci-purple); }
+        .admin-sidebar .sidebar-nav li a.active { background:linear-gradient(135deg,var(--cbwci-purple),var(--cbwci-purple-dark)); color:#fff; box-shadow:0 4px 15px rgba(74,25,66,0.25); }
+        .admin-sidebar .sidebar-nav li a.active i { color:#fff; }
+        .admin-sidebar .sidebar-nav li a .badge-nav { margin-left:auto; background:var(--cbwci-gold); color:var(--cbwci-purple-dark); font-size:9px; padding:1px 8px; border-radius:50px; }
+        .admin-sidebar .sidebar-nav li a .badge-nav-danger { margin-left:auto; background:var(--danger); color:#fff; font-size:9px; padding:1px 8px; border-radius:50px; }
+        .admin-sidebar .sidebar-footer { margin-top:12px; padding-top:12px; border-top:2px solid #f5f0eb; text-align:center; }
+        .admin-sidebar .sidebar-footer small { color:var(--cbwci-muted); font-size:10px; }
+        .admin-sidebar .sidebar-footer i { color:var(--cbwci-gold); }
+
+        .transport-content { background:#fff; border-radius:12px; padding:18px 20px; box-shadow:0 2px 12px rgba(0,0,0,0.06); border:1px solid rgba(201,168,76,0.06); }
+        .transport-content .content-header { display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; margin-bottom:16px; padding-bottom:12px; border-bottom:2px solid #f5f0eb; }
+        .transport-content .content-header h6 { font-weight:700; color:var(--cbwci-purple); margin:0; font-size:15px; }
+        .transport-content .content-header h6 i { color:var(--cbwci-gold); margin-right:8px; }
+
+        .transport-stats { display:grid; grid-template-columns:repeat(auto-fit, minmax(120px, 1fr)); gap:10px; margin-bottom:16px; }
+        .transport-stats .stat-mini { background:#f8f4f0; border-radius:8px; padding:10px 14px; text-align:center; }
+        .transport-stats .stat-mini .number { font-family:'Playfair Display',serif; font-weight:900; font-size:22px; color:var(--cbwci-purple); }
+        .transport-stats .stat-mini .label { font-size:11px; color:var(--cbwci-muted); }
+        .transport-stats .stat-mini .label i { margin-right:4px; }
+        .transport-stats .stat-mini.active .number { color:var(--success); }
+        .transport-stats .stat-mini.completed .number { color:var(--info); }
+        .transport-stats .stat-mini.idle .number { color:var(--cbwci-muted); }
+        .transport-stats .stat-mini.total .number { color:var(--cbwci-purple); }
+
+        .fleet-overview { display:grid; grid-template-columns:repeat(auto-fit, minmax(200px, 1fr)); gap:12px; margin-bottom:16px; }
+        .fleet-overview .taxi-card { background:linear-gradient(135deg,rgba(74,25,66,0.03),rgba(201,168,76,0.05)); border-radius:10px; padding:14px 16px; border:1px solid rgba(201,168,76,0.08); transition:var(--transition); }
+        .fleet-overview .taxi-card:hover { transform:translateY(-2px); box-shadow:var(--shadow); }
+        .fleet-overview .taxi-card .taxi-header { display:flex; justify-content:space-between; align-items:center; margin-bottom:6px; }
+        .fleet-overview .taxi-card .taxi-header .taxi-name { font-weight:700; color:var(--cbwci-purple); font-size:14px; }
+        .fleet-overview .taxi-card .taxi-header .taxi-status { font-size:10px; font-weight:600; padding:2px 10px; border-radius:50px; }
+        .fleet-overview .taxi-card .taxi-header .taxi-status.active { background:rgba(45,143,92,0.12); color:var(--success); animation:pulse-badge 2s infinite; }
+        .fleet-overview .taxi-card .taxi-header .taxi-status.completed { background:rgba(41,128,185,0.12); color:var(--info); }
+        .fleet-overview .taxi-card .taxi-header .taxi-status.idle { background:rgba(122,106,114,0.12); color:var(--cbwci-muted); }
+        @keyframes pulse-badge { 0%,100%{opacity:1;} 50%{opacity:0.6;} }
+        .fleet-overview .taxi-card .taxi-details { font-size:12px; color:var(--cbwci-muted); }
+        .fleet-overview .taxi-card .taxi-details span { display:inline-block; margin-right:12px; }
+        .fleet-overview .taxi-card .taxi-details i { color:var(--cbwci-gold); width:14px; }
+
+        .search-filter-bar { display:flex; gap:10px; flex-wrap:wrap; margin-bottom:16px; margin-top:10px; }
+        .search-filter-bar .search-box { flex:1; min-width:200px; position:relative; }
+        .search-filter-bar .search-box input { width:100%; padding:8px 14px 8px 36px; border-radius:8px; border:2px solid #E8DCC8; background:#FDFAF5; font-size:13px; transition:var(--transition); }
+        .search-filter-bar .search-box input:focus { border-color:var(--cbwci-gold); outline:none; box-shadow:0 0 0 3px rgba(201,168,76,0.1); }
+        .search-filter-bar .search-box i { position:absolute; left:12px; top:50%; transform:translateY(-50%); color:var(--cbwci-muted); font-size:14px; }
+        .search-filter-bar .filter-group { display:flex; gap:6px; flex-wrap:wrap; }
+        .search-filter-bar .filter-group .filter-btn { padding:6px 14px; border-radius:50px; border:2px solid #E8DCC8; background:transparent; font-size:12px; font-weight:600; color:var(--cbwci-muted); transition:var(--transition); cursor:pointer; }
+        .search-filter-bar .filter-group .filter-btn:hover { border-color:var(--cbwci-purple); color:var(--cbwci-purple); }
+        .search-filter-bar .filter-group .filter-btn.active { background:var(--cbwci-purple); border-color:var(--cbwci-purple); color:#fff; }
+
+        .table-container { overflow-x:auto; }
+        .table-container table { width:100%; border-collapse:collapse; font-size:13px; }
+        .table-container table thead th { background:#f8f4f0; padding:10px 12px; text-align:left; font-weight:600; color:var(--cbwci-purple); border-bottom:2px solid #f0ebe4; font-size:12px; text-transform:uppercase; letter-spacing:0.5px; white-space:nowrap; }
+        .table-container table tbody td { padding:10px 12px; border-bottom:1px solid #f5f0eb; vertical-align:middle; }
+        .table-container table tbody tr:hover { background:rgba(74,25,66,0.02); }
+        .status-badge { padding:3px 12px; border-radius:50px; font-size:11px; font-weight:600; }
+        .status-badge.active { background:rgba(45,143,92,0.12); color:var(--success); animation:pulse-badge 2s infinite; }
+        .status-badge.completed { background:rgba(41,128,185,0.12); color:var(--info); }
+        .status-badge.idle { background:rgba(122,106,114,0.12); color:var(--cbwci-muted); }
+        .passenger-list { font-size:12px; color:var(--cbwci-muted); max-width:200px; }
+        .passenger-list .passenger-item { display:inline-block; background:rgba(74,25,66,0.05); padding:1px 8px; border-radius:4px; margin:2px 2px; font-size:11px; }
+        .time-detail { font-size:12px; color:var(--cbwci-muted); }
+        .time-detail .label { font-size:10px; text-transform:uppercase; letter-spacing:0.3px; color:var(--cbwci-muted); opacity:0.7; }
+
+        .pagination-container { display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; margin-top:16px; padding-top:12px; border-top:2px solid #f5f0eb; }
+        .pagination-container .info { font-size:12px; color:var(--cbwci-muted); }
+        .pagination-container .pagination { display:flex; gap:4px; list-style:none; padding:0; margin:0; }
+        .pagination-container .pagination li a { display:flex; align-items:center; justify-content:center; width:30px; height:30px; border-radius:6px; border:2px solid #E8DCC8; color:var(--cbwci-muted); text-decoration:none; font-size:12px; font-weight:600; transition:var(--transition); }
+        .pagination-container .pagination li a:hover { border-color:var(--cbwci-purple); color:var(--cbwci-purple); }
+        .pagination-container .pagination li.active a { background:var(--cbwci-purple); border-color:var(--cbwci-purple); color:#fff; }
+        .pagination-container .pagination li.disabled a { opacity:0.4; cursor:not-allowed; }
+
+        .empty-state { text-align:center; padding:40px 20px; color:var(--cbwci-muted); }
+        .empty-state i { font-size:48px; color:var(--cbwci-gold-light); margin-bottom:12px; display:block; }
+        .empty-state h6 { font-size:16px; color:var(--cbwci-text); margin-bottom:4px; }
+        .empty-state p { font-size:13px; margin:0; }
+
+        .toast-container { position:fixed; bottom:20px; right:20px; z-index:9999; }
+        .toast-custom { background:#fff; border-radius:12px; padding:14px 20px; box-shadow:0 10px 40px rgba(0,0,0,0.15); border-left:4px solid var(--success); display:flex; align-items:center; gap:12px; animation:slideUp 0.4s ease; margin-top:10px; min-width:280px; max-width:420px; }
+        .toast-custom i { font-size:20px; color:var(--success); }
+        .toast-custom .msg h6 { margin:0; font-weight:600; font-size:14px; }
+        .toast-custom .msg small { color:var(--cbwci-muted); font-size:12px; }
+        .toast-custom.toast-danger { border-left-color:var(--danger); }
+        .toast-custom.toast-danger i { color:var(--danger); }
+        .toast-custom.toast-warning { border-left-color:var(--warning); }
+        .toast-custom.toast-warning i { color:var(--warning); }
+        @keyframes slideUp { from { opacity:0; transform:translateY(30px); } to { opacity:1; transform:translateY(0); } }
+
+        .badge-count { background:rgba(74,25,66,0.08); padding:4px 14px; border-radius:50px; font-size:12px; color:var(--cbwci-purple); }
+        .loading-spinner { display:flex; align-items:center; justify-content:center; padding:30px 0; flex-direction:column; gap:10px; }
+        .loading-spinner .spinner { width:30px; height:30px; border:3px solid #f0ebe4; border-top-color:var(--cbwci-gold); border-radius:50%; animation:spin 1s linear infinite; }
+        @keyframes spin { 0% { transform:rotate(0deg); } 100% { transform:rotate(360deg); } }
+
+        @media (max-width:992px) { .admin-sidebar { position:relative; top:0; margin-bottom:16px; } .search-filter-bar { flex-direction:column; } .search-filter-bar .search-box { min-width:100%; } .transport-stats { grid-template-columns:repeat(2,1fr); } .fleet-overview { grid-template-columns:repeat(auto-fit,minmax(160px,1fr)); } }
+        @media (max-width:768px) { body { padding-top:68px; } .page-title { font-size:20px; } .transport-content { padding:14px; } .table-container table { font-size:12px; } .search-filter-bar .filter-group .filter-btn { flex:1; text-align:center; font-size:11px; padding:4px 10px; } .fleet-overview { grid-template-columns:1fr 1fr; } }
+        @media (max-width:576px) { .page-title { font-size:18px; } .transport-content { padding:12px 10px; } .transport-stats { grid-template-columns:1fr 1fr; } .transport-stats .stat-mini .number { font-size:18px; } .status-badge { font-size:10px; padding:2px 8px; } .fleet-overview { grid-template-columns:1fr; } }
+        ::-webkit-scrollbar { width:6px; } ::-webkit-scrollbar-track { background:#f5f0eb; } ::-webkit-scrollbar-thumb { background:var(--cbwci-purple); border-radius:10px; } ::-webkit-scrollbar-thumb:hover { background:var(--cbwci-gold); }
+    </style>
+</head>
+<body>
+
+<!-- ===== NAVBAR ===== -->
+<nav class="navbar navbar-expand-lg fixed-top">
+    <div class="container">
+        <a class="navbar-brand" href="#">
+            <i class="fas fa-church"></i> CBWCI
+            <span class="gold">Changed By The Word</span>
+            <span class="admin-badge"><i class="fas fa-crown"></i> ADMIN</span>
+        </a>
+        <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+            <span class="navbar-toggler-icon" style="filter:invert(1);"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav ms-auto align-items-lg-center">
+                <li class="nav-item"><a class="nav-link" href="#">Home</a></li>
+                <li class="nav-item"><a class="nav-link active" href="#">Admin</a></li>
+                <li class="nav-item"><a class="nav-link" href="/admin/meetings"><i class="fas fa-video"></i> CBWCI Virtual Meeting</a></li>
+                <li class="nav-item"><a class="nav-link" href="#">Profile</a></li>
+                <li class="nav-item ms-lg-2"><a href="#" class="btn btn-back me-2"><i class="fas fa-arrow-left"></i> Back</a></li>
+                <li class="nav-item"><a href="#" class="btn btn-logout" onclick="logoutUser(event)"><i class="fas fa-sign-out-alt"></i> Logout</a></li>
+            </ul>
+        </div>
+    </div>
+</nav>
+
+<!-- ===== ADMIN CONTENT ===== -->
+<section class="admin-wrapper">
+    <div class="container">
+        <div class="row g-3">
+
+            <!-- SIDEBAR -->
+            <div class="col-lg-3" data-aos="fade-right" data-aos-duration="600">
+                <div class="admin-sidebar">
+                    <div class="sidebar-brand">
+                        <div class="brand-icon"><i class="fas fa-crown"></i></div>
+                        <h6>Admin Panel</h6>
+                        <small>CBWCI Church Management</small>
+                    </div>
+                    <ul class="sidebar-nav">
+                        <li><a href="Dashboard.html"><i class="fas fa-chart-pie"></i> Dashboard</a></li>
+                        <li><a href="Members.html"><i class="fas fa-users"></i> Members <span class="badge-nav" id="memberBadge">0</span></a></li>
+                        <li><a href="FollowUp.html"><i class="fas fa-user-plus"></i> Follow-Up <span class="badge-nav-danger" id="followupBadge">0</span></a></li>
+                        <li><a href="Drivers.html"><i class="fas fa-taxi"></i> Drivers <span class="badge-nav" id="driverBadge">0</span></a></li>
+                        <li><a href="transport.html" class="active"><i class="fas fa-route"></i> Transport</a></li>
+                        <li><a href="announcement.html"><i class="fas fa-bullhorn"></i> Announcements</a></li>
+                        <li><a href="/admin/meetings"><i class="fas fa-video"></i> CBWCI Virtual Meeting</a></li>
+                        <li><a href="reports.html"><i class="fas fa-file-alt"></i> Reports</a></li>
+                        <li style="margin-top:8px;border-top:1px solid #f5f0eb;padding-top:8px;">
+                            <a href="#" style="color:var(--danger);" onclick="logoutUser(event)"><i class="fas fa-sign-out-alt" style="color:var(--danger);"></i> Logout</a>
+                        </li>
+                    </ul>
+                    <div class="sidebar-footer">
+                        <small><i class="fas fa-shield-alt"></i><br>Logged in as <strong id="adminName">Admin</strong></small>
+                    </div>
+                </div>
+            </div>
+
+            <!-- MAIN -->
+            <div class="col-lg-9">
+
+                <!-- header -->
+                <div data-aos="fade-up" data-aos-duration="600">
+                    <div class="breadcrumb-custom">
+                        <a href="#"><i class="fas fa-home"></i> Home</a>
+                        <span class="separator">/</span>
+                        <a href="#">Admin</a>
+                        <span class="separator">/</span>
+                        <span style="color:var(--cbwci-gold-dark);font-weight:500;">Transport</span>
+                    </div>
+                    <div class="d-flex flex-wrap justify-content-between align-items-center">
+                        <div>
+                            <h1 class="page-title"><i class="fas fa-route"></i> Transport Operations</h1>
+                            <p class="page-subtitle">Real-time taxi fleet monitoring and trip management</p>
+                        </div>
+                        <div class="welcome-text mt-1 mt-md-0">
+                            <span class="badge-count"><i class="fas fa-taxi"></i> <span id="activeTripsBadge">0</span> Active Trips</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- TRANSPORT CONTENT -->
+                <div class="transport-content mt-2" data-aos="fade-up" data-aos-delay="100">
+                    <div class="content-header">
+                        <h6><i class="fas fa-list"></i> Trip Overview</h6>
+                        <button class="btn btn-sm" style="background:var(--cbwci-purple);color:#fff;" onclick="openRegisterTaxiModal()"><i class="fas fa-plus"></i> Register Taxi</button>
+                        <span style="font-size:12px;color:var(--cbwci-muted);">
+                            <i class="fas fa-sync-alt"></i> Last updated: <span id="lastUpdated">Just now</span>
+                        </span>
+                    </div>
+
+                    <!-- stats -->
+                    <div class="transport-stats">
+                        <div class="stat-mini total"><div class="number" id="totalCount">0</div><div class="label"><i class="fas fa-taxi"></i> Total Trips</div></div>
+                        <div class="stat-mini active"><div class="number" id="activeCount">0</div><div class="label"><i class="fas fa-play-circle"></i> Active</div></div>
+                        <div class="stat-mini completed"><div class="number" id="completedCount">0</div><div class="label"><i class="fas fa-flag-checkered"></i> Completed</div></div>
+                        <div class="stat-mini idle"><div class="number" id="idleCount">0</div><div class="label"><i class="fas fa-pause-circle"></i> Idle</div></div>
+                    </div>
+
+                    <!-- fleet overview -->
+                    <h6 style="font-weight:700;color:var(--cbwci-purple);font-size:13px;margin-bottom:10px;">
+                        <i class="fas fa-car" style="color:var(--cbwci-gold);"></i> Fleet Status
+                    </h6>
+                    <div class="fleet-overview" id="fleetOverview">
+                        <div class="loading-spinner" style="grid-column:1/-1;"><div class="spinner"></div><p>Loading fleet...</p></div>
+                    </div>
+
+                    <!-- search & filter -->
+                    <div class="search-filter-bar">
+                        <div class="search-box">
+                            <i class="fas fa-search"></i>
+                            <input type="text" placeholder="Search by taxi, driver, or location..." id="searchInput" oninput="filterTrips()">
+                        </div>
+                        <div class="filter-group">
+                            <button class="filter-btn active" onclick="filterTrips('all', this)">All</button>
+                            <button class="filter-btn" onclick="filterTrips('active', this)">Active</button>
+                            <button class="filter-btn" onclick="filterTrips('completed', this)">Completed</button>
+                            <button class="filter-btn" onclick="filterTrips('idle', this)">Idle</button>
+                        </div>
+                    </div>
+
+                    <!-- table -->
+                    <div class="table-container">
+                        <table>
+                            <thead>
+                                <tr><th>Taxi / Location</th><th>Driver</th><th>Passengers</th><th>Pickup</th><th>Finish</th><th>Status</th></tr>
+                            </thead>
+                            <tbody id="tripsTableBody">
+                                <tr><td colspan="6"><div class="loading-spinner"><div class="spinner"></div><p>Loading trips...</p></div></td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- pagination -->
+                    <div class="pagination-container">
+                        <span class="info" id="paginationInfo">Showing 0 of 0 trips</span>
+                        <ul class="pagination">
+                            <li class="disabled"><a href="#"><i class="fas fa-chevron-left"></i></a></li>
+                            <li class="active"><a href="#">1</a></li>
+                            <li class="disabled"><a href="#"><i class="fas fa-chevron-right"></i></a></li>
+                        </ul>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ===== REGISTER TAXI MODAL ===== -->
+<div class="modal fade" id="registerTaxiModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header" style="background:var(--cbwci-purple);color:#fff;">
+                <h5 class="modal-title"><i class="fas fa-taxi"></i> Register Taxi</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form id="registerTaxiForm" onsubmit="registerTaxi(event)">
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label">Taxi name or registration</label>
+                        <input class="form-control" id="taxiNameInput" required maxlength="80" placeholder="e.g. Taxi 01">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Current location</label>
+                        <input class="form-control" id="taxiLocationInput" required maxlength="120" placeholder="e.g. Church grounds">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Driver</label>
+                        <input class="form-control" id="taxiDriverInput" required maxlength="80" placeholder="Driver name">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-light" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn" style="background:var(--cbwci-purple);color:#fff;"><i class="fas fa-save"></i> Register Taxi</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- ===== TOAST ===== -->
+<div class="toast-container" id="toastContainer"></div>
+
+<!-- ===== SCRIPTS ===== -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+<script>
+    AOS.init({ duration:600, once:true });
+
+    // ===== FIREBASE =====
+    const firebaseConfig = {
+        apiKey: "AIzaSyBhXS5EOZjEAahTjk8XPd-9PkG3HeKV8bg",
+        authDomain: "cbwci-892de.firebaseapp.com",
+        projectId: "cbwci-892de",
+        storageBucket: "cbwci-892de.firebasestorage.app",
+        messagingSenderId: "187272132769",
+        appId: "1:187272132769:web:63a9fcba465e54867d98e0",
+        databaseURL: "https://cbwci-892de-default-rtdb.firebaseio.com"
+    };
+    if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
+
+    // ===== TOAST =====
+    function showToast(title, message, type='success') {
+        const container = document.getElementById('toastContainer');
+        const iconMap = { success:'fa-check-circle', danger:'fa-exclamation-circle', warning:'fa-exclamation-triangle', info:'fa-info-circle' };
+        const colorMap = { success:'var(--success)', danger:'var(--danger)', warning:'var(--warning)', info:'var(--info)' };
+        const toast = document.createElement('div');
+        toast.className = `toast-custom ${type==='danger'?'toast-danger':''}`;
+        toast.innerHTML = `<i class="fas ${iconMap[type]||'fa-check-circle'}" style="color:${colorMap[type]||'var(--success)'};"></i><div class="msg"><h6>${title}</h6><small>${message}</small></div>`;
+        container.appendChild(toast);
+        setTimeout(() => { toast.style.opacity='0'; toast.style.transform='translateX(50px)'; setTimeout(()=>toast.remove(),400); }, 4000);
+    }
+    window.showToast = showToast;
+
+    // ===== LOGOUT =====
+    function logoutUser(e) {
+        e.preventDefault();
+        if (confirm('Logout?')) {
+            firebase.auth().signOut().then(() => {
+                sessionStorage.clear();
+                showToast('Logged Out', 'See you soon!', 'info');
+                setTimeout(() => window.location.href='login.html', 1500);
+            }).catch(() => showToast('Error', 'Logout failed', 'danger'));
+        }
+    }
+
+    // ===== STATE =====
+    let allTrips = [];
+    let allFleet = [];
+    let filteredTrips = [];
+    let currentFilter = 'all';
+    let currentSearch = '';
+
+    // ===== FIREBASE: FETCH FLEET (taxis) =====
+    async function fetchFleetFromFirebase() {
+        try {
+            const snapshot = await firebase.database().ref('cbwci/transport/fleet').once('value');
+            const data = snapshot.val();
+            if (data) {
+                allFleet = Object.keys(data).map(key => ({
+                    id: key,
+                    ...data[key]
+                })).filter(taxi => taxi.registered === true && String(taxi.location || '').trim());
+            } else {
+                allFleet = [];
+            }
+            renderFleet(allFleet);
+        } catch (err) {
+            console.error('Error fetching fleet:', err);
+            document.getElementById('fleetOverview').innerHTML = `
+                <div style="grid-column:1/-1;text-align:center;padding:20px;color:var(--cbwci-muted);">
+                    <i class="fas fa-exclamation-triangle" style="font-size:24px;color:var(--danger);"></i>
+                    <p style="margin-top:8px;font-size:13px;">Error loading fleet: ${err.message}</p>
+                </div>
+            `;
+        }
+    }
+
+    // ===== FIREBASE: FETCH TRIPS =====
+    async function fetchTripsFromFirebase() {
+        try {
+            const snapshot = await firebase.database().ref('cbwci/transport/trips').once('value');
+            const data = snapshot.val();
+            if (data) {
+                allTrips = Object.keys(data).map(key => {
+                    const raw = data[key];
+                    return {
+                        id: key,
+                        taxiId: raw.taxiId || '',
+                        taxiName: raw.taxiName || 'Unknown Taxi',
+                        location: raw.location || 'Unknown',
+                        driver: raw.driver || 'Unknown Driver',
+                        passengers: raw.passengers || [],
+                        totalPassengers: raw.totalPassengers || (raw.passengers ? raw.passengers.length : 0),
+                        startTime: raw.startTime || 'N/A',
+                        finishTime: raw.finishTime || null,
+                        status: raw.status || 'idle',
+                        date: raw.date || new Date().toLocaleDateString('en-ZA'),
+                        createdAt: raw.createdAt || Date.now()
+                    };
+                }).filter(trip => {
+                    const taxi = allFleet.find(item => item.id === trip.taxiId);
+                    return taxi && String(trip.location || taxi.location || '').trim();
+                });
+                allTrips.sort((a,b) => (b.createdAt || 0) - (a.createdAt || 0));
+            } else {
+                allTrips = [];
+            }
+            document.getElementById('lastUpdated').textContent = new Date().toLocaleString();
+            applyFiltersAndRender();
+            updateStats(allTrips);
+            updateActiveBadge(allTrips);
+            // Also update fleet status based on trips
+            updateFleetStatusFromTrips(allTrips);
+            showToast('Transport Data Loaded', `${allTrips.length} trips, ${allFleet.length} taxis.`, 'success');
+        } catch (err) {
+            console.error('Error fetching trips:', err);
+            showToast('Error', 'Failed to load trips data.', 'danger');
+            document.getElementById('tripsTableBody').innerHTML = `<tr><td colspan="6"><div class="empty-state"><i class="fas fa-database"></i><h6>Error loading</h6><p>${err.message}</p></div></td></tr>`;
+        }
+    }
+
+    // ===== UPDATE FLEET STATUS FROM TRIPS =====
+    function updateFleetStatusFromTrips(trips) {
+        // For each taxi in fleet, find the latest trip
+        allFleet.forEach(taxi => {
+            const taxiTrips = trips.filter(t => t.taxiId === taxi.id);
+            if (taxiTrips.length === 0) {
+                taxi.status = 'idle';
+                taxi.passengers = [];
+                taxi.totalPassengers = 0;
+                taxi.startTime = null;
+                taxi.finishTime = null;
+                return;
+            }
+            // Get the most recent trip for this taxi
+            const latest = taxiTrips.sort((a,b) => (b.createdAt || 0) - (a.createdAt || 0))[0];
+            taxi.status = latest.status || 'idle';
+            taxi.passengers = latest.passengers || [];
+            taxi.totalPassengers = latest.totalPassengers || taxi.passengers.length;
+            taxi.startTime = latest.startTime || null;
+            taxi.finishTime = latest.finishTime || null;
+            taxi.location = latest.location || taxi.location;
+            taxi.driver = latest.driver || taxi.driver;
+        });
+        renderFleet(allFleet);
+    }
+
+    // ===== RENDER FLEET =====
+    function renderFleet(fleetData) {
+        const container = document.getElementById('fleetOverview');
+        if (!fleetData || fleetData.length === 0) {
+            container.innerHTML = `
+                <div style="grid-column:1/-1;text-align:center;padding:20px;color:var(--cbwci-muted);">
+                    <i class="fas fa-car" style="font-size:24px;color:var(--cbwci-gold-light);"></i>
+                    <p style="margin-top:8px;font-size:13px;">No taxis in the fleet. Add vehicles to start tracking trips.</p>
+                </div>
+            `;
+            return;
+        }
+        let html = '';
+        fleetData.forEach(taxi => {
+            const statusClass = taxi.status || 'idle';
+            const statusLabel = statusClass.charAt(0).toUpperCase() + statusClass.slice(1);
+            const passengerCount = taxi.totalPassengers || 0;
+            html += `
+                <div class="taxi-card">
+                    <div class="taxi-header">
+                        <span class="taxi-name"><i class="fas fa-taxi"></i> ${taxi.name || taxi.taxiName || 'Taxi'}</span>
+                        <span class="taxi-status ${statusClass}">${statusLabel}</span>
+                    </div>
+                    <div class="taxi-details">
+                        <span><i class="fas fa-map-marker-alt"></i> ${taxi.location || 'Unknown'}</span>
+                        <span><i class="fas fa-user"></i> ${taxi.driver || 'Unassigned'}</span>
+                        ${statusClass !== 'idle' ? `<span><i class="fas fa-users"></i> ${passengerCount} passengers</span>` : ''}
+                        ${statusClass === 'idle' ? `<span><i class="fas fa-clock"></i> Available</span>` : ''}
+                        ${taxi.startTime ? `<span><i class="fas fa-clock"></i> Started: ${taxi.startTime}</span>` : ''}
+                        ${taxi.finishTime ? `<span><i class="fas fa-flag-checkered"></i> Finished: ${taxi.finishTime}</span>` : ''}
+                    </div>
+                </div>
+            `;
+        });
+        container.innerHTML = html;
+    }
+
+    // ===== RENDER TRIPS TABLE =====
+    function renderTripsTable(data) {
+        const tbody = document.getElementById('tripsTableBody');
+        if (!data || data.length === 0) {
+            tbody.innerHTML = `
+                <tr><td colspan="6">
+                    <div class="empty-state">
+                        <i class="fas fa-route"></i>
+                        <h6>No Trips Found</h6>
+                        <p>Trips will appear here when they are created.</p>
+                    </div>
+                </td></tr>
+            `;
+            return;
+        }
+        let html = '';
+        data.forEach(trip => {
+            const statusClass = trip.status || 'idle';
+            const statusLabel = statusClass.charAt(0).toUpperCase() + statusClass.slice(1);
+            const passengerList = (trip.passengers || []).map(p => 
+                `<span class="passenger-item">${p}</span>`
+            ).join('');
+            html += `
+                <tr>
+                    <td>
+                        <div style="font-weight:600;color:var(--cbwci-purple);"><i class="fas fa-taxi"></i> ${trip.taxiName}</div>
+                        <div style="font-size:12px;color:var(--cbwci-muted);"><i class="fas fa-map-marker-alt"></i> ${trip.location}</div>
+                    </td>
+                    <td><div style="font-weight:500;">${trip.driver}</div><div style="font-size:11px;color:var(--cbwci-muted);"><i class="fas fa-id-badge"></i> ${trip.taxiId}</div></td>
+                    <td>
+                        <div class="passenger-list">${passengerList || 'No passengers'}</div>
+                        <div style="font-size:11px;color:var(--cbwci-purple);font-weight:600;margin-top:4px;">
+                            <i class="fas fa-users"></i> Total: ${trip.totalPassengers || (trip.passengers ? trip.passengers.length : 0)} passengers
+                        </div>
+                    </td>
+                    <td><div style="font-weight:500;">${trip.startTime || 'N/A'}</div><div class="time-detail"><span class="label">First pickup</span></div><div style="font-size:11px;color:var(--cbwci-muted);">${trip.date || 'Today'}</div></td>
+                    <td><div style="font-weight:500;">${trip.finishTime || '—'}</div><div class="time-detail"><span class="label">All pickups completed</span></div></td>
+                    <td><span class="status-badge ${statusClass}">${statusLabel}</span></td>
+                </tr>
+            `;
+        });
+        tbody.innerHTML = html;
+        document.getElementById('paginationInfo').textContent = `Showing ${data.length} of ${allTrips.length} trips`;
+    }
+
+    // ===== UPDATE STATS =====
+    function updateStats(data) {
+        const total = data.length;
+        const active = data.filter(t => t.status === 'active').length;
+        const completed = data.filter(t => t.status === 'completed').length;
+        const idle = data.filter(t => t.status === 'idle').length;
+        document.getElementById('totalCount').textContent = total;
+        document.getElementById('activeCount').textContent = active;
+        document.getElementById('completedCount').textContent = completed;
+        document.getElementById('idleCount').textContent = idle;
+    }
+
+    // ===== UPDATE ACTIVE BADGE =====
+    function updateActiveBadge(data) {
+        const active = data.filter(t => t.status === 'active').length;
+        document.getElementById('activeTripsBadge').textContent = active;
+    }
+
+    // ===== APPLY FILTERS =====
+    function applyFiltersAndRender() {
+        let data = [...allTrips];
+        if (currentFilter !== 'all') {
+            data = data.filter(t => t.status === currentFilter);
+        }
+        if (currentSearch.trim()) {
+            const q = currentSearch.trim().toLowerCase();
+            data = data.filter(t =>
+                (t.taxiName || '').toLowerCase().includes(q) ||
+                (t.driver || '').toLowerCase().includes(q) ||
+                (t.location || '').toLowerCase().includes(q) ||
+                (t.passengers || []).some(p => p.toLowerCase().includes(q))
+            );
+        }
+        filteredTrips = data;
+        renderTripsTable(data);
+    }
+
+    function filterTrips(filter, btn) {
+        if (btn) {
+            document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            currentFilter = filter;
+        } else {
+            currentSearch = document.getElementById('searchInput').value;
+        }
+        applyFiltersAndRender();
+    }
+    window.filterTrips = filterTrips;
+
+    document.getElementById('searchInput').addEventListener('input', function() {
+        currentSearch = this.value;
+        applyFiltersAndRender();
+    });
+
+    // ===== REGISTER TAXI =====
+    function openRegisterTaxiModal() {
+        document.getElementById('registerTaxiForm').reset();
+        new bootstrap.Modal(document.getElementById('registerTaxiModal')).show();
+    }
+    window.openRegisterTaxiModal = openRegisterTaxiModal;
+
+    async function registerTaxi(event) {
+        event.preventDefault();
+        const taxi = {
+            name: document.getElementById('taxiNameInput').value.trim(),
+            location: document.getElementById('taxiLocationInput').value.trim(),
+            driver: document.getElementById('taxiDriverInput').value.trim(),
+            registered: true,
+            registeredAt: Date.now(),
+            status: 'idle'
+        };
+        if (!taxi.name || !taxi.location || !taxi.driver) {
+            showToast('Incomplete Details', 'Taxi name, location, and driver are required.', 'warning');
+            return;
+        }
+        try {
+            await firebase.database().ref('cbwci/transport/fleet').push(taxi);
+            bootstrap.Modal.getInstance(document.getElementById('registerTaxiModal')).hide();
+            showToast('Taxi Registered', `${taxi.name} was registered at ${taxi.location}.`, 'success');
+            await fetchFleetFromFirebase();
+            await fetchTripsFromFirebase();
+        } catch (error) {
+            console.error('Error registering taxi:', error);
+            showToast('Error', 'Failed to register taxi.', 'danger');
+        }
+    }
+    window.registerTaxi = registerTaxi;
+
+    // ===== AUTH =====
+    firebase.auth().onAuthStateChanged(async user => {
+        if (user) {
+            console.log('✅ Admin logged in:', user.uid);
+            document.getElementById('adminName').textContent = user.displayName || 'Admin';
+            await fetchFleetFromFirebase();
+            await fetchTripsFromFirebase();
+        } else {
+            showToast('Not Logged In', 'Please log in to access transport data.', 'warning');
+            setTimeout(() => window.location.href='login.html', 2000);
+        }
+    });
+
+    console.log('%c✝ CBWCI - Transport Operations ✝', 'font-size:18px;color:#C9A84C;font-weight:bold;');
+    console.log('🚕 Live fleet and trip data from Firebase Realtime Database');
+</script>
+</body>
+</html>

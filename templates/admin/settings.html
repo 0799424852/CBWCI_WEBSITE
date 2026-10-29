@@ -1,0 +1,1407 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Settings - CBWCI Admin</title>
+    
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <!-- Font Awesome Icons -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- AOS Animation -->
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+    
+    <style>
+        /* ===== CBWCI BRAND COLORS ===== */
+        :root {
+            --cbwci-purple: #4A1942;
+            --cbwci-purple-light: #6B2D5F;
+            --cbwci-purple-dark: #2E0F28;
+            --cbwci-gold: #C9A84C;
+            --cbwci-gold-light: #E8CD7A;
+            --cbwci-gold-dark: #A8893A;
+            --cbwci-cream: #FDF8F0;
+            --cbwci-dark: #1A0F16;
+            --cbwci-text: #2C1A24;
+            --cbwci-muted: #7A6A72;
+            --shadow: 0 10px 40px rgba(74, 25, 66, 0.12);
+            --shadow-hover: 0 15px 50px rgba(74, 25, 66, 0.2);
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            --success: #2D8F5C;
+            --danger: #C0392B;
+            --warning: #E67E22;
+            --info: #2980B9;
+        }
+
+        /* ===== GLOBAL ===== */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: #f5f0eb;
+            color: var(--cbwci-text);
+            padding-top: 76px;
+            min-height: 100vh;
+        }
+
+        /* ===== NAVBAR ===== */
+        .navbar {
+            background: linear-gradient(135deg, var(--cbwci-purple), var(--cbwci-purple-dark));
+            padding: 10px 0;
+            box-shadow: 0 4px 30px rgba(0,0,0,0.3);
+            border-bottom: 3px solid var(--cbwci-gold);
+        }
+
+        .navbar-brand {
+            font-family: 'Playfair Display', serif;
+            font-weight: 900;
+            font-size: 20px;
+            color: white !important;
+            letter-spacing: 2px;
+        }
+
+        .navbar-brand .gold {
+            color: var(--cbwci-gold);
+            display: block;
+            font-size: 12px;
+            letter-spacing: 4px;
+        }
+
+        .navbar-brand i {
+            color: var(--cbwci-gold);
+            margin-right: 10px;
+        }
+
+        .nav-link {
+            color: rgba(255,255,255,0.8) !important;
+            font-weight: 500;
+            font-size: 13px;
+            letter-spacing: 1px;
+            transition: var(--transition);
+            padding: 6px 16px !important;
+            border-radius: 8px;
+        }
+
+        .nav-link:hover {
+            color: var(--cbwci-gold) !important;
+            background: rgba(201, 168, 76, 0.1);
+        }
+
+        .nav-link.active {
+            color: var(--cbwci-gold) !important;
+        }
+
+        .navbar .btn-back {
+            background: transparent;
+            border: 2px solid rgba(255,255,255,0.2);
+            color: white;
+            padding: 4px 16px;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 12px;
+            transition: var(--transition);
+            text-decoration: none;
+        }
+
+        .navbar .btn-back:hover {
+            background: rgba(255,255,255,0.1);
+            border-color: white;
+            transform: translateY(-2px);
+            color: white;
+        }
+
+        .navbar .btn-logout {
+            background: transparent;
+            border: 2px solid rgba(255,255,255,0.2);
+            color: white;
+            padding: 4px 16px;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 12px;
+            transition: var(--transition);
+            text-decoration: none;
+            cursor: pointer;
+        }
+
+        .navbar .btn-logout:hover {
+            background: var(--danger);
+            border-color: var(--danger);
+            transform: translateY(-2px);
+            color: white;
+        }
+
+        .navbar .admin-badge {
+            background: var(--cbwci-gold);
+            color: var(--cbwci-purple-dark);
+            font-size: 10px;
+            font-weight: 700;
+            padding: 2px 12px;
+            border-radius: 50px;
+            margin-left: 8px;
+            letter-spacing: 1px;
+        }
+
+        /* ===== ADMIN WRAPPER ===== */
+        .admin-wrapper {
+            padding: 10px 0 40px;
+        }
+
+        /* ===== BREADCRUMB ===== */
+        .breadcrumb-custom {
+            color: var(--cbwci-muted);
+            font-size: 12px;
+            margin-bottom: 2px;
+        }
+
+        .breadcrumb-custom a {
+            color: var(--cbwci-purple);
+            text-decoration: none;
+            transition: var(--transition);
+        }
+
+        .breadcrumb-custom a:hover {
+            color: var(--cbwci-gold);
+        }
+
+        .breadcrumb-custom .separator {
+            margin: 0 6px;
+            color: var(--cbwci-gold);
+        }
+
+        .page-title {
+            font-family: 'Playfair Display', serif;
+            font-weight: 700;
+            color: var(--cbwci-purple);
+            font-size: 24px;
+            margin: 0;
+        }
+
+        .page-title i {
+            color: var(--cbwci-gold);
+        }
+
+        .page-subtitle {
+            color: var(--cbwci-muted);
+            font-size: 13px;
+            margin: 0;
+        }
+
+        /* ===== SIDEBAR ===== */
+        .admin-sidebar {
+            background: white;
+            border-radius: 12px;
+            padding: 16px 14px;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+            border: 1px solid rgba(201, 168, 76, 0.06);
+            position: sticky;
+            top: 96px;
+        }
+
+        .admin-sidebar .sidebar-brand {
+            text-align: center;
+            padding-bottom: 12px;
+            border-bottom: 2px solid #f5f0eb;
+            margin-bottom: 12px;
+        }
+
+        .admin-sidebar .sidebar-brand .brand-icon {
+            font-size: 28px;
+            color: var(--cbwci-gold);
+        }
+
+        .admin-sidebar .sidebar-brand h6 {
+            font-family: 'Playfair Display', serif;
+            font-weight: 700;
+            color: var(--cbwci-purple);
+            margin-top: 2px;
+            font-size: 14px;
+        }
+
+        .admin-sidebar .sidebar-brand small {
+            color: var(--cbwci-muted);
+            font-size: 10px;
+        }
+
+        .admin-sidebar .sidebar-nav {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .admin-sidebar .sidebar-nav li {
+            margin-bottom: 2px;
+        }
+
+        .admin-sidebar .sidebar-nav li a {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 12px;
+            border-radius: 8px;
+            color: var(--cbwci-text);
+            text-decoration: none;
+            transition: var(--transition);
+            font-weight: 500;
+            font-size: 12px;
+        }
+
+        .admin-sidebar .sidebar-nav li a i {
+            width: 16px;
+            color: var(--cbwci-muted);
+            transition: var(--transition);
+            font-size: 13px;
+        }
+
+        .admin-sidebar .sidebar-nav li a:hover {
+            background: rgba(74, 25, 66, 0.05);
+            color: var(--cbwci-purple);
+        }
+
+        .admin-sidebar .sidebar-nav li a:hover i {
+            color: var(--cbwci-purple);
+        }
+
+        .admin-sidebar .sidebar-nav li a.active {
+            background: linear-gradient(135deg, var(--cbwci-purple), var(--cbwci-purple-dark));
+            color: white;
+            box-shadow: 0 4px 15px rgba(74, 25, 66, 0.25);
+        }
+
+        .admin-sidebar .sidebar-nav li a.active i {
+            color: white;
+        }
+
+        .admin-sidebar .sidebar-nav li a .badge-nav {
+            margin-left: auto;
+            background: var(--cbwci-gold);
+            color: var(--cbwci-purple-dark);
+            font-size: 9px;
+            padding: 1px 8px;
+            border-radius: 50px;
+        }
+
+        .admin-sidebar .sidebar-nav li a .badge-nav-danger {
+            margin-left: auto;
+            background: var(--danger);
+            color: white;
+            font-size: 9px;
+            padding: 1px 8px;
+            border-radius: 50px;
+        }
+
+        .admin-sidebar .sidebar-footer {
+            margin-top: 12px;
+            padding-top: 12px;
+            border-top: 2px solid #f5f0eb;
+            text-align: center;
+        }
+
+        .admin-sidebar .sidebar-footer small {
+            color: var(--cbwci-muted);
+            font-size: 10px;
+        }
+
+        .admin-sidebar .sidebar-footer i {
+            color: var(--cbwci-gold);
+        }
+
+        /* ===== SETTINGS CONTENT ===== */
+        .settings-content {
+            background: white;
+            border-radius: 12px;
+            padding: 18px 20px;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+            border: 1px solid rgba(201, 168, 76, 0.06);
+        }
+
+        .settings-content .content-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            margin-bottom: 16px;
+            padding-bottom: 12px;
+            border-bottom: 2px solid #f5f0eb;
+        }
+
+        .settings-content .content-header h6 {
+            font-weight: 700;
+            color: var(--cbwci-purple);
+            margin: 0;
+            font-size: 15px;
+        }
+
+        .settings-content .content-header h6 i {
+            color: var(--cbwci-gold);
+            margin-right: 8px;
+        }
+
+        /* ===== SETTINGS NAV TABS ===== */
+        .settings-tabs {
+            display: flex;
+            gap: 4px;
+            flex-wrap: wrap;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #f5f0eb;
+            padding-bottom: 8px;
+        }
+
+        .settings-tabs .tab-btn {
+            padding: 8px 20px;
+            border-radius: 8px 8px 0 0;
+            border: 2px solid transparent;
+            background: transparent;
+            font-weight: 600;
+            font-size: 13px;
+            color: var(--cbwci-muted);
+            transition: var(--transition);
+            cursor: pointer;
+        }
+
+        .settings-tabs .tab-btn:hover {
+            color: var(--cbwci-purple);
+            background: rgba(74, 25, 66, 0.03);
+        }
+
+        .settings-tabs .tab-btn.active {
+            color: var(--cbwci-purple);
+            border-bottom: 3px solid var(--cbwci-gold);
+            background: rgba(201, 168, 76, 0.05);
+        }
+
+        .settings-tabs .tab-btn i {
+            margin-right: 6px;
+        }
+
+        /* ===== SETTINGS PANELS ===== */
+        .settings-panel {
+            display: none;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .settings-panel.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .settings-panel .setting-group {
+            background: #f8f4f0;
+            border-radius: 10px;
+            padding: 16px 18px;
+            margin-bottom: 16px;
+            border: 1px solid rgba(201, 168, 76, 0.06);
+        }
+
+        .settings-panel .setting-group .group-title {
+            font-weight: 600;
+            color: var(--cbwci-purple);
+            font-size: 14px;
+            margin-bottom: 12px;
+        }
+
+        .settings-panel .setting-group .group-title i {
+            color: var(--cbwci-gold);
+            margin-right: 8px;
+        }
+
+        .settings-panel .form-label {
+            font-weight: 600;
+            font-size: 13px;
+            color: var(--cbwci-text);
+        }
+
+        .settings-panel .form-control,
+        .settings-panel .form-select {
+            border: 2px solid #E8DCC8;
+            border-radius: 8px;
+            padding: 8px 14px;
+            font-size: 13px;
+            background: #FDFAF5;
+            transition: var(--transition);
+        }
+
+        .settings-panel .form-control:focus,
+        .settings-panel .form-select:focus {
+            border-color: var(--cbwci-gold);
+            box-shadow: 0 0 0 3px rgba(201, 168, 76, 0.1);
+        }
+
+        .settings-panel .form-control:disabled {
+            background: #f0ece6;
+            cursor: not-allowed;
+        }
+
+        .settings-panel .form-check-input {
+            accent-color: var(--cbwci-purple);
+            width: 18px;
+            height: 18px;
+        }
+
+        .settings-panel .form-check-label {
+            font-size: 13px;
+            color: var(--cbwci-text);
+        }
+
+        .settings-panel .btn-save {
+            background: linear-gradient(135deg, var(--cbwci-gold), var(--cbwci-gold-dark));
+            border: none;
+            border-radius: 8px;
+            padding: 10px 30px;
+            font-weight: 600;
+            font-size: 14px;
+            color: var(--cbwci-purple-dark);
+            transition: var(--transition);
+        }
+
+        .settings-panel .btn-save:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(201, 168, 76, 0.3);
+        }
+
+        .settings-panel .btn-danger {
+            background: var(--danger);
+            border: none;
+            border-radius: 8px;
+            padding: 10px 30px;
+            font-weight: 600;
+            font-size: 14px;
+            color: white;
+            transition: var(--transition);
+        }
+
+        .settings-panel .btn-danger:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(192, 57, 43, 0.3);
+        }
+
+        .settings-panel .btn-outline-custom {
+            background: transparent;
+            border: 2px solid #E8DCC8;
+            border-radius: 8px;
+            padding: 8px 24px;
+            font-weight: 600;
+            font-size: 13px;
+            color: var(--cbwci-muted);
+            transition: var(--transition);
+        }
+
+        .settings-panel .btn-outline-custom:hover {
+            border-color: var(--cbwci-purple);
+            color: var(--cbwci-purple);
+        }
+
+        .toggle-switch {
+            position: relative;
+            width: 44px;
+            height: 24px;
+            display: inline-block;
+        }
+
+        .toggle-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .toggle-switch .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: #ccc;
+            transition: var(--transition);
+            border-radius: 24px;
+        }
+
+        .toggle-switch .slider:before {
+            position: absolute;
+            content: "";
+            height: 18px;
+            width: 18px;
+            left: 3px;
+            bottom: 3px;
+            background: white;
+            transition: var(--transition);
+            border-radius: 50%;
+        }
+
+        .toggle-switch input:checked + .slider {
+            background: var(--cbwci-gold);
+        }
+
+        .toggle-switch input:checked + .slider:before {
+            transform: translateX(20px);
+        }
+
+        .toggle-label {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 13px;
+            color: var(--cbwci-text);
+        }
+
+        .backup-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 14px;
+            background: white;
+            border-radius: 8px;
+            border: 1px solid #f0ebe4;
+            margin-bottom: 8px;
+        }
+
+        .backup-item .backup-info {
+            font-size: 13px;
+        }
+
+        .backup-item .backup-info .name {
+            font-weight: 600;
+            color: var(--cbwci-purple);
+        }
+
+        .backup-item .backup-info .date {
+            font-size: 12px;
+            color: var(--cbwci-muted);
+        }
+
+        .backup-item .backup-actions {
+            display: flex;
+            gap: 6px;
+        }
+
+        .backup-item .backup-actions .btn-sm {
+            padding: 4px 12px;
+            font-size: 11px;
+            border-radius: 6px;
+        }
+
+        /* ===== TOAST ===== */
+        .toast-container {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            z-index: 9999;
+        }
+
+        .toast-custom {
+            background: white;
+            border-radius: 12px;
+            padding: 14px 20px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.15);
+            border-left: 4px solid var(--success);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            animation: slideUp 0.4s ease;
+            margin-top: 10px;
+            min-width: 280px;
+            max-width: 420px;
+        }
+
+        .toast-custom i {
+            font-size: 20px;
+            color: var(--success);
+        }
+
+        .toast-custom .msg h6 {
+            margin: 0;
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        .toast-custom .msg small {
+            color: var(--cbwci-muted);
+            font-size: 12px;
+        }
+
+        .toast-custom.toast-danger {
+            border-left-color: var(--danger);
+        }
+        .toast-custom.toast-danger i {
+            color: var(--danger);
+        }
+        .toast-custom.toast-warning {
+            border-left-color: var(--warning);
+        }
+        .toast-custom.toast-warning i {
+            color: var(--warning);
+        }
+
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* ===== RESPONSIVE ===== */
+        @media (max-width: 992px) {
+            .admin-sidebar {
+                position: relative;
+                top: 0;
+                margin-bottom: 16px;
+            }
+            .page-title {
+                font-size: 22px;
+            }
+            .settings-tabs {
+                flex-wrap: nowrap;
+                overflow-x: auto;
+            }
+            .settings-tabs .tab-btn {
+                white-space: nowrap;
+                font-size: 12px;
+                padding: 6px 14px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            body {
+                padding-top: 68px;
+            }
+            .page-title {
+                font-size: 20px;
+            }
+            .navbar-brand {
+                font-size: 16px;
+            }
+            .navbar-brand .gold {
+                font-size: 10px;
+            }
+            .navbar .btn-back,
+            .navbar .btn-logout {
+                font-size: 11px;
+                padding: 3px 12px;
+            }
+            .admin-wrapper {
+                padding: 8px 0 30px;
+            }
+            .settings-content {
+                padding: 14px 14px;
+            }
+            .settings-panel .setting-group {
+                padding: 14px 14px;
+            }
+            .backup-item {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 8px;
+            }
+            .backup-item .backup-actions {
+                width: 100%;
+            }
+            .backup-item .backup-actions .btn-sm {
+                flex: 1;
+                text-align: center;
+            }
+        }
+
+        @media (max-width: 576px) {
+            .page-title {
+                font-size: 18px;
+            }
+            .admin-sidebar {
+                padding: 12px 10px;
+            }
+            .admin-sidebar .sidebar-nav li a {
+                font-size: 11px;
+                padding: 6px 8px;
+            }
+            .settings-content {
+                padding: 12px 10px;
+            }
+            .settings-content .content-header h6 {
+                font-size: 13px;
+            }
+            .settings-tabs .tab-btn {
+                font-size: 11px;
+                padding: 4px 10px;
+            }
+            .toast-custom {
+                min-width: 200px;
+                padding: 10px 14px;
+            }
+        }
+
+        /* ===== SCROLLBAR ===== */
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f5f0eb;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: var(--cbwci-purple);
+            border-radius: 10px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--cbwci-gold);
+        }
+    </style>
+</head>
+<body>
+
+    <!-- ======================================== -->
+    <!-- NAVBAR -->
+    <!-- ======================================== -->
+    <nav class="navbar navbar-expand-lg fixed-top">
+        <div class="container">
+            <a class="navbar-brand" href="#">
+                <i class="fas fa-church"></i>
+                CBWCI
+                <span class="gold">Changed By The Word</span>
+                <span class="admin-badge"><i class="fas fa-crown"></i> ADMIN</span>
+            </a>
+            <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon" style="filter: invert(1);"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto align-items-lg-center">
+                    <li class="nav-item">
+                        <a class="nav-link" href="#">Home</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active" href="#">Admin</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#">Profile</a>
+                    </li>
+                    <li class="nav-item ms-lg-2">
+                        <a href="#" class="btn btn-back me-2">
+                            <i class="fas fa-arrow-left"></i> Back
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="#" class="btn btn-logout">
+                            <i class="fas fa-sign-out-alt"></i> Logout
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- ======================================== -->
+    <!-- ADMIN CONTENT -->
+    <!-- ======================================== -->
+    <section class="admin-wrapper">
+        <div class="container">
+
+            <div class="row g-3">
+
+                <!-- ======================================== -->
+                <!-- SIDEBAR -->
+                <!-- ======================================== -->
+                <div class="col-lg-3" data-aos="fade-right" data-aos-duration="600">
+                    <div class="admin-sidebar">
+                        <div class="sidebar-brand">
+                            <div class="brand-icon"><i class="fas fa-crown"></i></div>
+                            <h6>Admin Panel</h6>
+                            <small>CBWCI Church Management</small>
+                        </div>
+
+                        <ul class="sidebar-nav">
+                            <li>
+                                <a href="Dashboard.html">
+                                    <i class="fas fa-chart-pie"></i> Dashboard
+                                </a>
+                            </li>
+                            <li>
+                                <a href="Members.html">
+                                    <i class="fas fa-users"></i> Members
+                                    <span class="badge-nav">0</span>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="followup.html">
+                                    <i class="fas fa-user-plus"></i> Follow-Up
+                                    <span class="badge-nav-danger">0</span>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="Driver.html">
+                                    <i class="fas fa-taxi"></i> Drivers
+                                    <span class="badge-nav">0</span>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="transport.html">
+                                    <i class="fas fa-route"></i> Transport
+                                </a>
+                            </li>
+                            <li>
+                                <a href="announcement.html">
+                                    <i class="fas fa-bullhorn"></i> Announcements
+                                </a>
+                            </li>
+                            <li>
+                                <a href="/admin/meetings">
+                                    <i class="fas fa-video"></i> CBWCI Virtual Meeting
+                                </a>
+                            </li>
+                            <li>
+                                <a href="reports.html">
+                                    <i class="fas fa-file-alt"></i> Reports
+                                </a>
+                            </li>
+                            <li>
+                                <a href="Settings.html" class="active">
+                                    <i class="fas fa-cog"></i> Settings
+                                </a>
+                            </li>
+                            <li style="margin-top: 8px; border-top: 1px solid #f5f0eb; padding-top: 8px;">
+                                <a href="Logout.html" style="color: var(--danger);">
+                                    <i class="fas fa-sign-out-alt" style="color: var(--danger);"></i> Logout
+                                </a>
+                            </li>
+                        </ul>
+
+                        <div class="sidebar-footer">
+                            <small>
+                                <i class="fas fa-shield-alt"></i>
+                                <br>
+                                Logged in as <strong>Admin</strong>
+                            </small>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ======================================== -->
+                <!-- MAIN CONTENT -->
+                <!-- ======================================== -->
+                <div class="col-lg-9">
+
+                    <!-- ===== PAGE HEADER ===== -->
+                    <div data-aos="fade-up" data-aos-duration="600">
+                        <div class="breadcrumb-custom">
+                            <a href="#"><i class="fas fa-home"></i> Home</a>
+                            <span class="separator">/</span>
+                            <a href="#">Admin</a>
+                            <span class="separator">/</span>
+                            <span style="color: var(--cbwci-gold-dark); font-weight: 500;">Settings</span>
+                        </div>
+                        <div class="d-flex flex-wrap justify-content-between align-items-center">
+                            <div>
+                                <h1 class="page-title">
+                                    <i class="fas fa-cog"></i> Settings
+                                </h1>
+                                <p class="page-subtitle">Configure church system settings and preferences</p>
+                            </div>
+                            <div class="welcome-text mt-1 mt-md-0">
+                                <span class="badge-count" style="background: rgba(74,25,66,0.08); padding: 4px 14px; border-radius: 50px; font-size: 12px; color: var(--cbwci-purple);">
+                                    <i class="fas fa-check-circle"></i> All settings saved
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- ===== SETTINGS CONTENT ===== -->
+                    <div class="settings-content mt-2" data-aos="fade-up" data-aos-delay="100">
+                        <div class="content-header">
+                            <h6><i class="fas fa-sliders-h"></i> System Configuration</h6>
+                            <span style="font-size: 12px; color: var(--cbwci-muted);">
+                                <i class="fas fa-sync-alt"></i> Auto-save enabled
+                            </span>
+                        </div>
+
+                        <!-- ===== SETTINGS TABS ===== -->
+                        <div class="settings-tabs">
+                            <button class="tab-btn active" onclick="switchTab('general', this)">
+                                <i class="fas fa-globe"></i> General
+                            </button>
+                            <button class="tab-btn" onclick="switchTab('church', this)">
+                                <i class="fas fa-church"></i> Church
+                            </button>
+                            <button class="tab-btn" onclick="switchTab('membership', this)">
+                                <i class="fas fa-users"></i> Membership
+                            </button>
+                            <button class="tab-btn" onclick="switchTab('transport', this)">
+                                <i class="fas fa-taxi"></i> Transport
+                            </button>
+                            <button class="tab-btn" onclick="switchTab('notifications', this)">
+                                <i class="fas fa-bell"></i> Notifications
+                            </button>
+                            <button class="tab-btn" onclick="switchTab('security', this)">
+                                <i class="fas fa-shield-alt"></i> Security
+                            </button>
+                            <button class="tab-btn" onclick="switchTab('backup', this)">
+                                <i class="fas fa-database"></i> Backup
+                            </button>
+                        </div>
+
+                        <!-- ===== GENERAL SETTINGS ===== -->
+                        <div class="settings-panel active" id="panel-general">
+                            <div class="setting-group">
+                                <div class="group-title"><i class="fas fa-globe"></i> General Settings</div>
+                                <div class="row g-3">
+                                    <div class="col-md-6">
+                                        <label class="form-label">Church Name</label>
+                                        <input type="text" class="form-control" value="Changed By The Word Church International">
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label">Church Short Name</label>
+                                        <input type="text" class="form-control" value="CBWCI">
+                                    </div>
+                                    <div class="col-md-12">
+                                        <label class="form-label">Tagline</label>
+                                        <input type="text" class="form-control" value='"Change, Dominate and Walk in Glory"'>
+                                    </div>
+                                    <div class="col-md-12">
+                                        <label class="form-label">Description</label>
+                                        <textarea class="form-control" rows="2">Changed By The Word Church International is a multi-cultural, spirit-filled church dedicated to transforming lives through the Word of God.</textarea>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="setting-group">
+                                <div class="group-title"><i class="fas fa-palette"></i> Appearance</div>
+                                <div class="row g-3">
+                                    <div class="col-md-6">
+                                        <label class="form-label">Primary Color</label>
+                                        <div style="display: flex; gap: 10px; align-items: center;">
+                                            <input type="color" class="form-control" style="width: 60px; padding: 2px;" value="#4A1942">
+                                            <span style="font-size: 13px; color: var(--cbwci-muted);">#4A1942</span>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label">Secondary Color</label>
+                                        <div style="display: flex; gap: 10px; align-items: center;">
+                                            <input type="color" class="form-control" style="width: 60px; padding: 2px;" value="#C9A84C">
+                                            <span style="font-size: 13px; color: var(--cbwci-muted);">#C9A84C</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <button class="btn-save" onclick="saveSettings()"><i class="fas fa-save"></i> Save Changes</button>
+                        </div>
+
+                        <!-- ===== CHURCH SETTINGS ===== -->
+                        <div class="settings-panel" id="panel-church">
+                            <div class="setting-group">
+                                <div class="group-title"><i class="fas fa-church"></i> Church Details</div>
+                                <div class="row g-3">
+                                    <div class="col-md-12">
+                                        <label class="form-label">Address</label>
+                                        <input type="text" class="form-control" value="123 Church Street, Nelspruit, Mpumalanga">
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label">City</label>
+                                        <input type="text" class="form-control" value="Nelspruit">
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label">Province</label>
+                                        <input type="text" class="form-control" value="Mpumalanga">
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label">Phone</label>
+                                        <input type="tel" class="form-control" value="+27 13 123 4567">
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label">Email</label>
+                                        <input type="email" class="form-control" value="info@cbwci.org">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="setting-group">
+                                <div class="group-title"><i class="fas fa-calendar-alt"></i> Service Times</div>
+                                <div class="row g-3">
+                                    <div class="col-md-6">
+                                        <label class="form-label">Sunday Service</label>
+                                        <input type="text" class="form-control" value="10:00 AM">
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label">Midweek Service</label>
+                                        <input type="text" class="form-control" value="6:30 PM">
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label">Prayer Meeting</label>
+                                        <input type="text" class="form-control" value="6:00 PM">
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label">Bible Study</label>
+                                        <input type="text" class="form-control" value="7:00 PM">
+                                    </div>
+                                </div>
+                            </div>
+                            <button class="btn-save" onclick="saveSettings()"><i class="fas fa-save"></i> Save Changes</button>
+                        </div>
+
+                        <!-- ===== MEMBERSHIP SETTINGS ===== -->
+                        <div class="settings-panel" id="panel-membership">
+                            <div class="setting-group">
+                                <div class="group-title"><i class="fas fa-user-plus"></i> Registration Settings</div>
+                                <div class="row g-3">
+                                    <div class="col-md-12">
+                                        <div class="toggle-label">
+                                            <span>Allow New Member Registration</span>
+                                            <label class="toggle-switch">
+                                                <input type="checkbox" checked>
+                                                <span class="slider"></span>
+                                            </label>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-12">
+                                        <div class="toggle-label">
+                                            <span>Require Admin Approval for New Members</span>
+                                            <label class="toggle-switch">
+                                                <input type="checkbox">
+                                                <span class="slider"></span>
+                                            </label>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label">Default Member Role</label>
+                                        <select class="form-select">
+                                            <option value="member">Member</option>
+                                            <option value="followup">Follow-Up</option>
+                                            <option value="driver">Driver</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label">Maximum Members</label>
+                                        <input type="number" class="form-control" value="1000">
+                                    </div>
+                                </div>
+                            </div>
+                            <button class="btn-save" onclick="saveSettings()"><i class="fas fa-save"></i> Save Changes</button>
+                        </div>
+
+                        <!-- ===== TRANSPORT SETTINGS ===== -->
+                        <div class="settings-panel" id="panel-transport">
+                            <div class="setting-group">
+                                <div class="group-title"><i class="fas fa-taxi"></i> Taxi & Transport Settings</div>
+                                <div class="row g-3">
+                                    <div class="col-md-6">
+                                        <label class="form-label">Maximum Passengers per Trip</label>
+                                        <input type="number" class="form-control" value="15">
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label">Default Pickup Time</label>
+                                        <input type="time" class="form-control" value="08:30">
+                                    </div>
+                                    <div class="col-md-12">
+                                        <div class="toggle-label">
+                                            <span>Allow Member Taxi Booking</span>
+                                            <label class="toggle-switch">
+                                                <input type="checkbox" checked>
+                                                <span class="slider"></span>
+                                            </label>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-12">
+                                        <div class="toggle-label">
+                                            <span>Enable Live Tracking</span>
+                                            <label class="toggle-switch">
+                                                <input type="checkbox" checked>
+                                                <span class="slider"></span>
+                                            </label>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <button class="btn-save" onclick="saveSettings()"><i class="fas fa-save"></i> Save Changes</button>
+                        </div>
+
+                        <!-- ===== NOTIFICATIONS SETTINGS ===== -->
+                        <div class="settings-panel" id="panel-notifications">
+                            <div class="setting-group">
+                                <div class="group-title"><i class="fas fa-bell"></i> Notification Preferences</div>
+                                <div class="row g-3">
+                                    <div class="col-md-12">
+                                        <div class="toggle-label">
+                                            <span>Email Notifications</span>
+                                            <label class="toggle-switch">
+                                                <input type="checkbox" checked>
+                                                <span class="slider"></span>
+                                            </label>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-12">
+                                        <div class="toggle-label">
+                                            <span>Push Notifications</span>
+                                            <label class="toggle-switch">
+                                                <input type="checkbox" checked>
+                                                <span class="slider"></span>
+                                            </label>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-12">
+                                        <div class="toggle-label">
+                                            <span>SMS Notifications</span>
+                                            <label class="toggle-switch">
+                                                <input type="checkbox">
+                                                <span class="slider"></span>
+                                            </label>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-12">
+                                        <div class="toggle-label">
+                                            <span>WhatsApp Notifications</span>
+                                            <label class="toggle-switch">
+                                                <input type="checkbox" checked>
+                                                <span class="slider"></span>
+                                            </label>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label">Notification Email</label>
+                                        <input type="email" class="form-control" value="notifications@cbwci.org">
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label">Notification Phone</label>
+                                        <input type="tel" class="form-control" value="+27 82 123 4567">
+                                    </div>
+                                </div>
+                            </div>
+                            <button class="btn-save" onclick="saveSettings()"><i class="fas fa-save"></i> Save Changes</button>
+                        </div>
+
+                        <!-- ===== SECURITY SETTINGS ===== -->
+                        <div class="settings-panel" id="panel-security">
+                            <div class="setting-group">
+                                <div class="group-title"><i class="fas fa-shield-alt"></i> Security Settings</div>
+                                <div class="row g-3">
+                                    <div class="col-md-12">
+                                        <div class="toggle-label">
+                                            <span>Two-Factor Authentication (2FA)</span>
+                                            <label class="toggle-switch">
+                                                <input type="checkbox">
+                                                <span class="slider"></span>
+                                            </label>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-12">
+                                        <div class="toggle-label">
+                                            <span>Session Timeout</span>
+                                            <label class="toggle-switch">
+                                                <input type="checkbox" checked>
+                                                <span class="slider"></span>
+                                            </label>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label">Session Timeout (minutes)</label>
+                                        <input type="number" class="form-control" value="30">
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label">Max Login Attempts</label>
+                                        <input type="number" class="form-control" value="5">
+                                    </div>
+                                    <div class="col-md-12" style="margin-top: 10px;">
+                                        <button class="btn btn-danger" onclick="changePassword()"><i class="fas fa-key"></i> Change Password</button>
+                                        <button class="btn btn-outline-custom" style="margin-left: 10px;" onclick="showToast('Security', 'Security audit completed successfully.', 'success')"><i class="fas fa-shield-alt"></i> Run Security Audit</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- ===== BACKUP SETTINGS ===== -->
+                        <div class="settings-panel" id="panel-backup">
+                            <div class="setting-group">
+                                <div class="group-title"><i class="fas fa-database"></i> Backup Management</div>
+                                <div class="row g-3">
+                                    <div class="col-md-12">
+                                        <div class="toggle-label">
+                                            <span>Auto Backup</span>
+                                            <label class="toggle-switch">
+                                                <input type="checkbox" checked>
+                                                <span class="slider"></span>
+                                            </label>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label">Backup Frequency</label>
+                                        <select class="form-select">
+                                            <option value="daily">Daily</option>
+                                            <option value="weekly" selected>Weekly</option>
+                                            <option value="monthly">Monthly</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label">Backup Time</label>
+                                        <input type="time" class="form-control" value="02:00">
+                                    </div>
+                                    <div class="col-md-12">
+                                        <button class="btn-save" onclick="createBackup()"><i class="fas fa-database"></i> Create Backup Now</button>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="setting-group">
+                                <div class="group-title"><i class="fas fa-history"></i> Recent Backups</div>
+                                <div class="backup-item">
+                                    <div class="backup-info">
+                                        <div class="name">CBWCI_Full_Backup_2026-08-15</div>
+                                        <div class="date">2026-08-15 02:00:00 • 245 MB</div>
+                                    </div>
+                                    <div class="backup-actions">
+                                        <button class="btn btn-sm btn-outline-custom" onclick="showToast('Downloading', 'Backup download started...', 'info')"><i class="fas fa-download"></i> Download</button>
+                                        <button class="btn btn-sm btn-outline-custom" onclick="showToast('Restoring', 'Backup restore initiated...', 'info')"><i class="fas fa-undo"></i> Restore</button>
+                                        <button class="btn btn-sm btn-danger" onclick="showToast('Deleted', 'Backup deleted successfully.', 'danger')"><i class="fas fa-trash"></i></button>
+                                    </div>
+                                </div>
+                                <div class="backup-item">
+                                    <div class="backup-info">
+                                        <div class="name">CBWCI_Members_Backup_2026-08-14</div>
+                                        <div class="date">2026-08-14 02:00:00 • 124 MB</div>
+                                    </div>
+                                    <div class="backup-actions">
+                                        <button class="btn btn-sm btn-outline-custom" onclick="showToast('Downloading', 'Backup download started...', 'info')"><i class="fas fa-download"></i> Download</button>
+                                        <button class="btn btn-sm btn-outline-custom" onclick="showToast('Restoring', 'Backup restore initiated...', 'info')"><i class="fas fa-undo"></i> Restore</button>
+                                        <button class="btn btn-sm btn-danger" onclick="showToast('Deleted', 'Backup deleted successfully.', 'danger')"><i class="fas fa-trash"></i></button>
+                                    </div>
+                                </div>
+                                <div class="backup-item">
+                                    <div class="backup-info">
+                                        <div class="name">CBWCI_Full_Backup_2026-08-07</div>
+                                        <div class="date">2026-08-07 02:00:00 • 238 MB</div>
+                                    </div>
+                                    <div class="backup-actions">
+                                        <button class="btn btn-sm btn-outline-custom" onclick="showToast('Downloading', 'Backup download started...', 'info')"><i class="fas fa-download"></i> Download</button>
+                                        <button class="btn btn-sm btn-outline-custom" onclick="showToast('Restoring', 'Backup restore initiated...', 'info')"><i class="fas fa-undo"></i> Restore</button>
+                                        <button class="btn btn-sm btn-danger" onclick="showToast('Deleted', 'Backup deleted successfully.', 'danger')"><i class="fas fa-trash"></i></button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+
+                </div>
+            </div>
+
+        </div>
+    </section>
+
+    <!-- ======================================== -->
+    <!-- TOAST CONTAINER -->
+    <!-- ======================================== -->
+    <div class="toast-container" id="toastContainer"></div>
+
+    <!-- ======================================== -->
+    <!-- SCRIPTS -->
+    <!-- ======================================== -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js">
+    </script>
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js">
+    </script>
+
+    <script>
+        // ========================================
+        // INITIALIZE AOS
+        // ========================================
+        AOS.init({
+            duration: 600,
+            once: true
+        });
+
+        // ========================================
+        // TOAST NOTIFICATION
+        // ========================================
+        function showToast(title, message, type = 'success') {
+            const container = document.getElementById('toastContainer');
+            const iconMap = {
+                'success': 'fa-check-circle',
+                'danger': 'fa-exclamation-circle',
+                'warning': 'fa-exclamation-triangle',
+                'info': 'fa-info-circle'
+            };
+            const colorMap = {
+                'success': 'var(--success)',
+                'danger': 'var(--danger)',
+                'warning': 'var(--warning)',
+                'info': 'var(--info)'
+            };
+
+            const toast = document.createElement('div');
+            toast.className = `toast-custom ${type === 'danger' ? 'toast-danger' : ''} ${type === 'warning' ? 'toast-warning' : ''}`;
+            toast.innerHTML = `
+                <i class="fas ${iconMap[type] || 'fa-check-circle'}" style="color: ${colorMap[type] || 'var(--success)'};"></i>
+                <div class="msg">
+                    <h6>${title}</h6>
+                    <small>${message}</small>
+                </div>
+            `;
+            
+            container.appendChild(toast);
+            
+            setTimeout(() => {
+                toast.style.opacity = '0';
+                toast.style.transform = 'translateX(50px)';
+                setTimeout(() => toast.remove(), 400);
+            }, 4000);
+        }
+
+        window.showToast = showToast;
+
+        // ========================================
+        // SWITCH TABS
+        // ========================================
+        function switchTab(tabId, btn) {
+            // Update tabs
+            document.querySelectorAll('.settings-tabs .tab-btn').forEach(b => b.classList.remove('active'));
+            if (btn) btn.classList.add('active');
+            
+            // Update panels
+            document.querySelectorAll('.settings-panel').forEach(p => p.classList.remove('active'));
+            const panel = document.getElementById('panel-' + tabId);
+            if (panel) panel.classList.add('active');
+        }
+
+        window.switchTab = switchTab;
+
+        // ========================================
+        // SAVE SETTINGS
+        // ========================================
+        function saveSettings() {
+            showToast('Settings Saved', 'All settings have been updated successfully!', 'success');
+        }
+
+        window.saveSettings = saveSettings;
+
+        // ========================================
+        // CHANGE PASSWORD
+        // ========================================
+        function changePassword() {
+            showToast('Password Change', 'Password change form would open here.', 'info');
+        }
+
+        window.changePassword = changePassword;
+
+        // ========================================
+        // CREATE BACKUP
+        // ========================================
+        function createBackup() {
+            showToast('Backup Started', 'Creating backup... This may take a few minutes.', 'info');
+            setTimeout(() => {
+                showToast('Backup Complete', 'Backup created successfully!', 'success');
+            }, 2000);
+        }
+
+        window.createBackup = createBackup;
+
+        // ========================================
+        // CONSOLE BRANDING
+        // ========================================
+        console.log('%c✝ CBWCI - Settings ✝', 'font-size: 18px; color: #C9A84C; font-weight: bold;');
+        console.log('%c"Change, Dominate and Walk in Glory"', 'font-size: 14px; color: #4A1942; font-style: italic;');
+        console.log('⚙️ Configure church system settings and preferences.');
+        console.log('🔄 Auto-save is enabled for all settings.');
+    </script>
+
+</body>
+</html>

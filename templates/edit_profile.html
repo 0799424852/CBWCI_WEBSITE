@@ -1,0 +1,1629 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edit Profile - CBWCI</title>
+    
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <!-- Font Awesome Icons -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- AOS Animation -->
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+    
+    <!-- Firebase SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+    
+    <style>
+        /* ===== CBWCI BRAND COLORS ===== */
+        :root {
+            --cbwci-purple: #4A1942;
+            --cbwci-purple-light: #6B2D5F;
+            --cbwci-purple-dark: #2E0F28;
+            --cbwci-gold: #C9A84C;
+            --cbwci-gold-light: #E8CD7A;
+            --cbwci-gold-dark: #A8893A;
+            --cbwci-cream: #FDF8F0;
+            --cbwci-dark: #1A0F16;
+            --cbwci-text: #2C1A24;
+            --cbwci-muted: #7A6A72;
+            --shadow: 0 10px 40px rgba(74, 25, 66, 0.12);
+            --shadow-hover: 0 15px 50px rgba(74, 25, 66, 0.2);
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            --success: #2D8F5C;
+            --danger: #C0392B;
+            --warning: #E67E22;
+            --info: #2980B9;
+        }
+
+        /* ===== GLOBAL ===== */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--cbwci-cream);
+            color: var(--cbwci-text);
+            padding-top: 80px;
+            min-height: 100vh;
+        }
+
+        /* ===== NAVBAR ===== */
+        .navbar {
+            background: rgba(74, 25, 66, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 12px 0;
+            box-shadow: 0 4px 30px rgba(0,0,0,0.2);
+            border-bottom: 3px solid var(--cbwci-gold);
+        }
+
+        .navbar-brand {
+            font-family: 'Playfair Display', serif;
+            font-weight: 900;
+            font-size: 20px;
+            color: white !important;
+            letter-spacing: 2px;
+        }
+
+        .navbar-brand .gold {
+            color: var(--cbwci-gold);
+            display: block;
+            font-size: 14px;
+            letter-spacing: 4px;
+        }
+
+        .navbar-brand i {
+            color: var(--cbwci-gold);
+            margin-right: 10px;
+        }
+
+        .nav-link {
+            color: rgba(255,255,255,0.8) !important;
+            font-weight: 500;
+            font-size: 14px;
+            letter-spacing: 1px;
+            transition: var(--transition);
+            padding: 8px 18px !important;
+            border-radius: 8px;
+        }
+
+        .nav-link:hover {
+            color: var(--cbwci-gold) !important;
+            background: rgba(201, 168, 76, 0.1);
+        }
+
+        .nav-link.active {
+            color: var(--cbwci-gold) !important;
+        }
+
+        .navbar .btn-back {
+            background: transparent;
+            border: 2px solid rgba(255,255,255,0.2);
+            color: white;
+            padding: 6px 20px;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 13px;
+            transition: var(--transition);
+            text-decoration: none;
+        }
+
+        .navbar .btn-back:hover {
+            background: rgba(255,255,255,0.1);
+            border-color: white;
+            transform: translateY(-2px);
+            color: white;
+        }
+
+        .navbar .btn-logout {
+            background: transparent;
+            border: 2px solid rgba(255,255,255,0.2);
+            color: white;
+            padding: 6px 20px;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 13px;
+            transition: var(--transition);
+            text-decoration: none;
+            cursor: pointer;
+        }
+
+        .navbar .btn-logout:hover {
+            background: var(--danger);
+            border-color: var(--danger);
+            transform: translateY(-2px);
+            color: white;
+        }
+
+        /* ===== PAGE HEADER ===== */
+        .page-header-section {
+            padding: 20px 0 30px;
+        }
+
+        .page-header-section h2 {
+            font-family: 'Playfair Display', serif;
+            font-weight: 700;
+            color: var(--cbwci-purple);
+            font-size: 32px;
+        }
+
+        .page-header-section .breadcrumb-custom {
+            color: var(--cbwci-muted);
+            font-size: 14px;
+        }
+
+        .page-header-section .breadcrumb-custom a {
+            color: var(--cbwci-purple);
+            text-decoration: none;
+            transition: var(--transition);
+        }
+
+        .page-header-section .breadcrumb-custom a:hover {
+            color: var(--cbwci-gold);
+        }
+
+        .page-header-section .breadcrumb-custom .separator {
+            margin: 0 8px;
+            color: var(--cbwci-gold);
+        }
+
+        /* ===== LOADING SPINNER ===== */
+        .loading-spinner {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 40px 0;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .loading-spinner .spinner {
+            width: 50px;
+            height: 50px;
+            border: 4px solid var(--cbwci-cream);
+            border-top: 4px solid var(--cbwci-gold);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .loading-spinner p {
+            color: var(--cbwci-muted);
+            font-size: 14px;
+        }
+
+        /* ===== EDIT PROFILE CARD ===== */
+        .edit-profile-card {
+            background: white;
+            border-radius: 16px;
+            padding: 35px 40px;
+            box-shadow: var(--shadow);
+            border: 1px solid rgba(201, 168, 76, 0.1);
+            margin-bottom: 30px;
+        }
+
+        .edit-profile-card .section-title {
+            font-family: 'Playfair Display', serif;
+            font-weight: 700;
+            font-size: 20px;
+            color: var(--cbwci-purple);
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .edit-profile-card .section-title i {
+            color: var(--cbwci-gold);
+            font-size: 22px;
+        }
+
+        .edit-profile-card .section-divider {
+            width: 60px;
+            height: 3px;
+            background: linear-gradient(90deg, var(--cbwci-gold), var(--cbwci-gold-light));
+            margin: 0 0 20px;
+            border-radius: 4px;
+        }
+
+        /* ===== AVATAR SECTION ===== */
+        .avatar-section {
+            text-align: center;
+            padding: 20px 0 30px;
+            border-bottom: 2px solid #f0ebe4;
+            margin-bottom: 30px;
+        }
+
+        .profile-avatar-wrapper {
+            position: relative;
+            display: inline-block;
+        }
+
+        .profile-avatar {
+            width: 140px;
+            height: 140px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--cbwci-purple), var(--cbwci-purple-dark));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 4px solid var(--cbwci-gold);
+            overflow: hidden;
+            transition: var(--transition);
+            cursor: pointer;
+        }
+
+        .profile-avatar:hover {
+            transform: scale(1.02);
+            box-shadow: 0 8px 30px rgba(74, 25, 66, 0.25);
+        }
+
+        .profile-avatar .avatar-text {
+            font-size: 56px;
+            color: white;
+            font-weight: 700;
+            font-family: 'Playfair Display', serif;
+        }
+
+        .profile-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .avatar-upload-btn {
+            position: absolute;
+            bottom: 5px;
+            right: 5px;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: var(--cbwci-gold);
+            border: 3px solid white;
+            color: var(--cbwci-purple-dark);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: var(--transition);
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        .avatar-upload-btn:hover {
+            transform: scale(1.1);
+            background: var(--cbwci-gold-light);
+        }
+
+        .avatar-upload-btn input {
+            position: absolute;
+            opacity: 0;
+            width: 100%;
+            height: 100%;
+            cursor: pointer;
+        }
+
+        .avatar-help-text {
+            font-size: 13px;
+            color: var(--cbwci-muted);
+            margin-top: 12px;
+        }
+
+        .avatar-help-text i {
+            color: var(--cbwci-gold);
+        }
+
+        /* ===== USER NAME UNDER AVATAR ===== */
+        .avatar-username {
+            margin-top: 12px;
+            font-weight: 600;
+            font-size: 16px;
+            color: var(--cbwci-purple);
+        }
+
+        .avatar-username .user-email {
+            display: block;
+            font-weight: 400;
+            font-size: 13px;
+            color: var(--cbwci-muted);
+        }
+
+        /* ===== FORM STYLES ===== */
+        .form-label {
+            font-weight: 600;
+            font-size: 14px;
+            color: var(--cbwci-text);
+            margin-bottom: 5px;
+        }
+
+        .form-label .required {
+            color: var(--danger);
+            margin-left: 3px;
+        }
+
+        .form-label i {
+            color: var(--cbwci-gold-dark);
+            margin-right: 6px;
+            width: 18px;
+        }
+
+        .form-control, .form-select {
+            border: 2px solid #E8DCC8;
+            border-radius: 10px;
+            padding: 12px 16px;
+            font-size: 14px;
+            transition: var(--transition);
+            background: #FDFAF5;
+            color: var(--cbwci-text);
+        }
+
+        .form-control:focus, .form-select:focus {
+            border-color: var(--cbwci-gold);
+            box-shadow: 0 0 0 4px rgba(201, 168, 76, 0.12);
+            background: white;
+        }
+
+        .form-control:disabled,
+        .form-control[readonly] {
+            background: #f5f0ea;
+            cursor: not-allowed;
+            opacity: 0.85;
+            border-color: #d5cec4;
+        }
+
+        .form-control.is-valid {
+            border-color: var(--success);
+        }
+
+        .form-control.is-invalid {
+            border-color: var(--danger);
+        }
+
+        .invalid-feedback {
+            font-size: 12px;
+            color: var(--danger);
+            margin-top: 4px;
+        }
+
+        .form-text {
+            font-size: 12px;
+            color: var(--cbwci-muted);
+        }
+
+        .admin-notice {
+            background: rgba(41, 128, 185, 0.06);
+            border: 1px solid rgba(41, 128, 185, 0.15);
+            border-radius: 8px;
+            padding: 12px 16px;
+            margin-top: 10px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: var(--cbwci-muted);
+            font-size: 13px;
+        }
+
+        .admin-notice i {
+            color: var(--cbwci-gold);
+            font-size: 18px;
+        }
+
+        /* ===== CHECKBOX GRID ===== */
+        .ministry-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+            gap: 10px;
+        }
+
+        .ministry-check {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 12px;
+            background: var(--cbwci-cream);
+            border-radius: 8px;
+            border: 1px solid rgba(201, 168, 76, 0.1);
+            transition: var(--transition);
+        }
+
+        .ministry-check:hover {
+            border-color: var(--cbwci-gold);
+            background: white;
+        }
+
+        .ministry-check input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            accent-color: var(--cbwci-purple);
+            cursor: pointer;
+            flex-shrink: 0;
+        }
+
+        .ministry-check label {
+            font-size: 13px;
+            cursor: pointer;
+            margin: 0;
+        }
+
+        /* ===== FORM ACTIONS ===== */
+        .form-actions {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+            margin-top: 30px;
+            padding-top: 25px;
+            border-top: 2px solid #f0ebe4;
+        }
+
+        .btn-primary-custom {
+            background: linear-gradient(135deg, var(--cbwci-purple), var(--cbwci-purple-dark));
+            border: none;
+            border-radius: 10px;
+            padding: 13px 35px;
+            font-weight: 600;
+            font-size: 15px;
+            color: white;
+            transition: var(--transition);
+        }
+
+        .btn-primary-custom:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(74, 25, 66, 0.35);
+            color: white;
+        }
+
+        .btn-primary-custom:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .btn-outline-custom {
+            background: transparent;
+            border: 2px solid #E8DCC8;
+            border-radius: 10px;
+            padding: 13px 35px;
+            font-weight: 600;
+            font-size: 15px;
+            color: var(--cbwci-muted);
+            transition: var(--transition);
+        }
+
+        .btn-outline-custom:hover {
+            border-color: var(--cbwci-purple);
+            color: var(--cbwci-purple);
+            background: rgba(74, 25, 66, 0.03);
+        }
+
+        .btn-danger-custom {
+            background: var(--danger);
+            border: none;
+            border-radius: 10px;
+            padding: 13px 35px;
+            font-weight: 600;
+            font-size: 15px;
+            color: white;
+            transition: var(--transition);
+        }
+
+        .btn-danger-custom:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(192, 57, 43, 0.35);
+            color: white;
+        }
+
+        /* ===== TOAST ===== */
+        .toast-container {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            z-index: 9999;
+        }
+
+        .toast-custom {
+            background: white;
+            border-radius: 12px;
+            padding: 18px 28px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.15);
+            border-left: 5px solid var(--success);
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            animation: slideUp 0.5s ease;
+            margin-top: 12px;
+            min-width: 320px;
+            max-width: 450px;
+        }
+
+        .toast-custom i {
+            font-size: 28px;
+            color: var(--success);
+        }
+
+        .toast-custom .msg h6 {
+            margin: 0;
+            font-weight: 600;
+            font-size: 15px;
+        }
+
+        .toast-custom .msg small {
+            color: var(--cbwci-muted);
+            font-size: 13px;
+        }
+
+        .toast-custom.toast-danger {
+            border-left-color: var(--danger);
+        }
+
+        .toast-custom.toast-danger i {
+            color: var(--danger);
+        }
+
+        .toast-custom.toast-warning {
+            border-left-color: var(--warning);
+        }
+
+        .toast-custom.toast-warning i {
+            color: var(--warning);
+        }
+
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(30px) scale(0.95); }
+            to { opacity: 1; transform: translateY(0) scale(1); }
+        }
+
+        @keyframes slideOut {
+            from { opacity: 1; transform: translateX(0); }
+            to { opacity: 0; transform: translateX(50px); }
+        }
+
+        .toast-custom.hiding {
+            animation: slideOut 0.4s ease forwards;
+        }
+
+        /* ===== RESPONSIVE ===== */
+        @media (max-width: 992px) {
+            .edit-profile-card {
+                padding: 25px 25px;
+            }
+            .ministry-grid {
+                grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+            }
+        }
+
+        @media (max-width: 768px) {
+            body {
+                padding-top: 70px;
+            }
+            .page-header-section h2 {
+                font-size: 26px;
+            }
+            .edit-profile-card {
+                padding: 20px 18px;
+            }
+            .edit-profile-card .section-title {
+                font-size: 18px;
+            }
+            .profile-avatar {
+                width: 110px;
+                height: 110px;
+            }
+            .profile-avatar .avatar-text {
+                font-size: 42px;
+            }
+            .avatar-upload-btn {
+                width: 34px;
+                height: 34px;
+                font-size: 13px;
+                bottom: 3px;
+                right: 3px;
+            }
+            .form-actions {
+                flex-direction: column;
+            }
+            .form-actions .btn {
+                width: 100%;
+            }
+            .navbar-brand {
+                font-size: 16px;
+            }
+            .navbar-brand .gold {
+                font-size: 11px;
+            }
+            .ministry-grid {
+                grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+            }
+            .toast-custom {
+                min-width: unset;
+                max-width: 90vw;
+                padding: 14px 18px;
+            }
+        }
+
+        @media (max-width: 576px) {
+            .edit-profile-card {
+                padding: 16px 14px;
+            }
+            .profile-avatar {
+                width: 90px;
+                height: 90px;
+            }
+            .profile-avatar .avatar-text {
+                font-size: 34px;
+            }
+            .page-header-section h2 {
+                font-size: 22px;
+            }
+            .edit-profile-card .section-title {
+                font-size: 16px;
+            }
+            .ministry-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+            .ministry-check {
+                padding: 6px 10px;
+            }
+            .ministry-check label {
+                font-size: 12px;
+            }
+        }
+
+        /* ===== SCROLLBAR ===== */
+        ::-webkit-scrollbar {
+            width: 10px;
+        }
+        ::-webkit-scrollbar-track {
+            background: var(--cbwci-cream);
+        }
+        ::-webkit-scrollbar-thumb {
+            background: var(--cbwci-purple);
+            border-radius: 10px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--cbwci-gold);
+        }
+
+        /* ===== HIDDEN ===== */
+        .hidden {
+            display: none !important;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- ======================================== -->
+    <!-- NAVBAR -->
+    <!-- ======================================== -->
+    <nav class="navbar navbar-expand-lg fixed-top">
+        <div class="container">
+            <a class="navbar-brand" href="index.html">
+                <i class="fas fa-church"></i>
+                CBWCI
+                <span class="gold">Changed By The Word</span>
+            </a>
+            <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon" style="filter: invert(1);"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto align-items-lg-center">
+                    <li class="nav-item">
+                        <a class="nav-link" href="profile.html"><i class="fas fa-chart-pie"></i> Overview</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active" href="edit_profile.html"><i class="fas fa-user-edit"></i> Edit Profile</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="taxi.html"><i class="fas fa-taxi"></i> Book a Ride</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="profile.html#tab-zoom"><i class="fas fa-video"></i> CBWCI Virtual Meeting</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="followup.html"><i class="fas fa-users"></i> Follow-Ups</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="notification.html"><i class="fas fa-bell"></i> Notifications</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="security.html"><i class="fas fa-shield-alt"></i> Security</a>
+                    </li>
+                    <li class="nav-item ms-lg-2">
+                        <a href="profile.html" class="btn btn-back me-2">
+                            <i class="fas fa-arrow-left"></i> Back
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="#" class="btn btn-logout" onclick="logoutUser(event)">
+                            <i class="fas fa-sign-out-alt"></i> Logout
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- ======================================== -->
+    <!-- PAGE HEADER -->
+    <!-- ======================================== -->
+    <section class="page-header-section">
+        <div class="container">
+            <div data-aos="fade-up">
+                <div class="breadcrumb-custom">
+                    <a href="index.html"><i class="fas fa-home"></i> Home</a>
+                    <span class="separator">/</span>
+                    <a href="profile.html">Profile</a>
+                    <span class="separator">/</span>
+                    <span style="color: var(--cbwci-gold-dark); font-weight: 500;">Edit Profile</span>
+                </div>
+                <h2>
+                    <i class="fas fa-user-edit" style="color: var(--cbwci-gold);"></i> 
+                    Edit Your Profile
+                </h2>
+                <p style="color: var(--cbwci-muted); font-size: 16px; max-width: 500px;">
+                    Keep your church information up to date. Personal details are locked for security.
+                </p>
+            </div>
+        </div>
+    </section>
+
+    <!-- ======================================== -->
+    <!-- EDIT PROFILE FORM -->
+    <!-- ======================================== -->
+    <section style="padding-bottom: 60px;">
+        <div class="container">
+
+            <div class="row">
+                <div class="col-lg-10 mx-auto">
+
+                    <!-- ===== LOADING STATE ===== -->
+                    <div id="loadingState" class="edit-profile-card">
+                        <div class="loading-spinner">
+                            <div class="spinner"></div>
+                            <p>Loading your profile data...</p>
+                        </div>
+                    </div>
+
+                    <!-- ===== PROFILE FORM ===== -->
+                    <div id="profileFormContainer" class="edit-profile-card hidden" data-aos="fade-up" data-aos-duration="800">
+
+                        <form id="editProfileForm" novalidate>
+
+                            <!-- ===== AVATAR SECTION ===== -->
+                            <div class="avatar-section">
+                                <div class="profile-avatar-wrapper">
+                                    <div class="profile-avatar" id="avatarPreview">
+                                        <span class="avatar-text" id="avatarText">--</span>
+                                    </div>
+                                    <label class="avatar-upload-btn" title="Change Profile Photo">
+                                        <i class="fas fa-camera"></i>
+                                        <input type="file" id="avatarInput" accept="image/*">
+                                    </label>
+                                </div>
+                                <!-- ===== USER NAME UNDER AVATAR ===== -->
+                                <div class="avatar-username" id="avatarUsername">
+                                    <span id="displayName">Loading...</span>
+                                    <span class="user-email" id="displayEmail">Loading...</span>
+                                </div>
+                                <div class="avatar-help-text">
+                                    <i class="fas fa-info-circle"></i> 
+                                    Click the camera icon to upload a new photo. 
+                                    <span style="display: block; font-size: 12px; margin-top: 2px;">Recommended: Square image, at least 300x300px</span>
+                                </div>
+                            </div>
+
+                            <!-- ===== PERSONAL INFORMATION (READ-ONLY / DISABLED) ===== -->
+                            <div class="section-divider"></div>
+                            <div class="section-title">
+                                <i class="fas fa-id-card"></i> Personal Information
+                                <span style="font-size: 12px; color: var(--cbwci-muted); font-weight: 400; margin-left: 8px;">
+                                    <i class="fas fa-lock" style="color: var(--cbwci-gold);"></i> Locked
+                                </span>
+                            </div>
+
+                            <div class="admin-notice">
+                                <i class="fas fa-shield-alt"></i>
+                                <span>Personal information (Name, Email, Phone, DOB) is locked for security. Please contact the church admin to update these details.</span>
+                            </div>
+
+                            <div class="row g-3 mt-2">
+                                <div class="col-md-6">
+                                    <label class="form-label">
+                                        <i class="fas fa-user"></i> Full Name <span class="required">*</span>
+                                    </label>
+                                    <input type="text" 
+                                           class="form-control" 
+                                           value="" 
+                                           id="fullName"
+                                           disabled
+                                           required>
+                                </div>
+
+                                <div class="col-md-6">
+                                    <label class="form-label">
+                                        <i class="fas fa-envelope"></i> Email Address
+                                    </label>
+                                    <input type="email" 
+                                           class="form-control" 
+                                           value="" 
+                                           id="email"
+                                           disabled>
+                                    <div class="form-text">
+                                        <i class="fas fa-lock" style="color: var(--cbwci-gold);"></i> 
+                                        Email cannot be changed. Contact admin for assistance.
+                                    </div>
+                                </div>
+
+                                <div class="col-md-6">
+                                    <label class="form-label">
+                                        <i class="fas fa-phone"></i> Phone Number <span class="required">*</span>
+                                    </label>
+                                    <input type="tel" 
+                                           class="form-control" 
+                                           value="" 
+                                           id="phone"
+                                           disabled
+                                           required>
+                                    <div class="form-text">
+                                        <i class="fas fa-lock" style="color: var(--cbwci-gold);"></i> 
+                                        Contact admin to update your phone number.
+                                    </div>
+                                </div>
+
+                                <div class="col-md-6">
+                                    <label class="form-label">
+                                        <i class="fas fa-calendar-alt"></i> Date of Birth
+                                    </label>
+                                    <input type="date" 
+                                           class="form-control" 
+                                           value="" 
+                                           id="dob"
+                                           disabled>
+                                    <div class="form-text">Contact admin to update your date of birth.</div>
+                                </div>
+                            </div>
+
+                            <!-- ===== CHURCH INFORMATION (EDITABLE) ===== -->
+                            <hr style="margin: 30px 0;">
+
+                            <div class="section-divider"></div>
+                            <div class="section-title">
+                                <i class="fas fa-church"></i> Church Information
+                                <span style="font-size: 12px; color: var(--success); font-weight: 400; margin-left: 8px;">
+                                    <i class="fas fa-edit"></i> Editable
+                                </span>
+                            </div>
+
+                            <div class="row g-3">
+                                <div class="col-md-6">
+                                    <label class="form-label">
+                                        <i class="fas fa-map-marker-alt"></i> Location / Area <span class="required">*</span>
+                                    </label>
+                                    <select class="form-select" id="location" required>
+                                        <option value="">Select your area...</option>
+                                        <option value="Sonheuwel">Sonheuwel</option>
+                                        <option value="West Acres">West Acres</option>
+                                        <option value="Stonehenge">Stonehenge</option>
+                                        <option value="Belladonna">Belladonna</option>
+                                        <option value="Mataffin">Mataffin</option>
+                                        <option value="Nelspruit Town CBD">Nelspruit Town CBD</option>
+                                        <option value="Msholozi">Msholozi</option>
+                                        <option value="WhiteRiver">WhiteRiver</option>
+                                        <option value="Ngodini">Ngodini</option>
+                                        <option value="HazyView">HazyView</option>
+                                        <option value="Other">Other (Please specify)</option>
+                                    </select>
+                                    <div class="invalid-feedback">Please select your location</div>
+                                </div>
+
+                                <div class="col-md-6" id="otherLocationDiv" style="display:none;">
+                                    <label class="form-label">
+                                        <i class="fas fa-map-pin"></i> Specify Location
+                                    </label>
+                                    <input type="text" 
+                                           class="form-control" 
+                                           placeholder="Enter your location"
+                                           id="otherLocation">
+                                </div>
+
+                                <div class="col-md-6">
+                                    <label class="form-label">
+                                        <i class="fas fa-taxi"></i> Taxi Service Preference
+                                    </label>
+                                    <select class="form-select" id="needsTaxi">
+                                        <option value="">Select your preference...</option>
+                                        <option value="no">No, I'll arrange my own transport</option>
+                                        <option value="yes">Yes, I need a church taxi</option>
+                                        <option value="maybe">Maybe, I'll decide later</option>
+                                    </select>
+                                    <div class="form-text">This helps us plan taxi routes for Sunday services</div>
+                                </div>
+
+                                <div class="col-md-6">
+                                    <label class="form-label">
+                                        <i class="fas fa-calendar-check"></i> Preferred Service Time
+                                    </label>
+                                    <select class="form-select" id="serviceTime">
+                                        <option value="">Select your preferred time...</option>
+                                        <option value="9am">9:00 AM (Early Service)</option>
+                                        <option value="11am">11:00 AM (Main Service)</option>
+                                        <option value="both">Both Services</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <!-- ===== MINISTRY INTERESTS ===== -->
+                            <hr style="margin: 30px 0;">
+
+                            <div class="section-divider"></div>
+                            <div class="section-title">
+                                <i class="fas fa-hands-helping"></i> Ministry Interests
+                                <span style="font-size: 12px; color: var(--success); font-weight: 400; margin-left: 8px;">
+                                    <i class="fas fa-edit"></i> Editable
+                                </span>
+                            </div>
+                            <p style="color: var(--cbwci-muted); font-size: 14px; margin-bottom: 15px;">
+                                Select the ministries you're interested in joining or serving with.
+                            </p>
+
+                            <div class="ministry-grid">
+                                <div class="ministry-check">
+                                    <input type="checkbox" id="min-worship">
+                                    <label for="min-worship">Worship</label>
+                                </div>
+                                <div class="ministry-check">
+                                    <input type="checkbox" id="min-youth">
+                                    <label for="min-youth">Youth</label>
+                                </div>
+                                <div class="ministry-check">
+                                    <input type="checkbox" id="min-children">
+                                    <label for="min-children">Children</label>
+                                </div>
+                                <div class="ministry-check">
+                                    <input type="checkbox" id="min-outreach">
+                                    <label for="min-outreach">Outreach</label>
+                                </div>
+                                <div class="ministry-check">
+                                    <input type="checkbox" id="min-ushering">
+                                    <label for="min-ushering">Ushering</label>
+                                </div>
+                                <div class="ministry-check">
+                                    <input type="checkbox" id="min-prayer">
+                                    <label for="min-prayer">Prayer</label>
+                                </div>
+                                <div class="ministry-check">
+                                    <input type="checkbox" id="min-media">
+                                    <label for="min-media">Media/Tech</label>
+                                </div>
+                                <div class="ministry-check">
+                                    <input type="checkbox" id="min-hospitality">
+                                    <label for="min-hospitality">Hospitality</label>
+                                </div>
+                                <div class="ministry-check">
+                                    <input type="checkbox" id="min-connect">
+                                    <label for="min-connect">Connect Group</label>
+                                </div>
+                                <div class="ministry-check">
+                                    <input type="checkbox" id="min-transport">
+                                    <label for="min-transport">Transport</label>
+                                </div>
+                            </div>
+
+                            <!-- ===== EMERGENCY CONTACT ===== -->
+                            <hr style="margin: 30px 0;">
+
+                            <div class="section-divider"></div>
+                            <div class="section-title">
+                                <i class="fas fa-ambulance"></i> Emergency Contact
+                                <span style="font-size: 12px; color: var(--success); font-weight: 400; margin-left: 8px;">
+                                    <i class="fas fa-edit"></i> Editable
+                                </span>
+                            </div>
+
+                            <div class="row g-3">
+                                <div class="col-md-6">
+                                    <label class="form-label">
+                                        <i class="fas fa-user"></i> Emergency Contact Name
+                                    </label>
+                                    <input type="text" 
+                                           class="form-control" 
+                                           value="" 
+                                           id="emergencyName"
+                                           placeholder="Enter emergency contact name">
+                                </div>
+
+                                <div class="col-md-6">
+                                    <label class="form-label">
+                                        <i class="fas fa-phone"></i> Emergency Contact Phone
+                                    </label>
+                                    <input type="tel" 
+                                           class="form-control" 
+                                           value="" 
+                                           id="emergencyPhone"
+                                           placeholder="Enter phone number">
+                                </div>
+
+                                <div class="col-md-12">
+                                    <label class="form-label">
+                                        <i class="fas fa-heart"></i> Relationship
+                                    </label>
+                                    <input type="text" 
+                                           class="form-control" 
+                                           value="" 
+                                           id="emergencyRelation"
+                                           placeholder="e.g., Spouse, Parent, Sibling">
+                                </div>
+                            </div>
+
+                            <!-- ===== FORM ACTIONS ===== -->
+                            <div class="form-actions">
+                                <button type="submit" class="btn btn-primary-custom" id="saveBtn">
+                                    <i class="fas fa-save"></i> Save Changes
+                                </button>
+                                <a href="profile.html" class="btn btn-outline-custom">
+                                    <i class="fas fa-times"></i> Cancel
+                                </a>
+                                <button type="reset" class="btn btn-outline-custom">
+                                    <i class="fas fa-undo"></i> Reset to Current
+                                </button>
+                                <span style="margin-left: auto; font-size: 13px; color: var(--cbwci-muted); display: flex; align-items: center; gap: 6px;">
+                                    <i class="fas fa-lock" style="color: var(--cbwci-gold);"></i> 
+                                    Personal data is locked
+                                </span>
+                            </div>
+
+                        </form>
+
+                    </div>
+
+                    <!-- ===== DANGER ZONE ===== -->
+                    <div class="edit-profile-card hidden" id="dangerZone" data-aos="fade-up" data-aos-delay="200" style="border-left: 4px solid var(--danger);">
+                        <div class="section-title" style="color: var(--danger);">
+                            <i class="fas fa-exclamation-triangle"></i> Danger Zone
+                        </div>
+                        <p style="color: var(--cbwci-muted); font-size: 14px; margin-bottom: 15px;">
+                            These actions are irreversible. Please proceed with caution.
+                        </p>
+                        <div style="display: flex; gap: 12px; flex-wrap: wrap;">
+                            <button class="btn btn-danger-custom" onclick="confirmDeactivate()">
+                                <i class="fas fa-user-slash"></i> Deactivate Account
+                            </button>
+                            <button class="btn btn-danger-custom" onclick="confirmDelete()" style="background: #922B21;">
+                                <i class="fas fa-trash-alt"></i> Delete Account
+                            </button>
+                        </div>
+                        <div class="form-text" style="margin-top: 10px;">
+                            <i class="fas fa-info-circle"></i> 
+                            Deactivating your account will hide your profile. Deleting your account will permanently remove all your data.
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+        </div>
+    </section>
+
+    <!-- ======================================== -->
+    <!-- TOAST CONTAINER -->
+    <!-- ======================================== -->
+    <div class="toast-container" id="toastContainer"></div>
+
+    <!-- ======================================== -->
+    <!-- SCRIPTS -->
+    <!-- ======================================== -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js">
+    </script>
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js">
+    </script>
+
+    <script>
+        // ========================================
+        // INITIALIZE AOS
+        // ========================================
+        AOS.init({
+            duration: 800,
+            once: true
+        });
+
+        // ========================================
+        // FIREBASE CONFIGURATION (UPDATED to cbwci-892de)
+        // ========================================
+        const firebaseConfig = {
+            apiKey: "AIzaSyBhXS5EOZjEAahTjk8XPd-9PkG3HeKV8bg",
+            authDomain: "cbwci-892de.firebaseapp.com",
+            projectId: "cbwci-892de",
+            storageBucket: "cbwci-892de.firebasestorage.app",
+            messagingSenderId: "187272132769",
+            appId: "1:187272132769:web:63a9fcba465e54867d98e0",
+            databaseURL: "https://cbwci-892de-default-rtdb.firebaseio.com"
+        };
+
+        // Initialize Firebase
+        firebase.initializeApp(firebaseConfig);
+        const database = firebase.database();
+        const auth = firebase.auth();
+        console.log('✅ Firebase initialized successfully (cbwci-892de)');
+
+        // ========================================
+        // DOM REFERENCES
+        // ========================================
+        const loadingState = document.getElementById('loadingState');
+        const profileFormContainer = document.getElementById('profileFormContainer');
+        const dangerZone = document.getElementById('dangerZone');
+        
+        const fullNameInput = document.getElementById('fullName');
+        const emailInput = document.getElementById('email');
+        const phoneInput = document.getElementById('phone');
+        const dobInput = document.getElementById('dob');
+        const avatarText = document.getElementById('avatarText');
+        const avatarPreview = document.getElementById('avatarPreview');
+        const displayName = document.getElementById('displayName');
+        const displayEmail = document.getElementById('displayEmail');
+
+        let currentUserData = null;
+        let currentUserId = null;
+
+        // ========================================
+        // GET USER ID FROM SESSION OR AUTH
+        // ========================================
+        function getUserId() {
+            // First check sessionStorage
+            const sessionUser = sessionStorage.getItem('cbwci_user');
+            if (sessionUser) {
+                try {
+                    const userData = JSON.parse(sessionUser);
+                    if (userData && userData.uid) {
+                        return userData.uid;
+                    }
+                } catch (e) {
+                    console.warn('⚠️ Invalid session data');
+                }
+            }
+            
+            // Check if user is logged in via Firebase Auth
+            const user = auth.currentUser;
+            if (user) {
+                return user.uid;
+            }
+            
+            return null;
+        }
+
+        // ========================================
+        // LOAD USER PROFILE FROM REALTIME DATABASE
+        // ========================================
+        function loadUserProfile(uid) {
+            if (!uid) {
+                console.warn('⚠️ No user ID found');
+                loadingState.classList.add('hidden');
+                profileFormContainer.classList.remove('hidden');
+                dangerZone.classList.remove('hidden');
+                showToast('No User Found', 'Please log in to view your profile.', 'warning');
+                return;
+            }
+
+            const userRef = database.ref('users/' + uid);
+            
+            userRef.once('value')
+                .then((snapshot) => {
+                    const data = snapshot.val();
+                    if (data) {
+                        currentUserData = data;
+                        populateProfile(data);
+                        // Update avatar username display
+                        displayName.textContent = data.fullName || data.fullname || data.name || 'User';
+                        displayEmail.textContent = data.email || '';
+                        showToast('Profile Loaded', 'Your profile data has been loaded successfully.');
+                    } else {
+                        console.warn('⚠️ No profile data found for user:', uid);
+                        showToast('No Profile Data', 'No profile data found. Please complete your registration.', 'warning');
+                        displayName.textContent = 'User';
+                        displayEmail.textContent = '';
+                        populateProfile({
+                            fullName: 'User',
+                            email: '',
+                            phone: '',
+                            dob: ''
+                        });
+                    }
+                })
+                .catch((error) => {
+                    console.error('❌ Error loading profile:', error);
+                    showToast('Error', 'Failed to load profile data. Please try again.', 'danger');
+                    populateProfile({
+                        fullName: 'User',
+                        email: '',
+                        phone: '',
+                        dob: ''
+                    });
+                })
+                .finally(() => {
+                    loadingState.classList.add('hidden');
+                    profileFormContainer.classList.remove('hidden');
+                    dangerZone.classList.remove('hidden');
+                });
+        }
+
+        // ========================================
+        // POPULATE PROFILE FIELDS
+        // ========================================
+        function populateProfile(data) {
+            const fullName = data.fullName || data.fullname || data.name || 'User';
+            const email = data.email || '';
+            const phone = data.phone || data.phoneNumber || '';
+            const dob = data.dob || data.dateOfBirth || data.birthDate || '';
+
+            // Set personal info fields
+            fullNameInput.value = fullName;
+            emailInput.value = email;
+            phoneInput.value = phone;
+            dobInput.value = dob;
+
+            // Set avatar initials
+            const initials = fullName
+                .split(' ')
+                .map(part => part.charAt(0).toUpperCase())
+                .slice(0, 2)
+                .join('');
+            avatarText.textContent = initials || '??';
+
+            // Populate church info if available
+            if (data.location) {
+                const locationSelect = document.getElementById('location');
+                const locationValue = data.location;
+                const optionExists = Array.from(locationSelect.options).some(opt => opt.value === locationValue);
+                if (optionExists) {
+                    locationSelect.value = locationValue;
+                } else {
+                    locationSelect.value = 'Other';
+                    document.getElementById('otherLocationDiv').style.display = 'block';
+                    document.getElementById('otherLocation').value = locationValue;
+                }
+            }
+
+            if (data.needsTaxi) {
+                document.getElementById('needsTaxi').value = data.needsTaxi;
+            }
+
+            if (data.serviceTime) {
+                document.getElementById('serviceTime').value = data.serviceTime;
+            }
+
+            // Populate ministry interests
+            if (data.ministries && Array.isArray(data.ministries)) {
+                data.ministries.forEach(ministry => {
+                    const checkbox = document.getElementById(`min-${ministry.toLowerCase()}`);
+                    if (checkbox) checkbox.checked = true;
+                });
+            }
+
+            // Populate emergency contact
+            if (data.emergencyContact) {
+                document.getElementById('emergencyName').value = data.emergencyContact.name || '';
+                document.getElementById('emergencyPhone').value = data.emergencyContact.phone || '';
+                document.getElementById('emergencyRelation').value = data.emergencyContact.relation || '';
+            }
+
+            console.log('✅ Profile populated for:', fullName);
+        }
+
+        // ========================================
+        // LOCATION "OTHER" TOGGLE
+        // ========================================
+        document.getElementById('location').addEventListener('change', function() {
+            const otherDiv = document.getElementById('otherLocationDiv');
+            if (this.value === 'Other') {
+                otherDiv.style.display = 'block';
+                document.getElementById('otherLocation').required = true;
+            } else {
+                otherDiv.style.display = 'none';
+                document.getElementById('otherLocation').required = false;
+            }
+        });
+
+        // ========================================
+        // AVATAR UPLOAD
+        // ========================================
+        const avatarInputEl = document.getElementById('avatarInput');
+
+        avatarInputEl.addEventListener('change', function(event) {
+            const file = event.target.files[0];
+            if (file) {
+                if (!file.type.startsWith('image/')) {
+                    showToast('Invalid File', 'Please select an image file.', 'danger');
+                    this.value = '';
+                    return;
+                }
+
+                if (file.size > 5 * 1024 * 1024) {
+                    showToast('File Too Large', 'Image must be less than 5MB.', 'danger');
+                    this.value = '';
+                    return;
+                }
+
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    avatarPreview.innerHTML = `
+                        <img src="${e.target.result}" alt="Profile Photo">
+                        <input type="file" id="avatarInput" accept="image/*" style="display:none;" onchange="handleAvatarChange(event)">
+                    `;
+                    showToast('Photo Updated', 'Your profile photo has been uploaded successfully!');
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+
+        function handleAvatarChange(event) {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    avatarPreview.innerHTML = `
+                        <img src="${e.target.result}" alt="Profile Photo">
+                        <input type="file" id="avatarInput" accept="image/*" style="display:none;" onchange="handleAvatarChange(event)">
+                    `;
+                    showToast('Photo Updated', 'Your profile photo has been updated!');
+                };
+                reader.readAsDataURL(file);
+            }
+        }
+
+        // ========================================
+        // FORM SUBMISSION - SAVE TO DATABASE
+        // ========================================
+        document.getElementById('editProfileForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            if (!this.checkValidity()) {
+                this.classList.add('was-validated');
+                showToast('Validation Error', 'Please fill in all required fields.', 'danger');
+                return;
+            }
+
+            if (!currentUserId) {
+                showToast('Error', 'You must be logged in to save changes.', 'danger');
+                return;
+            }
+
+            // Collect form data
+            const location = document.getElementById('location').value;
+            const otherLocation = document.getElementById('otherLocation').value;
+            const needsTaxi = document.getElementById('needsTaxi').value;
+            const serviceTime = document.getElementById('serviceTime').value;
+            const emergencyName = document.getElementById('emergencyName').value;
+            const emergencyPhone = document.getElementById('emergencyPhone').value;
+            const emergencyRelation = document.getElementById('emergencyRelation').value;
+
+            // Get ministry interests
+            const ministryChecks = document.querySelectorAll('.ministry-check input[type="checkbox"]:checked');
+            const ministries = Array.from(ministryChecks).map(cb => cb.id.replace('min-', ''));
+
+            const finalLocation = location === 'Other' ? otherLocation : location;
+
+            // Build update data
+            const updateData = {
+                location: finalLocation,
+                needsTaxi: needsTaxi || '',
+                serviceTime: serviceTime || '',
+                ministries: ministries,
+                emergencyContact: {
+                    name: emergencyName || '',
+                    phone: emergencyPhone || '',
+                    relation: emergencyRelation || ''
+                },
+                lastUpdated: firebase.database.ServerValue.TIMESTAMP
+            };
+
+            // Show saving state
+            const saveBtn = document.getElementById('saveBtn');
+            saveBtn.disabled = true;
+            saveBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving...';
+
+            // Save to Firebase
+            const userRef = database.ref('users/' + currentUserId);
+            userRef.update(updateData)
+                .then(() => {
+                    showToast('Profile Updated', 'Your church information has been saved successfully!');
+                    console.log('✅ Profile updated in Firebase:', updateData);
+                    setTimeout(() => {
+                        window.location.href = 'profile.html';
+                    }, 1500);
+                })
+                .catch((error) => {
+                    console.error('❌ Error saving profile:', error);
+                    showToast('Save Error', 'Failed to save profile changes. Please try again.', 'danger');
+                })
+                .finally(() => {
+                    saveBtn.disabled = false;
+                    saveBtn.innerHTML = '<i class="fas fa-save"></i> Save Changes';
+                });
+        });
+
+        // ========================================
+        // REAL-TIME VALIDATION
+        // ========================================
+        document.querySelectorAll('.form-control, .form-select').forEach(el => {
+            el.addEventListener('blur', function() {
+                if (this.hasAttribute('required') && !this.value) {
+                    this.classList.add('is-invalid');
+                } else {
+                    this.classList.remove('is-invalid');
+                    this.classList.add('is-valid');
+                }
+            });
+            el.addEventListener('input', function() {
+                if (this.value) {
+                    this.classList.remove('is-invalid');
+                    this.classList.add('is-valid');
+                }
+            });
+        });
+
+        // ========================================
+        // SHOW TOAST NOTIFICATION
+        // ========================================
+        function showToast(title, message, type = 'success') {
+            const container = document.getElementById('toastContainer');
+            const iconMap = {
+                'success': 'fa-check-circle',
+                'danger': 'fa-exclamation-circle',
+                'warning': 'fa-exclamation-triangle',
+                'info': 'fa-info-circle'
+            };
+
+            const toast = document.createElement('div');
+            toast.className = `toast-custom toast-${type}`;
+            toast.innerHTML = `
+                <i class="fas ${iconMap[type] || 'fa-check-circle'}"></i>
+                <div class="msg">
+                    <h6>${title}</h6>
+                    <small>${message}</small>
+                </div>
+            `;
+
+            container.appendChild(toast);
+
+            setTimeout(() => {
+                toast.classList.add('hiding');
+                setTimeout(() => toast.remove(), 400);
+            }, 4000);
+        }
+
+        // ========================================
+        // CONFIRM DEACTIVATE ACCOUNT
+        // ========================================
+        function confirmDeactivate() {
+            if (confirm('⚠️ Are you sure you want to deactivate your account?\n\nYour profile will be hidden from other members. You can reactivate anytime by contacting admin.')) {
+                if (currentUserId) {
+                    database.ref('users/' + currentUserId + '/active').set(false)
+                        .then(() => {
+                            showToast('Account Deactivated', 'Your account has been deactivated.', 'warning');
+                            setTimeout(() => {
+                                window.location.href = 'index.html';
+                            }, 2000);
+                        })
+                        .catch((error) => {
+                            showToast('Error', 'Failed to deactivate account. Please try again.', 'danger');
+                        });
+                } else {
+                    showToast('Error', 'You must be logged in to deactivate your account.', 'danger');
+                }
+            }
+        }
+
+        // ========================================
+        // CONFIRM DELETE ACCOUNT
+        // ========================================
+        function confirmDelete() {
+            if (confirm('⚠️ WARNING: This will permanently delete your account!\n\nAll your data including profile, taxi history, and guest invites will be removed. This action cannot be undone.')) {
+                if (confirm('Are you absolutely sure? Type "DELETE" in the prompt below to confirm.')) {
+                    const confirmation = prompt('Type "DELETE" to confirm account deletion:');
+                    if (confirmation === 'DELETE' && currentUserId) {
+                        database.ref('users/' + currentUserId).remove()
+                            .then(() => {
+                                showToast('Account Deleted', 'Your account has been permanently deleted.', 'danger');
+                                setTimeout(() => {
+                                    window.location.href = 'index.html';
+                                }, 2500);
+                            })
+                            .catch((error) => {
+                                showToast('Error', 'Failed to delete account. Please try again.', 'danger');
+                            });
+                    } else if (confirmation !== 'DELETE') {
+                        showToast('Cancelled', 'Account deletion was cancelled.', 'warning');
+                    }
+                }
+            }
+        }
+
+        // ========================================
+        // LOGOUT
+        // ========================================
+        function logoutUser(event) {
+            event.preventDefault();
+            if (confirm('Are you sure you want to logout?')) {
+                auth.signOut()
+                    .then(() => {
+                        sessionStorage.removeItem('cbwci_user');
+                        showToast('Logged Out', 'You have been successfully logged out.', 'info');
+                        setTimeout(() => {
+                            window.location.href = 'login.html';
+                        }, 1500);
+                    })
+                    .catch((error) => {
+                        showToast('Logout Error', 'Failed to logout. Please try again.', 'danger');
+                    });
+            }
+        }
+
+        // ========================================
+        // KEYBOARD SHORTCUTS
+        // ========================================
+        document.addEventListener('keydown', function(e) {
+            if (e.ctrlKey && e.key === 's') {
+                e.preventDefault();
+                document.getElementById('editProfileForm').dispatchEvent(new Event('submit'));
+            }
+            if (e.key === 'Escape') {
+                window.location.href = 'profile.html';
+            }
+        });
+
+        // ========================================
+        // CONSOLE BRANDING
+        // ========================================
+        console.log('%c✝ CBWCI - Edit Profile ✝', 'font-size: 18px; color: #C9A84C; font-weight: bold;');
+        console.log('%c"Change, Dominate and Walk in Glory"', 'font-size: 14px; color: #4A1942; font-style: italic;');
+        console.log('🔒 Personal Information: Fetched from database (READ-ONLY)');
+        console.log('✏️ Church Information: User selects their own preferences');
+        console.log('🔥 Data is synced with Firebase Realtime Database');
+
+        // ========================================
+        // START - CHECK AUTH AND LOAD PROFILE
+        // ========================================
+        // First check if user is already authenticated
+        auth.onAuthStateChanged(function(user) {
+            if (user) {
+                // User is logged in via Firebase Auth
+                currentUserId = user.uid;
+                // Save to session for persistence
+                sessionStorage.setItem('cbwci_user', JSON.stringify({ uid: user.uid }));
+                console.log('✅ User authenticated via Firebase:', user.uid);
+                loadUserProfile(user.uid);
+            } else {
+                // Check session storage as fallback
+                const uid = getUserId();
+                if (uid) {
+                    currentUserId = uid;
+                    console.log('✅ Using session user:', uid);
+                    loadUserProfile(uid);
+                } else {
+                    // No user found
+                    loadingState.classList.add('hidden');
+                    profileFormContainer.classList.remove('hidden');
+                    dangerZone.classList.remove('hidden');
+                    showToast('No User Found', 'Please log in to view your profile.', 'warning');
+                    displayName.textContent = 'Guest User';
+                    displayEmail.textContent = 'Not logged in';
+                    avatarText.textContent = '--';
+                }
+            }
+        });
+    </script>
+
+</body>
+</html>

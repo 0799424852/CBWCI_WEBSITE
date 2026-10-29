@@ -1,0 +1,728 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Members Management · CBWCI Admin</title>
+    <!-- Bootstrap 5 -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome 6 -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- AOS -->
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+    <!-- Firebase -->
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+
+    <style>
+        :root {
+            --cbwci-purple: #4A1942;
+            --cbwci-purple-light: #6B2D5F;
+            --cbwci-purple-dark: #2E0F28;
+            --cbwci-gold: #C9A84C;
+            --cbwci-gold-light: #E8CD7A;
+            --cbwci-gold-dark: #A8893A;
+            --cbwci-cream: #FDF8F0;
+            --cbwci-dark: #1A0F16;
+            --cbwci-text: #2C1A24;
+            --cbwci-muted: #7A6A72;
+            --shadow: 0 10px 40px rgba(74, 25, 66, 0.12);
+            --shadow-hover: 0 15px 50px rgba(74, 25, 66, 0.2);
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            --success: #2D8F5C;
+            --danger: #C0392B;
+            --warning: #E67E22;
+            --info: #2980B9;
+        }
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body { font-family:'Inter',sans-serif; background:#f5f0eb; color:var(--cbwci-text); padding-top:76px; min-height:100vh; }
+
+        /* navbar */
+        .navbar { background: linear-gradient(135deg, var(--cbwci-purple), var(--cbwci-purple-dark)); padding:10px 0; box-shadow:0 4px 30px rgba(0,0,0,0.3); border-bottom:3px solid var(--cbwci-gold); }
+        .navbar-brand { font-family:'Playfair Display',serif; font-weight:900; font-size:20px; color:#fff!important; letter-spacing:2px; }
+        .navbar-brand .gold { color:var(--cbwci-gold); display:block; font-size:12px; letter-spacing:4px; }
+        .navbar-brand i { color:var(--cbwci-gold); margin-right:10px; }
+        .nav-link { color:rgba(255,255,255,0.8)!important; font-weight:500; font-size:13px; letter-spacing:1px; transition:var(--transition); padding:6px 16px!important; border-radius:8px; }
+        .nav-link:hover { color:var(--cbwci-gold)!important; background:rgba(201,168,76,0.1); }
+        .nav-link.active { color:var(--cbwci-gold)!important; }
+        .navbar .btn-back { background:transparent; border:2px solid rgba(255,255,255,0.2); color:#fff; padding:4px 16px; border-radius:8px; font-weight:600; font-size:12px; transition:var(--transition); text-decoration:none; }
+        .navbar .btn-back:hover { background:rgba(255,255,255,0.1); border-color:#fff; transform:translateY(-2px); color:#fff; }
+        .navbar .btn-logout { background:transparent; border:2px solid rgba(255,255,255,0.2); color:#fff; padding:4px 16px; border-radius:8px; font-weight:600; font-size:12px; transition:var(--transition); text-decoration:none; cursor:pointer; }
+        .navbar .btn-logout:hover { background:var(--danger); border-color:var(--danger); transform:translateY(-2px); color:#fff; }
+        .navbar .admin-badge { background:var(--cbwci-gold); color:var(--cbwci-purple-dark); font-size:10px; font-weight:700; padding:2px 12px; border-radius:50px; margin-left:8px; letter-spacing:1px; }
+
+        .admin-wrapper { padding:10px 0 40px; }
+        .breadcrumb-custom { color:var(--cbwci-muted); font-size:12px; margin-bottom:2px; }
+        .breadcrumb-custom a { color:var(--cbwci-purple); text-decoration:none; transition:var(--transition); }
+        .breadcrumb-custom a:hover { color:var(--cbwci-gold); }
+        .breadcrumb-custom .separator { margin:0 6px; color:var(--cbwci-gold); }
+        .page-title { font-family:'Playfair Display',serif; font-weight:700; color:var(--cbwci-purple); font-size:24px; margin:0; }
+        .page-title i { color:var(--cbwci-gold); }
+        .page-subtitle { color:var(--cbwci-muted); font-size:13px; margin:0; }
+        .welcome-text { color:var(--cbwci-muted); font-size:13px; font-weight:400; }
+        .welcome-text strong { color:var(--cbwci-purple); }
+
+        /* sidebar */
+        .admin-sidebar { background:#fff; border-radius:12px; padding:16px 14px; box-shadow:0 2px 12px rgba(0,0,0,0.06); border:1px solid rgba(201,168,76,0.06); position:sticky; top:96px; }
+        .admin-sidebar .sidebar-brand { text-align:center; padding-bottom:12px; border-bottom:2px solid #f5f0eb; margin-bottom:12px; }
+        .admin-sidebar .sidebar-brand .brand-icon { font-size:28px; color:var(--cbwci-gold); }
+        .admin-sidebar .sidebar-brand h6 { font-family:'Playfair Display',serif; font-weight:700; color:var(--cbwci-purple); margin-top:2px; font-size:14px; }
+        .admin-sidebar .sidebar-brand small { color:var(--cbwci-muted); font-size:10px; }
+        .admin-sidebar .sidebar-nav { list-style:none; padding:0; margin:0; }
+        .admin-sidebar .sidebar-nav li { margin-bottom:2px; }
+        .admin-sidebar .sidebar-nav li a { display:flex; align-items:center; gap:8px; padding:8px 12px; border-radius:8px; color:var(--cbwci-text); text-decoration:none; transition:var(--transition); font-weight:500; font-size:12px; }
+        .admin-sidebar .sidebar-nav li a i { width:16px; color:var(--cbwci-muted); transition:var(--transition); font-size:13px; }
+        .admin-sidebar .sidebar-nav li a:hover { background:rgba(74,25,66,0.05); color:var(--cbwci-purple); }
+        .admin-sidebar .sidebar-nav li a.active { background:linear-gradient(135deg,var(--cbwci-purple),var(--cbwci-purple-dark)); color:#fff; box-shadow:0 4px 15px rgba(74,25,66,0.25); }
+        .admin-sidebar .sidebar-nav li a.active i { color:#fff; }
+        .admin-sidebar .sidebar-nav li a .badge-nav { margin-left:auto; background:var(--cbwci-gold); color:var(--cbwci-purple-dark); font-size:9px; padding:1px 8px; border-radius:50px; }
+        .admin-sidebar .sidebar-nav li a .badge-nav-danger { margin-left:auto; background:var(--danger); color:#fff; font-size:9px; padding:1px 8px; border-radius:50px; }
+        .admin-sidebar .sidebar-footer { margin-top:12px; padding-top:12px; border-top:2px solid #f5f0eb; text-align:center; }
+        .admin-sidebar .sidebar-footer small { color:var(--cbwci-muted); font-size:10px; }
+        .admin-sidebar .sidebar-footer i { color:var(--cbwci-gold); }
+
+        /* members content */
+        .members-content { background:#fff; border-radius:12px; padding:18px 20px; box-shadow:0 2px 12px rgba(0,0,0,0.06); border:1px solid rgba(201,168,76,0.06); }
+        .members-content .content-header { display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; margin-bottom:16px; padding-bottom:12px; border-bottom:2px solid #f5f0eb; }
+        .members-content .content-header h6 { font-weight:700; color:var(--cbwci-purple); margin:0; font-size:15px; }
+        .members-content .content-header h6 i { color:var(--cbwci-gold); margin-right:8px; }
+
+        .search-filter-bar { display:flex; gap:10px; flex-wrap:wrap; margin-bottom:16px; }
+        .search-filter-bar .search-box { flex:1; min-width:200px; position:relative; }
+        .search-filter-bar .search-box input { width:100%; padding:8px 14px 8px 36px; border-radius:8px; border:2px solid #E8DCC8; background:#FDFAF5; font-size:13px; transition:var(--transition); }
+        .search-filter-bar .search-box input:focus { border-color:var(--cbwci-gold); outline:none; box-shadow:0 0 0 3px rgba(201,168,76,0.1); }
+        .search-filter-bar .search-box i { position:absolute; left:12px; top:50%; transform:translateY(-50%); color:var(--cbwci-muted); font-size:14px; }
+        .search-filter-bar .filter-group { display:flex; gap:6px; flex-wrap:wrap; }
+        .search-filter-bar .filter-group .filter-btn { padding:6px 14px; border-radius:50px; border:2px solid #E8DCC8; background:transparent; font-size:12px; font-weight:600; color:var(--cbwci-muted); transition:var(--transition); cursor:pointer; }
+        .search-filter-bar .filter-group .filter-btn:hover { border-color:var(--cbwci-purple); color:var(--cbwci-purple); }
+        .search-filter-bar .filter-group .filter-btn.active { background:var(--cbwci-purple); border-color:var(--cbwci-purple); color:#fff; }
+        .search-filter-bar .add-btn { padding:8px 20px; border-radius:8px; background:linear-gradient(135deg,var(--cbwci-gold),var(--cbwci-gold-dark)); border:none; font-weight:600; font-size:13px; color:var(--cbwci-purple-dark); transition:var(--transition); white-space:nowrap; }
+        .search-filter-bar .add-btn:hover { transform:translateY(-2px); box-shadow:0 4px 15px rgba(201,168,76,0.3); }
+
+        .table-container { overflow-x:auto; }
+        .table-container table { width:100%; border-collapse:collapse; font-size:13px; }
+        .table-container table thead th { background:#f8f4f0; padding:10px 12px; text-align:left; font-weight:600; color:var(--cbwci-purple); border-bottom:2px solid #f0ebe4; font-size:12px; text-transform:uppercase; letter-spacing:0.5px; white-space:nowrap; }
+        .table-container table tbody td { padding:10px 12px; border-bottom:1px solid #f5f0eb; vertical-align:middle; }
+        .table-container table tbody tr:hover { background:rgba(74,25,66,0.02); }
+        .member-avatar-sm { width:32px; height:32px; border-radius:50%; background:linear-gradient(135deg,var(--cbwci-purple),var(--cbwci-purple-dark)); display:flex; align-items:center; justify-content:center; color:#fff; font-weight:700; font-size:12px; flex-shrink:0; }
+        .member-info { display:flex; align-items:center; gap:10px; }
+        .member-info .member-details .name { font-weight:600; color:var(--cbwci-text); }
+        .member-info .member-details .email { font-size:11px; color:var(--cbwci-muted); }
+        .status-badge { padding:3px 12px; border-radius:50px; font-size:11px; font-weight:600; }
+        .status-badge.active { background:rgba(45,143,92,0.12); color:var(--success); }
+        .status-badge.inactive { background:rgba(192,57,43,0.12); color:var(--danger); }
+        .status-badge.pending { background:rgba(230,126,34,0.12); color:var(--warning); }
+        .role-badge { padding:2px 10px; border-radius:50px; font-size:10px; font-weight:600; background:rgba(74,25,66,0.08); color:var(--cbwci-purple); }
+        .role-badge.admin { background:rgba(201,168,76,0.15); color:var(--cbwci-gold-dark); }
+        .role-badge.driver { background:rgba(41,128,185,0.12); color:var(--info); }
+        .role-badge.followup { background:rgba(45,143,92,0.12); color:var(--success); }
+        .action-btns { display:flex; gap:4px; flex-wrap:wrap; justify-content:center; }
+        .action-btns .btn-action { width:28px; height:28px; border-radius:6px; border:none; display:flex; align-items:center; justify-content:center; font-size:12px; transition:var(--transition); cursor:pointer; }
+        .action-btns .btn-action:hover { transform:scale(1.1); }
+        .action-btns .btn-action.view { background:rgba(41,128,185,0.1); color:var(--info); }
+        .action-btns .btn-action.view:hover { background:var(--info); color:#fff; }
+        .action-btns .btn-action.edit { background:rgba(201,168,76,0.12); color:var(--cbwci-gold-dark); }
+        .action-btns .btn-action.edit:hover { background:var(--cbwci-gold); color:var(--cbwci-purple-dark); }
+        .action-btns .btn-action.delete { background:rgba(192,57,43,0.1); color:var(--danger); }
+        .action-btns .btn-action.delete:hover { background:var(--danger); color:#fff; }
+
+        .pagination-container { display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; margin-top:16px; padding-top:12px; border-top:2px solid #f5f0eb; }
+        .pagination-container .info { font-size:12px; color:var(--cbwci-muted); }
+        .pagination-container .pagination { display:flex; gap:4px; list-style:none; padding:0; margin:0; }
+        .pagination-container .pagination li a { display:flex; align-items:center; justify-content:center; width:30px; height:30px; border-radius:6px; border:2px solid #E8DCC8; color:var(--cbwci-muted); text-decoration:none; font-size:12px; font-weight:600; transition:var(--transition); }
+        .pagination-container .pagination li a:hover { border-color:var(--cbwci-purple); color:var(--cbwci-purple); }
+        .pagination-container .pagination li.active a { background:var(--cbwci-purple); border-color:var(--cbwci-purple); color:#fff; }
+        .pagination-container .pagination li.disabled a { opacity:0.4; cursor:not-allowed; }
+
+        .empty-state { text-align:center; padding:40px 20px; color:var(--cbwci-muted); }
+        .empty-state i { font-size:48px; color:var(--cbwci-gold-light); margin-bottom:12px; display:block; }
+        .empty-state h6 { font-size:16px; color:var(--cbwci-text); margin-bottom:4px; }
+        .empty-state p { font-size:13px; margin:0; }
+
+        .toast-container { position:fixed; bottom:20px; right:20px; z-index:9999; }
+        .toast-custom { background:#fff; border-radius:12px; padding:14px 20px; box-shadow:0 10px 40px rgba(0,0,0,0.15); border-left:4px solid var(--success); display:flex; align-items:center; gap:12px; animation:slideUp 0.4s ease; margin-top:10px; min-width:280px; max-width:420px; }
+        .toast-custom i { font-size:20px; color:var(--success); }
+        .toast-custom .msg h6 { margin:0; font-weight:600; font-size:14px; }
+        .toast-custom .msg small { color:var(--cbwci-muted); font-size:12px; }
+        .toast-custom.toast-danger { border-left-color:var(--danger); }
+        .toast-custom.toast-danger i { color:var(--danger); }
+        .toast-custom.toast-warning { border-left-color:var(--warning); }
+        .toast-custom.toast-warning i { color:var(--warning); }
+        @keyframes slideUp { from { opacity:0; transform:translateY(30px); } to { opacity:1; transform:translateY(0); } }
+
+        .modal-content { border-radius:12px; border:2px solid rgba(201,168,76,0.1); }
+        .modal-header { background:linear-gradient(135deg,var(--cbwci-purple),var(--cbwci-purple-dark)); color:#fff; border-radius:12px 12px 0 0; border-bottom:3px solid var(--cbwci-gold); }
+        .modal-header .btn-close { filter:invert(1); }
+        .modal-body .form-label { font-weight:600; font-size:13px; color:var(--cbwci-text); }
+        .modal-body .form-control, .modal-body .form-select { border:2px solid #E8DCC8; border-radius:8px; padding:8px 14px; font-size:13px; background:#FDFAF5; transition:var(--transition); }
+        .modal-body .form-control:focus, .modal-body .form-select:focus { border-color:var(--cbwci-gold); box-shadow:0 0 0 3px rgba(201,168,76,0.1); }
+        .modal-footer .btn-primary { background:linear-gradient(135deg,var(--cbwci-purple),var(--cbwci-purple-dark)); border:none; padding:8px 24px; font-weight:600; }
+        .modal-footer .btn-primary:hover { transform:translateY(-2px); box-shadow:0 4px 15px rgba(74,25,66,0.3); }
+        .modal-footer .btn-secondary { background:transparent; border:2px solid #E8DCC8; color:var(--cbwci-muted); padding:8px 24px; font-weight:600; }
+        .modal-footer .btn-secondary:hover { border-color:var(--cbwci-purple); color:var(--cbwci-purple); }
+
+        .badge-count { background:rgba(74,25,66,0.08); padding:4px 14px; border-radius:50px; font-size:12px; color:var(--cbwci-purple); }
+
+        @media (max-width:992px) { .admin-sidebar { position:relative; top:0; margin-bottom:16px; } .search-filter-bar { flex-direction:column; } .search-filter-bar .search-box { min-width:100%; } .page-title { font-size:22px; } }
+        @media (max-width:768px) { body { padding-top:68px; } .page-title { font-size:20px; } .members-content { padding:14px; } .table-container table { font-size:12px; } .search-filter-bar .filter-group .filter-btn { flex:1; text-align:center; font-size:11px; padding:4px 10px; } }
+        @media (max-width:576px) { .page-title { font-size:18px; } .members-content { padding:12px 10px; } .member-info .member-details .email { font-size:10px; } .status-badge { font-size:10px; padding:2px 8px; } }
+        ::-webkit-scrollbar { width:6px; } ::-webkit-scrollbar-track { background:#f5f0eb; } ::-webkit-scrollbar-thumb { background:var(--cbwci-purple); border-radius:10px; } ::-webkit-scrollbar-thumb:hover { background:var(--cbwci-gold); }
+
+        /* loading spinner */
+        .loading-spinner { display:flex; align-items:center; justify-content:center; padding:30px 0; flex-direction:column; gap:10px; }
+        .loading-spinner .spinner { width:30px; height:30px; border:3px solid #f0ebe4; border-top-color:var(--cbwci-gold); border-radius:50%; animation:spin 1s linear infinite; }
+        @keyframes spin { 0% { transform:rotate(0deg); } 100% { transform:rotate(360deg); } }
+    </style>
+</head>
+<body>
+
+<!-- ===== NAVBAR ===== -->
+<nav class="navbar navbar-expand-lg fixed-top">
+    <div class="container">
+        <a class="navbar-brand" href="#">
+            <i class="fas fa-church"></i> CBWCI
+            <span class="gold">Changed By The Word</span>
+            <span class="admin-badge"><i class="fas fa-crown"></i> ADMIN</span>
+        </a>
+        <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+            <span class="navbar-toggler-icon" style="filter:invert(1);"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav ms-auto align-items-lg-center">
+                <li class="nav-item"><a class="nav-link" href="#">Home</a></li>
+                <li class="nav-item"><a class="nav-link active" href="#">Admin</a></li>
+                <li class="nav-item"><a class="nav-link" href="/admin/meetings"><i class="fas fa-video"></i> CBWCI Virtual Meeting</a></li>
+                <li class="nav-item"><a class="nav-link" href="#">Profile</a></li>
+                <li class="nav-item ms-lg-2"><a href="#" class="btn btn-back me-2"><i class="fas fa-arrow-left"></i> Back</a></li>
+                <li class="nav-item"><a href="#" class="btn btn-logout" onclick="logoutUser(event)"><i class="fas fa-sign-out-alt"></i> Logout</a></li>
+            </ul>
+        </div>
+    </div>
+</nav>
+
+<!-- ===== ADMIN CONTENT ===== -->
+<section class="admin-wrapper">
+    <div class="container">
+        <div class="row g-3">
+
+            <!-- SIDEBAR -->
+            <div class="col-lg-3" data-aos="fade-right" data-aos-duration="600">
+                <div class="admin-sidebar">
+                    <div class="sidebar-brand">
+                        <div class="brand-icon"><i class="fas fa-crown"></i></div>
+                        <h6>Admin Panel</h6>
+                        <small>CBWCI Church Management</small>
+                    </div>
+                    <ul class="sidebar-nav">
+                        <li><a href="Dashboard.html"><i class="fas fa-chart-pie"></i> Dashboard</a></li>
+                        <li><a href="Members.html" class="active"><i class="fas fa-users"></i> Members <span class="badge-nav" id="memberBadge">0</span></a></li>
+                        <li><a href="FollowUp.html"><i class="fas fa-user-plus"></i> Follow-Up <span class="badge-nav-danger" id="followupBadge">0</span></a></li>
+                        <li><a href="Drivers.html"><i class="fas fa-taxi"></i> Drivers <span class="badge-nav" id="driverBadge">0</span></a></li>
+                        <li><a href="transport.html"><i class="fas fa-route"></i> Transport</a></li>
+                        <li><a href="announcement.html"><i class="fas fa-bullhorn"></i> Announcements</a></li>
+                        <li><a href="/admin/meetings"><i class="fas fa-video"></i> CBWCI Virtual Meeting</a></li>
+                        <li><a href="reports.html"><i class="fas fa-file-alt"></i> Reports</a></li>
+                        <li style="margin-top:8px;border-top:1px solid #f5f0eb;padding-top:8px;">
+                            <a href="#" style="color:var(--danger);" onclick="logoutUser(event)"><i class="fas fa-sign-out-alt" style="color:var(--danger);"></i> Logout</a>
+                        </li>
+                    </ul>
+                    <div class="sidebar-footer">
+                        <small><i class="fas fa-shield-alt"></i><br>Logged in as <strong id="adminName">Admin</strong></small>
+                    </div>
+                </div>
+            </div>
+
+            <!-- MAIN -->
+            <div class="col-lg-9">
+
+                <!-- header -->
+                <div data-aos="fade-up" data-aos-duration="600">
+                    <div class="breadcrumb-custom">
+                        <a href="#"><i class="fas fa-home"></i> Home</a>
+                        <span class="separator">/</span>
+                        <a href="#">Admin</a>
+                        <span class="separator">/</span>
+                        <span style="color:var(--cbwci-gold-dark);font-weight:500;">Members</span>
+                    </div>
+                    <div class="d-flex flex-wrap justify-content-between align-items-center">
+                        <div>
+                            <h1 class="page-title"><i class="fas fa-users"></i> Members Management</h1>
+                            <p class="page-subtitle">View and manage all church members</p>
+                        </div>
+                        <div class="welcome-text mt-1 mt-md-0">
+                            <span class="badge-count"><i class="fas fa-users"></i> <span id="totalMembersCount">0</span> Members</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- MEMBERS CONTENT -->
+                <div class="members-content mt-2" data-aos="fade-up" data-aos-delay="100">
+                    <div class="content-header">
+                        <h6><i class="fas fa-list"></i> All Members</h6>
+                        <span style="font-size:12px;color:var(--cbwci-muted);">
+                            <i class="fas fa-sync-alt"></i> Last updated: <span id="lastUpdated">Just now</span>
+                        </span>
+                    </div>
+
+                    <!-- search & filter -->
+                    <div class="search-filter-bar">
+                        <div class="search-box">
+                            <i class="fas fa-search"></i>
+                            <input type="text" placeholder="Search members by name, email, or phone..." id="searchInput" oninput="filterMembers()">
+                        </div>
+                        <div class="filter-group">
+                            <button class="filter-btn active" onclick="filterMembers('all', this)">All</button>
+                            <button class="filter-btn" onclick="filterMembers('active', this)">Active</button>
+                            <button class="filter-btn" onclick="filterMembers('inactive', this)">Inactive</button>
+                            <button class="filter-btn" onclick="filterMembers('pending', this)">Pending</button>
+                        </div>
+                        <button class="add-btn" onclick="openAddMemberModal()"><i class="fas fa-plus"></i> Add Member</button>
+                    </div>
+
+                    <!-- table -->
+                    <div class="table-container">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Member</th>
+                                    <th>Phone</th>
+                                    <th>Role</th>
+                                    <th>Status</th>
+                                    <th>Joined</th>
+                                    <th style="text-align:center;">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="membersTableBody">
+                                <tr><td colspan="6"><div class="loading-spinner"><div class="spinner"></div><p style="color:var(--cbwci-muted);font-size:13px;">Loading members...</p></div></td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- pagination -->
+                    <div class="pagination-container">
+                        <span class="info" id="paginationInfo">Showing 0 of 0 members</span>
+                        <ul class="pagination" id="paginationControls">
+                            <li class="disabled"><a href="#"><i class="fas fa-chevron-left"></i></a></li>
+                            <li class="active"><a href="#">1</a></li>
+                            <li class="disabled"><a href="#"><i class="fas fa-chevron-right"></i></a></li>
+                        </ul>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ===== ADD MEMBER MODAL ===== -->
+<div class="modal fade" id="addMemberModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title"><i class="fas fa-user-plus" style="color:var(--cbwci-gold);"></i> Add New Member</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="addMemberForm">
+                    <div class="mb-3"><label class="form-label"><i class="fas fa-user"></i> Full Name <span class="text-danger">*</span></label><input type="text" class="form-control" id="memberName" placeholder="Enter full name" required></div>
+                    <div class="mb-3"><label class="form-label"><i class="fas fa-envelope"></i> Email <span class="text-danger">*</span></label><input type="email" class="form-control" id="memberEmail" placeholder="Enter email" required></div>
+                    <div class="mb-3"><label class="form-label"><i class="fas fa-phone"></i> Phone <span class="text-danger">*</span></label><input type="tel" class="form-control" id="memberPhone" placeholder="Enter phone" required></div>
+                    <div class="mb-3"><label class="form-label"><i class="fas fa-user-tag"></i> Role</label>
+                        <select class="form-select" id="memberRole">
+                            <option value="member">Member</option>
+                            <option value="admin">Admin</option>
+                            <option value="driver">Driver</option>
+                            <option value="followup">Follow-Up</option>
+                        </select>
+                    </div>
+                    <div class="mb-3"><label class="form-label"><i class="fas fa-check-circle"></i> Status</label>
+                        <select class="form-select" id="memberStatus">
+                            <option value="active">Active</option>
+                            <option value="pending">Pending</option>
+                            <option value="inactive">Inactive</option>
+                        </select>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary" onclick="addMemberToFirebase()"><i class="fas fa-save"></i> Add Member</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ===== VIEW MEMBER MODAL ===== -->
+<div class="modal fade" id="viewMemberModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title"><i class="fas fa-user" style="color:var(--cbwci-gold);"></i> Member Details</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body" id="viewMemberBody">
+                <div class="text-center mb-3">
+                    <div style="width:80px;height:80px;border-radius:50%;background:linear-gradient(135deg,var(--cbwci-purple),var(--cbwci-purple-dark));display:flex;align-items:center;justify-content:center;margin:0 auto;color:#fff;font-size:30px;font-weight:700;font-family:'Playfair Display',serif;">JD</div>
+                    <h5 class="mt-2" id="viewName">John Doe</h5>
+                    <span class="role-badge" id="viewRole">Member</span>
+                    <span class="status-badge active" id="viewStatus" style="margin-left:6px;">Active</span>
+                </div>
+                <div style="background:#f8f4f0;border-radius:8px;padding:14px;">
+                    <div style="display:flex;justify-content:space-between;padding:4px 0;border-bottom:1px solid #f0ebe4;"><span style="color:var(--cbwci-muted);font-size:13px;"><i class="fas fa-envelope"></i> Email</span><span style="font-weight:500;font-size:13px;" id="viewEmail">john@email.com</span></div>
+                    <div style="display:flex;justify-content:space-between;padding:4px 0;border-bottom:1px solid #f0ebe4;"><span style="color:var(--cbwci-muted);font-size:13px;"><i class="fas fa-phone"></i> Phone</span><span style="font-weight:500;font-size:13px;" id="viewPhone">+27 82 123 4567</span></div>
+                    <div style="display:flex;justify-content:space-between;padding:4px 0;border-bottom:1px solid #f0ebe4;"><span style="color:var(--cbwci-muted);font-size:13px;"><i class="fas fa-calendar-alt"></i> Joined</span><span style="font-weight:500;font-size:13px;" id="viewJoined">2026-08-01</span></div>
+                    <div style="display:flex;justify-content:space-between;padding:4px 0;"><span style="color:var(--cbwci-muted);font-size:13px;"><i class="fas fa-user-tag"></i> Role</span><span style="font-weight:500;font-size:13px;" id="viewRoleDetail">Member</span></div>
+                    <div style="display:flex;justify-content:space-between;padding:4px 0;border-top:1px solid #f0ebe4;margin-top:4px;padding-top:8px;"><span style="color:var(--cbwci-muted);font-size:13px;"><i class="fas fa-id-card"></i> Member ID</span><span style="font-weight:500;font-size:12px;color:var(--cbwci-muted);" id="viewId">-</span></div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary" onclick="editMemberFromView()"><i class="fas fa-edit"></i> Edit Member</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ===== TOAST ===== -->
+<div class="toast-container" id="toastContainer"></div>
+
+<!-- ===== SCRIPTS ===== -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+<script>
+    AOS.init({ duration:600, once:true });
+
+    // ===== FIREBASE =====
+    const firebaseConfig = {
+        apiKey: "AIzaSyBhXS5EOZjEAahTjk8XPd-9PkG3HeKV8bg",
+        authDomain: "cbwci-892de.firebaseapp.com",
+        projectId: "cbwci-892de",
+        storageBucket: "cbwci-892de.firebasestorage.app",
+        messagingSenderId: "187272132769",
+        appId: "1:187272132769:web:63a9fcba465e54867d98e0",
+        databaseURL: "https://cbwci-892de-default-rtdb.firebaseio.com"
+    };
+    if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
+
+    // ===== TOAST =====
+    function showToast(title, message, type='success') {
+        const container = document.getElementById('toastContainer');
+        const iconMap = { success:'fa-check-circle', danger:'fa-exclamation-circle', warning:'fa-exclamation-triangle', info:'fa-info-circle' };
+        const colorMap = { success:'var(--success)', danger:'var(--danger)', warning:'var(--warning)', info:'var(--info)' };
+        const toast = document.createElement('div');
+        toast.className = `toast-custom ${type==='danger'?'toast-danger':''}`;
+        toast.innerHTML = `<i class="fas ${iconMap[type]||'fa-check-circle'}" style="color:${colorMap[type]||'var(--success)'};"></i><div class="msg"><h6>${title}</h6><small>${message}</small></div>`;
+        container.appendChild(toast);
+        setTimeout(() => { toast.style.opacity='0'; toast.style.transform='translateX(50px)'; setTimeout(()=>toast.remove(),400); }, 4000);
+    }
+    window.showToast = showToast;
+
+    // ===== LOGOUT =====
+    function logoutUser(e) {
+        e.preventDefault();
+        if (confirm('Logout?')) {
+            firebase.auth().signOut().then(() => {
+                sessionStorage.clear();
+                showToast('Logged Out', 'See you soon!', 'info');
+                setTimeout(() => window.location.href='login.html', 1500);
+            }).catch(() => showToast('Error', 'Logout failed', 'danger'));
+        }
+    }
+
+    // ===== STATE =====
+    let allMembers = [];
+    let filteredMembers = [];
+    let currentFilter = 'all';
+    let currentSearch = '';
+
+    // ===== HELPER: format role display =====
+    function formatRole(role) {
+        if (!role) return 'Member';
+        const roleMap = {
+            'admin': 'Admin',
+            'member': 'Member',
+            'driver': 'Driver',
+            'followup': 'Follow-Up',
+            'follow-up': 'Follow-Up'
+        };
+        return roleMap[role.toLowerCase()] || role.charAt(0).toUpperCase() + role.slice(1);
+    }
+
+    // ===== HELPER: get display name =====
+    function getDisplayName(member) {
+        if (member.name && member.name.trim()) return member.name.trim();
+        if (member.fullName && member.fullName.trim()) return member.fullName.trim();
+        if (member.displayName && member.displayName.trim()) return member.displayName.trim();
+        return 'Unknown Member';
+    }
+
+    // ===== FIREBASE: FETCH MEMBERS =====
+    async function fetchMembersFromFirebase() {
+        try {
+            const snapshot = await firebase.database().ref('cbwci/members').once('value');
+            const data = snapshot.val();
+            if (data) {
+                allMembers = Object.keys(data).map(key => {
+                    const raw = data[key];
+                    return {
+                        id: key,
+                        name: getDisplayName(raw),
+                        email: raw.email || raw.Email || 'No email',
+                        phone: raw.phone || raw.mobile || raw.Phone || 'N/A',
+                        role: raw.role || raw.Role || 'member',
+                        status: raw.status || raw.Status || 'active',
+                        joined: raw.joined || raw.dateJoined || raw.Joined || 'N/A',
+                        dateJoined: raw.dateJoined || raw.createdAt || null,
+                        // preserve raw for editing
+                        _raw: raw
+                    };
+                });
+            } else {
+                allMembers = [];
+            }
+            // update badges
+            document.getElementById('memberBadge').textContent = allMembers.length;
+            document.getElementById('totalMembersCount').textContent = allMembers.length;
+            applyFiltersAndRender();
+            document.getElementById('lastUpdated').textContent = new Date().toLocaleString();
+            showToast('Members Loaded', `${allMembers.length} members fetched from database.`, 'success');
+        } catch (err) {
+            console.error('Error fetching members:', err);
+            showToast('Error', 'Failed to load members from database.', 'danger');
+            document.getElementById('membersTableBody').innerHTML = `<tr><td colspan="6"><div class="empty-state"><i class="fas fa-database"></i><h6>Could not load members</h6><p>${err.message}</p></div></td></tr>`;
+        }
+    }
+
+    // ===== RENDER TABLE =====
+    function renderMembersTable(data) {
+        const tbody = document.getElementById('membersTableBody');
+        if (!data || data.length === 0) {
+            tbody.innerHTML = `<tr><td colspan="6"><div class="empty-state"><i class="fas fa-users-slash"></i><h6>No Members Found</h6><p>Start by adding your first member or wait for members to register.</p><button class="add-btn" style="margin-top:12px;padding:8px 24px;" onclick="openAddMemberModal()"><i class="fas fa-plus"></i> Add First Member</button></div></td></tr>`;
+            return;
+        }
+        let html = '';
+        data.forEach(m => {
+            const initials = m.name.split(' ').map(n=>n[0]).join('').toUpperCase().slice(0,2) || '??';
+            const status = m.status || 'active';
+            const role = m.role || 'member';
+            const joined = m.joined || 'N/A';
+            const phone = m.phone || 'N/A';
+            const email = m.email || 'No email';
+            const displayRole = formatRole(role);
+            const roleClass = role.toLowerCase() === 'admin' ? 'admin' : 
+                              role.toLowerCase() === 'driver' ? 'driver' :
+                              role.toLowerCase() === 'followup' || role.toLowerCase() === 'follow-up' ? 'followup' : '';
+            html += `<tr>
+                <td><div class="member-info"><div class="member-avatar-sm">${initials}</div><div class="member-details"><div class="name">${m.name}</div><div class="email">${email}</div></div></div></td>
+                <td>${phone}</td>
+                <td><span class="role-badge ${roleClass}">${displayRole}</span></td>
+                <td><span class="status-badge ${status}">${status.charAt(0).toUpperCase()+status.slice(1)}</span></td>
+                <td style="font-size:12px;color:var(--cbwci-muted);">${joined}</td>
+                <td style="text-align:center;"><div class="action-btns">
+                    <button class="btn-action view" onclick="viewMember('${m.id}')" title="View"><i class="fas fa-eye"></i></button>
+                    <button class="btn-action edit" onclick="editMember('${m.id}')" title="Edit"><i class="fas fa-edit"></i></button>
+                    <button class="btn-action delete" onclick="deleteMember('${m.id}')" title="Delete"><i class="fas fa-trash"></i></button>
+                </div></td>
+            </tr>`;
+        });
+        tbody.innerHTML = html;
+        document.getElementById('paginationInfo').textContent = `Showing ${data.length} of ${allMembers.length} members`;
+    }
+
+    // ===== FILTER & SEARCH =====
+    function applyFiltersAndRender() {
+        let data = [...allMembers];
+        if (currentFilter !== 'all') {
+            data = data.filter(m => (m.status||'active') === currentFilter);
+        }
+        if (currentSearch.trim()) {
+            const q = currentSearch.trim().toLowerCase();
+            data = data.filter(m =>
+                (m.name||'').toLowerCase().includes(q) ||
+                (m.email||'').toLowerCase().includes(q) ||
+                (m.phone||'').includes(q)
+            );
+        }
+        filteredMembers = data;
+        renderMembersTable(data);
+    }
+
+    function filterMembers(filter, btn) {
+        if (btn) {
+            document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            currentFilter = filter;
+        } else {
+            currentSearch = document.getElementById('searchInput').value;
+        }
+        applyFiltersAndRender();
+    }
+    window.filterMembers = filterMembers;
+
+    document.getElementById('searchInput').addEventListener('input', function() {
+        currentSearch = this.value;
+        applyFiltersAndRender();
+    });
+
+    // ===== ADD MEMBER TO FIREBASE =====
+    async function addMemberToFirebase() {
+        const name = document.getElementById('memberName').value.trim();
+        const email = document.getElementById('memberEmail').value.trim();
+        const phone = document.getElementById('memberPhone').value.trim();
+        const role = document.getElementById('memberRole').value;
+        const status = document.getElementById('memberStatus').value;
+
+        if (!name || !email || !phone) {
+            showToast('Error', 'Please fill in all required fields.', 'danger');
+            return;
+        }
+
+        const newMember = {
+            name,
+            email,
+            phone,
+            role,
+            status,
+            joined: new Date().toLocaleDateString('en-ZA'),
+            dateJoined: new Date().toISOString(),
+            createdAt: firebase.database.ServerValue.TIMESTAMP
+        };
+
+        try {
+            const ref = firebase.database().ref('cbwci/members').push();
+            await ref.set(newMember);
+            bootstrap.Modal.getInstance(document.getElementById('addMemberModal')).hide();
+            document.getElementById('addMemberForm').reset();
+            showToast('Member Added', `${name} has been added to the database.`, 'success');
+            await fetchMembersFromFirebase();
+        } catch (err) {
+            console.error(err);
+            showToast('Error', 'Failed to add member: ' + err.message, 'danger');
+        }
+    }
+    window.addMemberToFirebase = addMemberToFirebase;
+
+    // ===== OPEN ADD MODAL =====
+    function openAddMemberModal() {
+        document.getElementById('addMemberForm').reset();
+        const modal = new bootstrap.Modal(document.getElementById('addMemberModal'));
+        modal.show();
+    }
+    window.openAddMemberModal = openAddMemberModal;
+
+    // ===== VIEW MEMBER =====
+    let currentViewId = null;
+    function viewMember(id) {
+        const member = allMembers.find(m => m.id === id);
+        if (!member) { showToast('Error', 'Member not found.', 'danger'); return; }
+        currentViewId = id;
+        const initials = member.name.split(' ').map(n=>n[0]).join('').toUpperCase().slice(0,2) || '??';
+        document.getElementById('viewName').textContent = member.name;
+        document.getElementById('viewEmail').textContent = member.email;
+        document.getElementById('viewPhone').textContent = member.phone;
+        document.getElementById('viewJoined').textContent = member.joined;
+        const displayRole = formatRole(member.role);
+        document.getElementById('viewRole').textContent = displayRole;
+        document.getElementById('viewRoleDetail').textContent = displayRole;
+        document.getElementById('viewId').textContent = member.id;
+        const st = member.status || 'active';
+        const statusEl = document.getElementById('viewStatus');
+        statusEl.textContent = st.charAt(0).toUpperCase()+st.slice(1);
+        statusEl.className = `status-badge ${st}`;
+        document.querySelector('#viewMemberBody .text-center div').textContent = initials;
+        const modal = new bootstrap.Modal(document.getElementById('viewMemberModal'));
+        modal.show();
+    }
+    window.viewMember = viewMember;
+
+    // ===== EDIT MEMBER =====
+    function editMember(id) {
+        const member = allMembers.find(m => m.id === id);
+        if (!member) { showToast('Error', 'Member not found.', 'danger'); return; }
+        document.getElementById('memberName').value = member.name || '';
+        document.getElementById('memberEmail').value = member.email || '';
+        document.getElementById('memberPhone').value = member.phone || '';
+        document.getElementById('memberRole').value = member.role || 'member';
+        document.getElementById('memberStatus').value = member.status || 'active';
+        const modal = new bootstrap.Modal(document.getElementById('addMemberModal'));
+        const btn = document.querySelector('#addMemberModal .btn-primary');
+        btn.textContent = 'Update Member';
+        btn.onclick = function() { updateMemberInFirebase(id); };
+        modal.show();
+        showToast('Edit Mode', `Editing ${member.name}. Update the fields and click Update.`, 'info');
+    }
+    window.editMember = editMember;
+
+    // ===== UPDATE MEMBER =====
+    async function updateMemberInFirebase(id) {
+        const name = document.getElementById('memberName').value.trim();
+        const email = document.getElementById('memberEmail').value.trim();
+        const phone = document.getElementById('memberPhone').value.trim();
+        const role = document.getElementById('memberRole').value;
+        const status = document.getElementById('memberStatus').value;
+
+        if (!name || !email || !phone) {
+            showToast('Error', 'Please fill in all required fields.', 'danger');
+            return;
+        }
+
+        try {
+            await firebase.database().ref(`cbwci/members/${id}`).update({
+                name, email, phone, role, status,
+                updatedAt: firebase.database.ServerValue.TIMESTAMP
+            });
+            bootstrap.Modal.getInstance(document.getElementById('addMemberModal')).hide();
+            const btn = document.querySelector('#addMemberModal .btn-primary');
+            btn.textContent = 'Add Member';
+            btn.onclick = addMemberToFirebase;
+            showToast('Member Updated', `${name} has been updated.`, 'success');
+            await fetchMembersFromFirebase();
+        } catch (err) {
+            showToast('Error', 'Failed to update: ' + err.message, 'danger');
+        }
+    }
+
+    // ===== EDIT FROM VIEW =====
+    function editMemberFromView() {
+        if (currentViewId) {
+            bootstrap.Modal.getInstance(document.getElementById('viewMemberModal')).hide();
+            editMember(currentViewId);
+        }
+    }
+    window.editMemberFromView = editMemberFromView;
+
+    // ===== DELETE MEMBER =====
+    async function deleteMember(id) {
+        const member = allMembers.find(m => m.id === id);
+        if (!member) return;
+        if (!confirm(`Are you sure you want to delete ${member.name}? This cannot be undone.`)) return;
+        try {
+            await firebase.database().ref(`cbwci/members/${id}`).remove();
+            showToast('Member Deleted', `${member.name} has been removed.`, 'danger');
+            await fetchMembersFromFirebase();
+        } catch (err) {
+            showToast('Error', 'Failed to delete: ' + err.message, 'danger');
+        }
+    }
+    window.deleteMember = deleteMember;
+
+    // ===== AUTH CHECK =====
+    firebase.auth().onAuthStateChanged(user => {
+        if (user) {
+            console.log('✅ Admin logged in:', user.uid);
+            document.getElementById('adminName').textContent = user.displayName || 'Admin';
+            fetchMembersFromFirebase();
+        } else {
+            showToast('Not Logged In', 'Please log in to access member management.', 'warning');
+            setTimeout(() => window.location.href='login.html', 2000);
+        }
+    });
+
+    console.log('%c✝ CBWCI - Members Management ✝', 'font-size:18px;color:#C9A84C;font-weight:bold;');
+    console.log('👥 Live data from Firebase Realtime Database');
+</script>
+</body>
+</html>

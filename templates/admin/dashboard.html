@@ -1,0 +1,567 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard · CBWCI</title>
+    <!-- Bootstrap 5 -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome 6 -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- AOS -->
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Firebase -->
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+
+    <style>
+        :root {
+            --cbwci-purple: #4A1942;
+            --cbwci-purple-light: #6B2D5F;
+            --cbwci-purple-dark: #2E0F28;
+            --cbwci-gold: #C9A84C;
+            --cbwci-gold-light: #E8CD7A;
+            --cbwci-gold-dark: #A8893A;
+            --cbwci-cream: #FDF8F0;
+            --cbwci-dark: #1A0F16;
+            --cbwci-text: #2C1A24;
+            --cbwci-muted: #7A6A72;
+            --shadow: 0 10px 40px rgba(74, 25, 66, 0.12);
+            --shadow-hover: 0 15px 50px rgba(74, 25, 66, 0.2);
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            --success: #2D8F5C;
+            --danger: #C0392B;
+            --warning: #E67E22;
+            --info: #2980B9;
+        }
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body { font-family:'Inter',sans-serif; background:#f5f0eb; color:var(--cbwci-text); padding-top:76px; min-height:100vh; }
+
+        /* navbar */
+        .navbar { background: linear-gradient(135deg, var(--cbwci-purple), var(--cbwci-purple-dark)); padding:10px 0; box-shadow:0 4px 30px rgba(0,0,0,0.3); border-bottom:3px solid var(--cbwci-gold); }
+        .navbar-brand { font-family:'Playfair Display',serif; font-weight:900; font-size:20px; color:#fff!important; letter-spacing:2px; }
+        .navbar-brand .gold { color:var(--cbwci-gold); display:block; font-size:12px; letter-spacing:4px; }
+        .navbar-brand i { color:var(--cbwci-gold); margin-right:10px; }
+        .nav-link { color:rgba(255,255,255,0.8)!important; font-weight:500; font-size:13px; letter-spacing:1px; transition:var(--transition); padding:6px 16px!important; border-radius:8px; }
+        .nav-link:hover { color:var(--cbwci-gold)!important; background:rgba(201,168,76,0.1); }
+        .navbar .btn-logout { background:transparent; border:2px solid rgba(255,255,255,0.2); color:#fff; padding:4px 16px; border-radius:8px; font-weight:600; font-size:12px; transition:var(--transition); cursor:pointer; }
+        .navbar .btn-logout:hover { background:var(--danger); border-color:var(--danger); transform:translateY(-2px); color:#fff; }
+        .navbar .admin-badge { background:var(--cbwci-gold); color:var(--cbwci-purple-dark); font-size:10px; font-weight:700; padding:2px 12px; border-radius:50px; margin-left:8px; letter-spacing:1px; }
+
+        /* admin wrapper */
+        .admin-wrapper { padding:10px 0 40px; }
+
+        /* breadcrumb */
+        .breadcrumb-custom { color:var(--cbwci-muted); font-size:12px; margin-bottom:2px; }
+        .breadcrumb-custom a { color:var(--cbwci-purple); text-decoration:none; transition:var(--transition); }
+        .breadcrumb-custom a:hover { color:var(--cbwci-gold); }
+        .breadcrumb-custom .separator { margin:0 6px; color:var(--cbwci-gold); }
+        .page-title { font-family:'Playfair Display',serif; font-weight:700; color:var(--cbwci-purple); font-size:24px; margin:0; }
+        .page-title i { color:var(--cbwci-gold); }
+        .page-subtitle { color:var(--cbwci-muted); font-size:13px; margin:0; }
+        .welcome-text { color:var(--cbwci-muted); font-size:13px; font-weight:400; }
+        .welcome-text strong { color:var(--cbwci-purple); }
+
+        /* stat cards */
+        .stat-card { background:#fff; border-radius:12px; padding:14px 16px; box-shadow:0 2px 12px rgba(0,0,0,0.06); border:1px solid rgba(201,168,76,0.08); transition:var(--transition); height:100%; }
+        .stat-card:hover { transform:translateY(-3px); box-shadow:0 8px 25px rgba(0,0,0,0.1); }
+        .stat-card .stat-top { display:flex; justify-content:space-between; align-items:flex-start; }
+        .stat-card .stat-icon { width:38px; height:38px; border-radius:10px; display:flex; align-items:center; justify-content:center; font-size:16px; }
+        .stat-card .stat-icon.purple { background:rgba(74,25,66,0.08); color:var(--cbwci-purple); }
+        .stat-card .stat-icon.gold { background:rgba(201,168,76,0.12); color:var(--cbwci-gold-dark); }
+        .stat-card .stat-icon.green { background:rgba(45,143,92,0.12); color:var(--success); }
+        .stat-card .stat-icon.red { background:rgba(192,57,43,0.12); color:var(--danger); }
+        .stat-card .stat-badge { font-size:9px; font-weight:600; padding:1px 8px; border-radius:50px; background:rgba(201,168,76,0.12); color:var(--cbwci-gold-dark); }
+        .stat-card .stat-badge.red { background:rgba(192,57,43,0.12); color:var(--danger); }
+        .stat-card .stat-badge.green { background:rgba(45,143,92,0.12); color:var(--success); }
+        .stat-card .stat-number { font-family:'Playfair Display',serif; font-weight:900; font-size:26px; color:var(--cbwci-purple); line-height:1.1; margin-top:4px; }
+        .stat-card .stat-label { font-size:12px; color:var(--cbwci-muted); font-weight:500; }
+        .stat-card .stat-change { font-size:10px; font-weight:600; margin-top:2px; }
+        .stat-card .stat-change.positive { color:var(--success); }
+        .stat-card .stat-change.negative { color:var(--danger); }
+
+        /* quick actions */
+        .quick-action { background:#fff; border-radius:10px; padding:12px; box-shadow:0 2px 12px rgba(0,0,0,0.06); border:1px solid rgba(201,168,76,0.06); text-align:center; transition:var(--transition); text-decoration:none; color:var(--cbwci-text); display:block; height:100%; }
+        .quick-action:hover { transform:translateY(-3px); box-shadow:0 8px 25px rgba(0,0,0,0.1); border-color:var(--cbwci-gold); color:var(--cbwci-text); }
+        .quick-action .qa-icon { font-size:22px; color:var(--cbwci-gold); margin-bottom:4px; }
+        .quick-action .qa-title { font-weight:600; font-size:12px; }
+        .quick-action .qa-desc { font-size:10px; color:var(--cbwci-muted); }
+
+        /* section cards */
+        .section-card { background:#fff; border-radius:12px; padding:16px 18px; box-shadow:0 2px 12px rgba(0,0,0,0.06); border:1px solid rgba(201,168,76,0.06); height:100%; }
+        .section-card .section-header { display:flex; justify-content:space-between; align-items:center; margin-bottom:10px; padding-bottom:8px; border-bottom:2px solid #f5f0eb; }
+        .section-card .section-header h6 { font-weight:700; color:var(--cbwci-purple); margin:0; font-size:13px; }
+        .section-card .section-header h6 i { color:var(--cbwci-gold); margin-right:6px; }
+        .section-card .section-header .badge-count { font-size:10px; font-weight:600; padding:1px 10px; border-radius:50px; background:rgba(74,25,66,0.08); color:var(--cbwci-purple); }
+
+        .chart-container { position:relative; height:180px; width:100%; }
+        .chart-container-sm { height:150px; width:100%; }
+
+        /* sidebar */
+        .admin-sidebar { background:#fff; border-radius:12px; padding:16px 14px; box-shadow:0 2px 12px rgba(0,0,0,0.06); border:1px solid rgba(201,168,76,0.06); position:sticky; top:96px; }
+        .admin-sidebar .sidebar-brand { text-align:center; padding-bottom:12px; border-bottom:2px solid #f5f0eb; margin-bottom:12px; }
+        .admin-sidebar .sidebar-brand .brand-icon { font-size:28px; color:var(--cbwci-gold); }
+        .admin-sidebar .sidebar-brand h6 { font-family:'Playfair Display',serif; font-weight:700; color:var(--cbwci-purple); margin-top:2px; font-size:14px; }
+        .admin-sidebar .sidebar-brand small { color:var(--cbwci-muted); font-size:10px; }
+        .admin-sidebar .sidebar-nav { list-style:none; padding:0; margin:0; }
+        .admin-sidebar .sidebar-nav li { margin-bottom:2px; }
+        .admin-sidebar .sidebar-nav li a { display:flex; align-items:center; gap:8px; padding:8px 12px; border-radius:8px; color:var(--cbwci-text); text-decoration:none; transition:var(--transition); font-weight:500; font-size:12px; }
+        .admin-sidebar .sidebar-nav li a i { width:16px; color:var(--cbwci-muted); transition:var(--transition); font-size:13px; }
+        .admin-sidebar .sidebar-nav li a:hover { background:rgba(74,25,66,0.05); color:var(--cbwci-purple); }
+        .admin-sidebar .sidebar-nav li a.active { background:linear-gradient(135deg,var(--cbwci-purple),var(--cbwci-purple-dark)); color:#fff; box-shadow:0 4px 15px rgba(74,25,66,0.25); }
+        .admin-sidebar .sidebar-nav li a.active i { color:#fff; }
+        .admin-sidebar .sidebar-nav li a .badge-nav { margin-left:auto; background:var(--cbwci-gold); color:var(--cbwci-purple-dark); font-size:9px; padding:1px 8px; border-radius:50px; }
+        .admin-sidebar .sidebar-nav li a .badge-nav-danger { margin-left:auto; background:var(--danger); color:#fff; font-size:9px; padding:1px 8px; border-radius:50px; }
+        .admin-sidebar .sidebar-footer { margin-top:12px; padding-top:12px; border-top:2px solid #f5f0eb; text-align:center; }
+        .admin-sidebar .sidebar-footer small { color:var(--cbwci-muted); font-size:10px; }
+        .admin-sidebar .sidebar-footer i { color:var(--cbwci-gold); }
+
+        /* activity */
+        .activity-item { display:flex; align-items:flex-start; gap:10px; padding:6px 0; border-bottom:1px solid #f5f0eb; }
+        .activity-item:last-child { border-bottom:none; }
+        .activity-item .activity-icon { width:28px; height:28px; border-radius:50%; display:flex; align-items:center; justify-content:center; flex-shrink:0; font-size:11px; }
+        .activity-item .activity-icon.purple { background:rgba(74,25,66,0.08); color:var(--cbwci-purple); }
+        .activity-item .activity-icon.green { background:rgba(45,143,92,0.12); color:var(--success); }
+        .activity-item .activity-icon.gold { background:rgba(201,168,76,0.12); color:var(--cbwci-gold-dark); }
+        .activity-item .activity-icon.blue { background:rgba(41,128,185,0.12); color:var(--info); }
+        .activity-item .activity-icon.red { background:rgba(192,57,43,0.12); color:var(--danger); }
+        .activity-item .activity-content { flex:1; min-width:0; }
+        .activity-item .activity-content .title { font-weight:600; font-size:12px; color:var(--cbwci-text); }
+        .activity-item .activity-content .meta { font-size:11px; color:var(--cbwci-muted); }
+        .activity-item .activity-time { font-size:10px; color:var(--cbwci-muted); white-space:nowrap; padding-top:2px; }
+
+        .empty-activity { text-align:center; padding:20px 10px; color:var(--cbwci-muted); }
+        .empty-activity i { font-size:32px; color:var(--cbwci-gold-light); margin-bottom:8px; display:block; }
+        .empty-activity h6 { font-size:14px; color:var(--cbwci-text); margin-bottom:2px; }
+
+        /* toast */
+        .toast-container { position:fixed; bottom:20px; right:20px; z-index:9999; }
+        .toast-custom { background:#fff; border-radius:12px; padding:14px 20px; box-shadow:0 10px 40px rgba(0,0,0,0.15); border-left:4px solid var(--success); display:flex; align-items:center; gap:12px; animation:slideUp 0.4s ease; margin-top:10px; min-width:280px; max-width:420px; }
+        .toast-custom i { font-size:20px; color:var(--success); }
+        .toast-custom .msg h6 { margin:0; font-weight:600; font-size:14px; }
+        .toast-custom .msg small { color:var(--cbwci-muted); font-size:12px; }
+        .toast-custom.toast-danger { border-left-color:var(--danger); }
+        .toast-custom.toast-danger i { color:var(--danger); }
+
+        @keyframes slideUp { from { opacity:0; transform:translateY(30px); } to { opacity:1; transform:translateY(0); } }
+
+        .loading-spinner { display:flex; align-items:center; justify-content:center; padding:20px 0; flex-direction:column; gap:10px; }
+        .loading-spinner .spinner { width:30px; height:30px; border:3px solid #f0ebe4; border-top-color:var(--cbwci-gold); border-radius:50%; animation:spin 1s linear infinite; }
+        @keyframes spin { 0% { transform:rotate(0deg); } 100% { transform:rotate(360deg); } }
+
+        @media (max-width:992px) { .admin-sidebar { position:relative; top:0; margin-bottom:16px; } .chart-container { height:160px; } }
+        @media (max-width:768px) { body { padding-top:68px; } .page-title { font-size:20px; } .stat-card .stat-number { font-size:22px; } }
+        @media (max-width:576px) { .page-title { font-size:18px; } .stat-card .stat-number { font-size:18px; } .chart-container { height:130px; } }
+    </style>
+</head>
+<body>
+
+<!-- ===== NAVBAR ===== -->
+<nav class="navbar navbar-expand-lg fixed-top">
+    <div class="container">
+        <a class="navbar-brand" href="#">
+            <i class="fas fa-church"></i> CBWCI
+            <span class="gold">Changed By The Word</span>
+            <span class="admin-badge"><i class="fas fa-crown"></i> ADMIN</span>
+        </a>
+        <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+            <span class="navbar-toggler-icon" style="filter:invert(1);"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav ms-auto align-items-lg-center">
+                <li class="nav-item"><a class="nav-link" href="#">Home</a></li>
+                <li class="nav-item"><a class="nav-link active" href="#">Admin</a></li>
+                <li class="nav-item"><a class="nav-link" href="/admin/meetings"><i class="fas fa-video"></i> CBWCI Virtual Meeting</a></li>
+                <li class="nav-item"><a class="nav-link" href="#">Profile</a></li>
+                <li class="nav-item ms-lg-2">
+                    <a href="#" class="btn btn-logout" onclick="logoutUser(event)"><i class="fas fa-sign-out-alt"></i> Logout</a>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>
+
+<!-- ===== ADMIN CONTENT ===== -->
+<section class="admin-wrapper">
+    <div class="container">
+        <div class="row g-3">
+
+            <!-- SIDEBAR -->
+            <div class="col-lg-3" data-aos="fade-right" data-aos-duration="600">
+                <div class="admin-sidebar">
+                    <div class="sidebar-brand">
+                        <div class="brand-icon"><i class="fas fa-crown"></i></div>
+                        <h6>Admin Panel</h6>
+                        <small>CBWCI Church Management</small>
+                    </div>
+                    <ul class="sidebar-nav">
+                        <li><a href="Dashboard.html" class="active"><i class="fas fa-chart-pie"></i> Dashboard</a></li>
+                        <li><a href="Members.html"><i class="fas fa-users"></i> Members <span class="badge-nav" id="memberBadge">0</span></a></li>
+                        <li><a href="FollowUp.html"><i class="fas fa-user-plus"></i> Follow-Up <span class="badge-nav-danger" id="followupBadge">0</span></a></li>
+                        <li><a href="Drivers.html"><i class="fas fa-taxi"></i> Drivers <span class="badge-nav" id="driverBadge">0</span></a></li>
+                        <li><a href="transport.html"><i class="fas fa-route"></i> Transport</a></li>
+                        <li><a href="announcement.html"><i class="fas fa-bullhorn"></i> Announcements</a></li>
+                        <li><a href="/admin/meetings"><i class="fas fa-video"></i> CBWCI Virtual Meeting</a></li>
+                        <li><a href="reports.html"><i class="fas fa-file-alt"></i> Reports</a></li>
+                        <li style="margin-top:8px;border-top:1px solid #f5f0eb;padding-top:8px;">
+                            <a href="#" style="color:var(--danger);" onclick="logoutUser(event)"><i class="fas fa-sign-out-alt" style="color:var(--danger);"></i> Logout</a>
+                        </li>
+                    </ul>
+                    <div class="sidebar-footer">
+                        <small><i class="fas fa-shield-alt"></i><br>Logged in as <strong id="adminName">Admin</strong></small>
+                    </div>
+                </div>
+            </div>
+
+            <!-- MAIN -->
+            <div class="col-lg-9">
+
+                <!-- header -->
+                <div data-aos="fade-up" data-aos-duration="600">
+                    <div class="breadcrumb-custom">
+                        <a href="#"><i class="fas fa-home"></i> Home</a>
+                        <span class="separator">/</span>
+                        <span style="color:var(--cbwci-gold-dark);font-weight:500;">Admin Dashboard</span>
+                    </div>
+                    <div class="d-flex flex-wrap justify-content-between align-items-center">
+                        <div>
+                            <h1 class="page-title"><i class="fas fa-crown"></i> Admin Dashboard</h1>
+                            <p class="page-subtitle">Real‑time church overview</p>
+                        </div>
+                        <div class="welcome-text mt-1 mt-md-0">Welcome back, <strong id="welcomeName">Admin</strong></div>
+                    </div>
+                </div>
+
+                <!-- STATS -->
+                <div class="row g-2 mt-2">
+                    <div class="col-xl-3 col-lg-6 col-6">
+                        <div class="stat-card" data-aos="fade-up" data-aos-delay="100">
+                            <div class="stat-top"><div class="stat-icon purple"><i class="fas fa-users"></i></div><span class="stat-badge">Active</span></div>
+                            <div class="stat-number" id="totalMembers">0</div>
+                            <div class="stat-label">Total Members</div>
+                            <div class="stat-change positive"><i class="fas fa-arrow-up"></i> <span id="memberGrowth">0</span>% this month</div>
+                        </div>
+                    </div>
+                    <div class="col-xl-3 col-lg-6 col-6">
+                        <div class="stat-card" data-aos="fade-up" data-aos-delay="200">
+                            <div class="stat-top"><div class="stat-icon red"><i class="fas fa-user-plus"></i></div><span class="stat-badge red">Action Needed</span></div>
+                            <div class="stat-number" id="pendingFollowups">0</div>
+                            <div class="stat-label">Pending Follow-Ups</div>
+                            <div class="stat-change negative"><i class="fas fa-arrow-up"></i> <span id="followupGrowth">0</span> new this week</div>
+                        </div>
+                    </div>
+                    <div class="col-xl-3 col-lg-6 col-6">
+                        <div class="stat-card" data-aos="fade-up" data-aos-delay="300">
+                            <div class="stat-top"><div class="stat-icon gold"><i class="fas fa-taxi"></i></div><span class="stat-badge">Active</span></div>
+                            <div class="stat-number" id="totalDrivers">0</div>
+                            <div class="stat-label">Total Drivers</div>
+                            <div class="stat-change positive"><i class="fas fa-arrow-up"></i> <span id="driverGrowth">0</span> new this month</div>
+                        </div>
+                    </div>
+                    <div class="col-xl-3 col-lg-6 col-6">
+                        <div class="stat-card" data-aos="fade-up" data-aos-delay="400">
+                            <div class="stat-top"><div class="stat-icon green"><i class="fas fa-calendar-check"></i></div><span class="stat-badge green">This Month</span></div>
+                            <div class="stat-number" id="totalBookings">0</div>
+                            <div class="stat-label">Taxi Bookings</div>
+                            <div class="stat-change positive"><i class="fas fa-arrow-up"></i> <span id="bookingGrowth">0</span> this month</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- quick actions -->
+                <h6 class="mt-3 mb-2" style="font-weight:700;color:var(--cbwci-purple);font-size:13px;"><i class="fas fa-bolt" style="color:var(--cbwci-gold);"></i> Quick Actions</h6>
+                <div class="row g-2 mb-3">
+                    <div class="col-md-3 col-6"><a href="#" class="quick-action" data-aos="fade-up" data-aos-delay="100"><div class="qa-icon"><i class="fas fa-user-plus"></i></div><div class="qa-title">Add Visitor</div><div class="qa-desc">New follow-up</div></a></div>
+                    <div class="col-md-3 col-6"><a href="#" class="quick-action" data-aos="fade-up" data-aos-delay="200"><div class="qa-icon"><i class="fas fa-bullhorn"></i></div><div class="qa-title">Post Announcement</div><div class="qa-desc">Notify members</div></a></div>
+                    <div class="col-md-3 col-6"><a href="#" class="quick-action" data-aos="fade-up" data-aos-delay="300"><div class="qa-icon"><i class="fas fa-route"></i></div><div class="qa-title">Manage Transport</div><div class="qa-desc">Assign drivers</div></a></div>
+                    <div class="col-md-3 col-6"><a href="#" class="quick-action" data-aos="fade-up" data-aos-delay="400"><div class="qa-icon"><i class="fas fa-users-cog"></i></div><div class="qa-title">Manage Members</div><div class="qa-desc">View & edit</div></a></div>
+                </div>
+
+                <!-- CHARTS + ACTIVITY -->
+                <div class="row g-2">
+                    <div class="col-lg-7">
+                        <div class="section-card" data-aos="fade-up" data-aos-delay="100">
+                            <div class="section-header"><h6><i class="fas fa-chart-line"></i> Member Growth</h6><span class="badge-count">Last 8 months</span></div>
+                            <div class="chart-container">
+                                <div id="memberChartLoading" class="loading-spinner"><div class="spinner"></div><p>Loading data...</p></div>
+                                <canvas id="memberGrowthChart" style="display:none;"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-5">
+                        <div class="section-card" data-aos="fade-up" data-aos-delay="200">
+                            <div class="section-header"><h6><i class="fas fa-chart-pie"></i> Follow-Up Status</h6><span class="badge-count" id="followupTotal">0 Total</span></div>
+                            <div class="chart-container-sm">
+                                <div id="followupChartLoading" class="loading-spinner"><div class="spinner"></div><p>Loading data...</p></div>
+                                <canvas id="followupChart" style="display:none;"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- recent activity -->
+                <div class="section-card mt-2" data-aos="fade-up" data-aos-delay="300">
+                    <div class="section-header"><h6><i class="fas fa-clock"></i> Recent Activity</h6><span class="badge-count" id="activityCount">No activity</span></div>
+                    <div id="activityContainer"><div class="loading-spinner"><div class="spinner"></div><p>Loading activity...</p></div></div>
+                </div>
+
+            </div><!-- end col-lg-9 -->
+        </div><!-- end row -->
+    </div><!-- end container -->
+</section>
+
+<!-- TOAST -->
+<div class="toast-container" id="toastContainer"></div>
+
+<!-- ===== SCRIPTS ===== -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+<script>
+    AOS.init({ duration: 600, once: true });
+
+    // ===== FIREBASE =====
+    const firebaseConfig = {
+        apiKey: "AIzaSyBhXS5EOZjEAahTjk8XPd-9PkG3HeKV8bg",
+        authDomain: "cbwci-892de.firebaseapp.com",
+        projectId: "cbwci-892de",
+        storageBucket: "cbwci-892de.firebasestorage.app",
+        messagingSenderId: "187272132769",
+        appId: "1:187272132769:web:63a9fcba465e54867d98e0",
+        databaseURL: "https://cbwci-892de-default-rtdb.firebaseio.com"
+    };
+    if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
+
+    // ===== TOAST =====
+    function showToast(title, message, type='success') {
+        const container = document.getElementById('toastContainer');
+        const iconMap = { success:'fa-check-circle', danger:'fa-exclamation-circle', warning:'fa-exclamation-triangle', info:'fa-info-circle' };
+        const colorMap = { success:'var(--success)', danger:'var(--danger)', warning:'var(--warning)', info:'var(--info)' };
+        const toast = document.createElement('div');
+        toast.className = `toast-custom ${type==='danger'?'toast-danger':''}`;
+        toast.innerHTML = `<i class="fas ${iconMap[type]||'fa-check-circle'}" style="color:${colorMap[type]||'var(--success)'};"></i><div class="msg"><h6>${title}</h6><small>${message}</small></div>`;
+        container.appendChild(toast);
+        setTimeout(() => { toast.style.opacity='0'; toast.style.transform='translateX(50px)'; setTimeout(()=>toast.remove(),400); }, 4000);
+    }
+    window.showToast = showToast;
+
+    // ===== LOGOUT =====
+    function logoutUser(e) {
+        e.preventDefault();
+        if (confirm('Logout?')) {
+            firebase.auth().signOut().then(() => {
+                sessionStorage.clear();
+                showToast('Logged Out', 'See you soon!', 'info');
+                setTimeout(() => window.location.href='login.html', 1500);
+            }).catch(() => showToast('Error', 'Logout failed', 'danger'));
+        }
+    }
+
+    // ===== FETCH DASHBOARD =====
+    async function fetchDashboardData() {
+        try {
+            const user = firebase.auth().currentUser;
+            if (user) {
+                const snap = await firebase.database().ref('cbwci/users/'+user.uid).once('value');
+                const data = snap.val();
+                if (data) {
+                    const name = data.fullName || data.name || 'Admin';
+                    document.getElementById('adminName').textContent = name;
+                    document.getElementById('welcomeName').textContent = name;
+                }
+            }
+
+            // ---- read statistics node ----
+            const statsSnap = await firebase.database().ref('cbwci/reports/statistics').once('value');
+            const stats = statsSnap.val() || {};
+
+            const members = stats.members || {};
+            const followups = stats.followups || {};
+            const transport = stats.transport || {};
+
+            // update numbers
+            document.getElementById('totalMembers').textContent = members.total || 0;
+            document.getElementById('pendingFollowups').textContent = followups.pending || 0;
+            document.getElementById('totalDrivers').textContent = members.drivers || 0;
+            document.getElementById('totalBookings').textContent = transport.total || 0;
+
+            // badges
+            document.getElementById('memberBadge').textContent = members.total || 0;
+            document.getElementById('followupBadge').textContent = followups.pending || 0;
+            document.getElementById('driverBadge').textContent = members.drivers || 0;
+
+            // ---- members for chart ----
+            const membersSnap = await firebase.database().ref('cbwci/members').once('value');
+            const membersData = membersSnap.val() || {};
+            const memberList = Object.values(membersData);
+            const monthlyData = getMonthlyMemberData(memberList);
+            updateMemberChart(monthlyData);
+            updateFollowupChart(followups);
+
+            // activity
+            await fetchRecentActivity();
+
+            // growth stats
+            updateGrowthStats(members, followups, transport);
+
+        } catch (err) {
+            console.error('❌ Dashboard error:', err);
+            showToast('Error', 'Failed to load dashboard data.', 'danger');
+        }
+    }
+
+    // ===== MONTHLY DATA =====
+    function getMonthlyMemberData(members) {
+        const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug'];
+        const monthlyCounts = new Array(8).fill(0);
+        const totalGrowth = new Array(8).fill(0);
+        const now = new Date();
+        const currentMonth = now.getMonth();
+        members.forEach(m => {
+            if (m.dateJoined) {
+                const d = new Date(m.dateJoined);
+                const diff = (currentMonth - d.getMonth() + 12) % 12;
+                if (diff < 8) {
+                    const idx = 7 - diff;
+                    monthlyCounts[idx]++;
+                }
+            }
+        });
+        let cum = 0;
+        for (let i=0; i<8; i++) { cum += monthlyCounts[i]; totalGrowth[i] = cum; }
+        return { labels: months, newMembers: monthlyCounts, totalMembers: totalGrowth };
+    }
+
+    // ===== MEMBER CHART =====
+    let memberChart = null;
+    function updateMemberChart(data) {
+        const canvas = document.getElementById('memberGrowthChart');
+        const loading = document.getElementById('memberChartLoading');
+        loading.style.display = 'none';
+        canvas.style.display = 'block';
+        if (memberChart) memberChart.destroy();
+        memberChart = new Chart(canvas, {
+            type: 'line',
+            data: {
+                labels: data.labels,
+                datasets: [
+                    { label: 'New Members', data: data.newMembers, borderColor:'#4A1942', backgroundColor:'rgba(74,25,66,0.08)', tension:0.4, fill:true, pointBackgroundColor:'#4A1942', pointRadius:3 },
+                    { label: 'Total Members', data: data.totalMembers, borderColor:'#C9A84C', backgroundColor:'rgba(201,168,76,0.05)', tension:0.4, fill:true, borderDash:[6,4], pointBackgroundColor:'#C9A84C', pointRadius:3 }
+                ]
+            },
+            options: { responsive:true, maintainAspectRatio:false, plugins:{legend:{display:false}}, scales:{ y:{ beginAtZero:true, grid:{color:'rgba(0,0,0,0.04)'}, ticks:{font:{size:10}} }, x:{ grid:{display:false}, ticks:{font:{size:10}} } }, interaction:{ intersect:false, mode:'index' } }
+        });
+    }
+
+    // ===== FOLLOWUP CHART =====
+    let followupChart = null;
+    function updateFollowupChart(followups) {
+        const canvas = document.getElementById('followupChart');
+        const loading = document.getElementById('followupChartLoading');
+        loading.style.display = 'none';
+        canvas.style.display = 'block';
+        const total = (followups.pending||0)+(followups.confirmed||0)+(followups.notComing||0);
+        document.getElementById('followupTotal').textContent = total + ' Total';
+        if (followupChart) followupChart.destroy();
+        followupChart = new Chart(canvas, {
+            type: 'doughnut',
+            data: {
+                labels: ['Pending','Confirmed','Not Coming'],
+                datasets: [{ data: [followups.pending||0, followups.confirmed||0, followups.notComing||0], backgroundColor: ['#E67E22','#2D8F5C','#C0392B'], borderWidth:0, hoverOffset:6 }]
+            },
+            options: { responsive:true, maintainAspectRatio:false, plugins:{ legend:{ position:'bottom', labels:{ padding:10, usePointStyle:true, pointStyle:'circle', font:{size:10} } } }, cutout:'68%' }
+        });
+    }
+
+    // ===== RECENT ACTIVITY =====
+    async function fetchRecentActivity() {
+        const container = document.getElementById('activityContainer');
+        try {
+            const logsSnap = await firebase.database().ref('cbwci/admin/logs/system').orderByChild('timestamp').limitToLast(5).once('value');
+            const logs = logsSnap.val();
+            if (logs) {
+                const entries = Object.values(logs).reverse();
+                renderActivity(entries);
+                document.getElementById('activityCount').textContent = entries.length + ' activities';
+            } else {
+                // fallback: users
+                const usersSnap = await firebase.database().ref('cbwci/users').once('value');
+                const users = usersSnap.val();
+                if (users) {
+                    const list = Object.values(users).slice(-5).reverse();
+                    renderUserActivity(list);
+                    document.getElementById('activityCount').textContent = list.length + ' activities';
+                } else {
+                    showEmptyActivity();
+                }
+            }
+        } catch (e) {
+            console.error(e);
+            showEmptyActivity();
+        }
+    }
+
+    function renderActivity(logs) {
+        const container = document.getElementById('activityContainer');
+        if (!logs || !logs.length) { showEmptyActivity(); return; }
+        let html = '';
+        logs.forEach(log => {
+            const iconMap = { 'Login':'fa-sign-in-alt','Logout':'fa-sign-out-alt','Admin Account Created':'fa-user-plus','Admin Role Added':'fa-user-cog' };
+            const colorMap = { 'Login':'green','Logout':'red','Admin Account Created':'purple','Admin Role Added':'gold' };
+            const icon = iconMap[log.action] || 'fa-bell';
+            const color = colorMap[log.action] || 'blue';
+            const time = log.timestamp ? new Date(log.timestamp).toLocaleString() : 'Just now';
+            html += `<div class="activity-item"><div class="activity-icon ${color}"><i class="fas ${icon}"></i></div><div class="activity-content"><div class="title">${log.action||'Activity'}</div><div class="meta">${log.details||''}</div></div><span class="activity-time">${time}</span></div>`;
+        });
+        container.innerHTML = html;
+    }
+
+    function renderUserActivity(users) {
+        const container = document.getElementById('activityContainer');
+        if (!users || !users.length) { showEmptyActivity(); return; }
+        let html = '';
+        users.forEach(u => {
+            const name = u.fullName || u.name || 'User';
+            const email = u.email || '';
+            const date = u.createdAt ? new Date(u.createdAt).toLocaleDateString() : 'Recently';
+            html += `<div class="activity-item"><div class="activity-icon purple"><i class="fas fa-user-plus"></i></div><div class="activity-content"><div class="title">New member registered</div><div class="meta">${name} joined (${email})</div></div><span class="activity-time">${date}</span></div>`;
+        });
+        container.innerHTML = html;
+    }
+
+    function showEmptyActivity() {
+        document.getElementById('activityContainer').innerHTML = `<div class="empty-activity"><i class="fas fa-inbox"></i><h6>No Activity</h6><p>Recent actions will appear here</p></div>`;
+        document.getElementById('activityCount').textContent = 'No activity';
+    }
+
+    // ===== GROWTH STATS =====
+    function updateGrowthStats(members, followups, transport) {
+        const mGrowth = members.total > 0 ? Math.round((members.active||0)/members.total*100) : 0;
+        const fGrowth = followups.pending > 0 ? Math.round((followups.confirmed||0)/(followups.pending+followups.confirmed)*100) : 0;
+        const dGrowth = members.drivers > 0 ? Math.round((members.drivers||0)/(members.total||1)*100) : 0;
+        const bGrowth = transport.total > 0 ? Math.round((transport.completed||0)/transport.total*100) : 0;
+        document.getElementById('memberGrowth').textContent = mGrowth;
+        document.getElementById('followupGrowth').textContent = followups.pending || 0;
+        document.getElementById('driverGrowth').textContent = dGrowth;
+        document.getElementById('bookingGrowth').textContent = bGrowth;
+    }
+
+    // ===== AUTH =====
+    firebase.auth().onAuthStateChanged(user => {
+        if (user) {
+            console.log('✅ Admin logged in:', user.uid);
+            fetchDashboardData();
+        } else {
+            showToast('Not Logged In', 'Please log in to access dashboard.', 'warning');
+            setTimeout(() => window.location.href='login.html', 2000);
+        }
+    });
+
+    console.log('%c✝ CBWCI Admin Dashboard ✝', 'font-size:18px;color:#C9A84C;font-weight:bold;');
+</script>
+</body>
+</html>

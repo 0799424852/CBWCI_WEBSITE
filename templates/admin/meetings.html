@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Virtual Meeting Host - CBWCI Admin</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    :root{--plum:#230f22;--gold:#c9a24d}
+    body{background:#f6f2ee;padding-top:70px}
+    .navbar{background:var(--plum)}
+    .navbar .nav-link{color:rgba(255,255,255,.8)!important;font-weight:500}
+    .navbar .nav-link:hover,.navbar .nav-link.active{color:var(--gold)!important}
+    .navbar-brand{color:var(--gold)!important;font-weight:700}
+    .panel{background:#fff;border-radius:12px;box-shadow:0 2px 10px rgba(0,0,0,.06);padding:20px}
+    .btn-gold{background:var(--gold);color:var(--plum);font-weight:600;border:0}
+    .btn-gold:hover{background:#b8913e;color:var(--plum)}
+    .badge-live{background:#fdecea;color:#c0392b} .badge-upcoming{background:#e8f4fd;color:#1f6fa5} .badge-ended{background:#eee;color:#777}
+    .sub{font-size:12px;color:#777}
+  </style>
+</head>
+<body>
+
+<!-- ===== TOP NAVIGATION BAR ===== -->
+<nav class="navbar navbar-expand-lg navbar-dark fixed-top">
+  <div class="container">
+    <a class="navbar-brand" href="{{ url_for('admin_dashboard') }}"><i class="fas fa-church"></i> CBWCI Admin</a>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#nav"><span class="navbar-toggler-icon"></span></button>
+    <div class="collapse navbar-collapse" id="nav">
+      <ul class="navbar-nav ms-auto align-items-lg-center">
+        <li class="nav-item"><a class="nav-link" href="{{ url_for('admin_dashboard') }}">Dashboard</a></li>
+        <li class="nav-item"><a class="nav-link" href="{{ url_for('admin_announcements') }}">Announcements</a></li>
+        <li class="nav-item"><a class="nav-link active" href="{{ url_for('admin_meetings') }}"><i class="fas fa-video"></i> CBWCI Virtual Meeting</a></li>
+        <li class="nav-item"><a class="nav-link" href="{{ url_for('logout') }}"><i class="fas fa-sign-out-alt"></i> Logout</a></li>
+      </ul>
+    </div>
+  </div>
+</nav>
+
+<div class="container pb-5">
+  <div class="d-flex flex-wrap justify-content-between align-items-center my-3 gap-2">
+    <div>
+      <h3 class="mb-0"><i class="fas fa-video" style="color:var(--gold)"></i> Virtual Meeting Host</h3>
+      <div class="sub">Schedule a meeting, start it as the host, and share the link with every member.</div>
+    </div>
+    <button class="btn btn-gold" onclick="toggleForm(true)"><i class="fas fa-plus"></i> Schedule Meeting</button>
+  </div>
+
+  <!-- schedule form -->
+  <div class="panel mb-3" id="formPanel" style="display:none">
+    <div class="row g-3">
+      <div class="col-md-6"><label class="form-label">Title *</label>
+        <input class="form-control" id="title" maxlength="120" placeholder="e.g. Sunday Online Service"></div>
+      <div class="col-md-4"><label class="form-label">Date and time *</label>
+        <input type="datetime-local" class="form-control" id="startsAt"></div>
+      <div class="col-md-2"><label class="form-label">Duration</label>
+        <select class="form-select" id="duration"><option value="30">30 min</option><option value="60" selected>1 hour</option><option value="90">1.5 hours</option><option value="120">2 hours</option><option value="180">3 hours</option></select></div>
+      <div class="col-12"><label class="form-label">Description</label>
+        <textarea class="form-control" id="description" rows="2" maxlength="1000" placeholder="Optional"></textarea></div>
+      <div class="col-12 d-flex flex-wrap align-items-center gap-3">
+        <div class="form-check"><input class="form-check-input" type="checkbox" id="shareNow" checked>
+          <label class="form-check-label" for="shareNow">Post the join link to Announcements now</label></div>
+        <button class="btn btn-gold ms-auto" id="saveBtn" onclick="saveMeeting()"><i class="fas fa-save"></i> Save</button>
+        <button class="btn btn-outline-secondary" onclick="toggleForm(false)">Cancel</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- list -->
+  <div class="panel">
+    <div class="table-responsive">
+      <table class="table align-middle mb-0">
+        <thead><tr><th>Meeting</th><th>When</th><th>Status</th><th class="text-end">Actions</th></tr></thead>
+        <tbody id="rows"><tr><td colspan="4" class="text-center text-muted py-4">Loading...</td></tr></tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<div class="position-fixed bottom-0 end-0 p-3" style="z-index:2000"><div id="toastBox"></div></div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+  const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+  let meetings = [];
+
+  function toast(msg, bad) {
+    const el = document.createElement('div');
+    el.className = 'alert ' + (bad ? 'alert-danger' : 'alert-success') + ' shadow mb-2';
+    el.textContent = msg;
+    document.getElementById('toastBox').appendChild(el);
+    setTimeout(() => el.remove(), 4000);
+  }
+
+  async function api(url, method, body) {
+    const res = await fetch(url, {method: method || 'GET', credentials: 'same-origin',
+      headers: body ? {'Content-Type': 'application/json'} : {}, body: body ? JSON.stringify(body) : undefined});
+    if (res.status === 401) { location.href = '/login'; throw new Error('login'); }
+    let data = {}; try { data = await res.json(); } catch (e) {}
+    if (!res.ok || data.success === false) throw new Error(data.message || 'Something went wrong.');
+    return data;
+  }
+  const fail = err => { if (err.message !== 'login') toast(err.message, true); };
+
+  function toggleForm(show) {
+    document.getElementById('formPanel').style.display = show ? '' : 'none';
+    if (show) {
+      const t = new Date(Date.now() + 86400000);
+      document.getElementById('startsAt').value = new Date(t - t.getTimezoneOffset() * 60000).toISOString().slice(0, 16);
+    }
+  }
+
+  async function load() {
+    try { meetings = (await api('/api/admin/meetings')).meetings; render(); } catch (e) { fail(e); }
+  }
+
+  function render() {
+    const body = document.getElementById('rows');
+    if (!meetings.length) { body.innerHTML = '<tr><td colspan="4" class="text-center text-muted py-4">No meetings yet. Click "Schedule Meeting".</td></tr>'; return; }
+    body.innerHTML = meetings.map(m => {
+      const when = new Date(m.startsAt).toLocaleString('en-ZA', {weekday:'short', day:'numeric', month:'short', hour:'2-digit', minute:'2-digit'});
+      const label = {live:'Live now', upcoming:'Upcoming', ended:'Ended'}[m.status];
+      const id = esc(m.id);
+      const buttons = m.status === 'ended' ? '' :
+        '<a class="btn btn-sm btn-success" target="_blank" href="/meeting/' + id + '"><i class="fas fa-play"></i> ' + (m.status === 'live' ? 'Rejoin' : 'Start') + '</a> ' +
+        '<button class="btn btn-sm btn-outline-primary" onclick="share(\'' + id + '\')"><i class="fas fa-bullhorn"></i> Share</button> ' +
+        '<button class="btn btn-sm btn-outline-secondary" onclick="copyLink(\'' + id + '\')"><i class="fas fa-link"></i></button> ' +
+        (m.status === 'live' ? '<button class="btn btn-sm btn-outline-warning" onclick="endMeeting(\'' + id + '\')"><i class="fas fa-stop"></i> End</button> ' : '');
+      return '<tr><td><strong>' + esc(m.title) + '</strong>' + (m.shared ? ' <i class="fas fa-check text-success" title="Shared"></i>' : '') +
+        '<div class="sub">Host: ' + esc(m.hostName) + '</div></td>' +
+        '<td>' + esc(when) + '<div class="sub">' + m.durationMins + ' min</div></td>' +
+        '<td><span class="badge badge-' + m.status + '">' + label + '</span></td>' +
+        '<td class="text-end text-nowrap">' + buttons +
+        '<button class="btn btn-sm btn-outline-danger" onclick="del(\'' + id + '\')"><i class="fas fa-trash-alt"></i></button></td></tr>';
+    }).join('');
+  }
+
+  async function saveMeeting() {
+    const v = document.getElementById('startsAt').value;
+    const btn = document.getElementById('saveBtn'); btn.disabled = true;
+    try {
+      const created = await api('/api/admin/meetings', 'POST', {
+        title: document.getElementById('title').value.trim(),
+        description: document.getElementById('description').value.trim(),
+        startsAt: v ? new Date(v).getTime() : null,
+        durationMins: parseInt(document.getElementById('duration').value, 10)});
+      if (document.getElementById('shareNow').checked) await api('/api/admin/meetings/' + created.id + '/share', 'POST');
+      toast('Meeting scheduled' + (document.getElementById('shareNow').checked ? ' and shared to Announcements' : ''));
+      document.getElementById('title').value = ''; document.getElementById('description').value = '';
+      toggleForm(false); load();
+    } catch (e) { fail(e); } finally { btn.disabled = false; }
+  }
+
+  async function share(id) {
+    const m = meetings.find(x => x.id === id);
+    if (m && m.shared && !confirm('Already shared. Post another announcement (e.g. a reminder)?')) return;
+    try { await api('/api/admin/meetings/' + id + '/share', 'POST'); toast('Link posted to Announcements'); load(); } catch (e) { fail(e); }
+  }
+  async function copyLink(id) {
+    const m = meetings.find(x => x.id === id); if (!m) return;
+    try { await navigator.clipboard.writeText(m.link); toast('Link copied: ' + m.link); } catch (e) { prompt('Copy this link:', m.link); }
+  }
+  async function endMeeting(id) {
+    if (!confirm('End this meeting for everyone?')) return;
+    try { await api('/api/admin/meetings/' + id + '/end', 'POST'); toast('Meeting ended'); load(); } catch (e) { fail(e); }
+  }
+  async function del(id) {
+    if (!confirm('Delete this meeting?')) return;
+    try { await api('/api/admin/meetings/' + id, 'DELETE'); toast('Meeting deleted'); load(); } catch (e) { fail(e); }
+  }
+
+  load();
+  setInterval(load, 30000);
+</script>
+</body>
+</html>

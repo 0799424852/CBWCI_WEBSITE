@@ -1,0 +1,2114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Follow-Up Management - CBWCI</title>
+    
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <!-- Font Awesome Icons -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- AOS Animation -->
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+    
+    <style>
+        /* ===== CBWCI BRAND COLORS ===== */
+        :root {
+            --cbwci-purple: #4A1942;
+            --cbwci-purple-light: #6B2D5F;
+            --cbwci-purple-dark: #2E0F28;
+            --cbwci-gold: #C9A84C;
+            --cbwci-gold-light: #E8CD7A;
+            --cbwci-gold-dark: #A8893A;
+            --cbwci-cream: #FDF8F0;
+            --cbwci-dark: #1A0F16;
+            --cbwci-text: #2C1A24;
+            --cbwci-muted: #7A6A72;
+            --shadow: 0 10px 40px rgba(74, 25, 66, 0.12);
+            --shadow-hover: 0 15px 50px rgba(74, 25, 66, 0.2);
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            --success: #2D8F5C;
+            --danger: #C0392B;
+            --warning: #E67E22;
+            --info: #2980B9;
+        }
+
+        /* ===== GLOBAL ===== */
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--cbwci-cream);
+            color: var(--cbwci-text);
+            padding-top: 80px;
+            min-height: 100vh;
+        }
+
+        /* ===== NAVBAR ===== */
+        .navbar {
+            background: rgba(74, 25, 66, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 12px 0;
+            box-shadow: 0 4px 30px rgba(0,0,0,0.2);
+            border-bottom: 3px solid var(--cbwci-gold);
+        }
+
+        .navbar-brand {
+            font-family: 'Playfair Display', serif;
+            font-weight: 900;
+            font-size: 20px;
+            color: white !important;
+            letter-spacing: 2px;
+        }
+
+        .navbar-brand .gold {
+            color: var(--cbwci-gold);
+            display: block;
+            font-size: 14px;
+            letter-spacing: 4px;
+        }
+
+        .navbar-brand i {
+            color: var(--cbwci-gold);
+            margin-right: 10px;
+        }
+
+        .nav-link {
+            color: rgba(255,255,255,0.8) !important;
+            font-weight: 500;
+            font-size: 14px;
+            letter-spacing: 1px;
+            transition: var(--transition);
+            padding: 8px 18px !important;
+            border-radius: 8px;
+        }
+
+        .nav-link:hover {
+            color: var(--cbwci-gold) !important;
+            background: rgba(201, 168, 76, 0.1);
+        }
+
+        .nav-link.active {
+            color: var(--cbwci-gold) !important;
+        }
+
+        .navbar .btn-back {
+            background: transparent;
+            border: 2px solid rgba(255,255,255,0.2);
+            color: white;
+            padding: 6px 20px;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 13px;
+            transition: var(--transition);
+            text-decoration: none;
+        }
+
+        .navbar .btn-back:hover {
+            background: rgba(255,255,255,0.1);
+            border-color: white;
+            transform: translateY(-2px);
+            color: white;
+        }
+
+        .navbar .btn-logout {
+            background: transparent;
+            border: 2px solid rgba(255,255,255,0.2);
+            color: white;
+            padding: 6px 20px;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 13px;
+            transition: var(--transition);
+            text-decoration: none;
+            cursor: pointer;
+        }
+
+        .navbar .btn-logout:hover {
+            background: var(--danger);
+            border-color: var(--danger);
+            transform: translateY(-2px);
+            color: white;
+        }
+
+        /* ===== PAGE HEADER ===== */
+        .page-header-section {
+            padding: 20px 0 30px;
+        }
+
+        .page-header-section h2 {
+            font-family: 'Playfair Display', serif;
+            font-weight: 700;
+            color: var(--cbwci-purple);
+            font-size: 32px;
+        }
+
+        .page-header-section .breadcrumb-custom {
+            color: var(--cbwci-muted);
+            font-size: 14px;
+        }
+
+        .page-header-section .breadcrumb-custom a {
+            color: var(--cbwci-purple);
+            text-decoration: none;
+            transition: var(--transition);
+        }
+
+        .page-header-section .breadcrumb-custom a:hover {
+            color: var(--cbwci-gold);
+        }
+
+        .page-header-section .breadcrumb-custom .separator {
+            margin: 0 8px;
+            color: var(--cbwci-gold);
+        }
+
+        .page-header-section .team-badge {
+            display: inline-block;
+            background: var(--info);
+            color: white;
+            padding: 4px 18px;
+            border-radius: 50px;
+            font-size: 14px;
+            font-weight: 600;
+            margin-left: 12px;
+        }
+
+        /* ===== FOLLOW-UP WRAPPER ===== */
+        .followup-wrapper {
+            padding-bottom: 60px;
+        }
+
+        /* ===== STATS CARDS ===== */
+        .stat-card {
+            background: white;
+            border-radius: 12px;
+            padding: 20px 24px;
+            box-shadow: var(--shadow);
+            border: 1px solid rgba(201, 168, 76, 0.1);
+            text-align: center;
+            transition: var(--transition);
+            height: 100%;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-3px);
+            box-shadow: var(--shadow-hover);
+        }
+
+        .stat-card .stat-icon {
+            font-size: 28px;
+            color: var(--cbwci-gold);
+            margin-bottom: 6px;
+        }
+
+        .stat-card .stat-number {
+            font-family: 'Playfair Display', serif;
+            font-weight: 900;
+            font-size: 32px;
+            color: var(--cbwci-purple);
+        }
+
+        .stat-card .stat-label {
+            font-size: 13px;
+            color: var(--cbwci-muted);
+        }
+
+        /* ===== COMPOSER CARD ===== */
+        .composer-card {
+            background: white;
+            border-radius: 16px;
+            padding: 28px 30px;
+            box-shadow: var(--shadow);
+            border: 1px solid rgba(201, 168, 76, 0.1);
+            margin-bottom: 25px;
+        }
+
+        .composer-card .composer-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #f0ebe4;
+        }
+
+        .composer-card .composer-header h5 {
+            font-weight: 700;
+            color: var(--cbwci-purple);
+            margin: 0;
+        }
+
+        .composer-card .composer-header h5 i {
+            color: var(--cbwci-gold);
+        }
+
+        /* ===== MANUAL ADD GUEST ===== */
+        .manual-add-section {
+            background: var(--cbwci-cream);
+            border-radius: 12px;
+            padding: 20px 24px;
+            border: 2px dashed var(--cbwci-gold);
+            margin-bottom: 20px;
+            transition: var(--transition);
+        }
+
+        .manual-add-section:hover {
+            border-color: var(--cbwci-gold-dark);
+            background: white;
+        }
+
+        .manual-add-section .add-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            margin-bottom: 15px;
+        }
+
+        .manual-add-section .add-header h6 {
+            font-weight: 700;
+            color: var(--cbwci-purple);
+            margin: 0;
+        }
+
+        .manual-add-section .add-header h6 i {
+            color: var(--cbwci-gold);
+        }
+
+        .manual-add-section .add-row {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+            align-items: flex-end;
+        }
+
+        .manual-add-section .add-row .form-group {
+            flex: 1;
+            min-width: 150px;
+        }
+
+        .manual-add-section .add-row .form-group label {
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--cbwci-muted);
+            margin-bottom: 2px;
+        }
+
+        .manual-add-section .add-row .form-group input,
+        .manual-add-section .add-row .form-group select {
+            width: 100%;
+            padding: 8px 14px;
+            border: 2px solid #E8DCC8;
+            border-radius: 8px;
+            font-size: 13px;
+            background: white;
+            transition: var(--transition);
+        }
+
+        .manual-add-section .add-row .form-group input:focus,
+        .manual-add-section .add-row .form-group select:focus {
+            border-color: var(--cbwci-gold);
+            box-shadow: 0 0 0 4px rgba(201, 168, 76, 0.12);
+            outline: none;
+        }
+
+        .manual-add-section .btn-add-guest {
+            background: linear-gradient(135deg, var(--cbwci-gold), var(--cbwci-gold-dark));
+            border: none;
+            border-radius: 8px;
+            padding: 10px 24px;
+            font-weight: 600;
+            font-size: 14px;
+            color: var(--cbwci-purple-dark);
+            transition: var(--transition);
+            white-space: nowrap;
+        }
+
+        .manual-add-section .btn-add-guest:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(201, 168, 76, 0.35);
+        }
+
+        .manual-add-section .btn-add-guest:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        /* ===== RECIPIENT SELECT ===== */
+        .recipient-select {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .recipient-select .btn-group-toggle {
+            display: flex;
+            gap: 6px;
+            flex-wrap: wrap;
+        }
+
+        .recipient-select .btn-toggle {
+            padding: 6px 18px;
+            border-radius: 50px;
+            border: 2px solid #E8DCC8;
+            background: transparent;
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--cbwci-muted);
+            transition: var(--transition);
+            cursor: pointer;
+        }
+
+        .recipient-select .btn-toggle:hover {
+            border-color: var(--cbwci-purple);
+            color: var(--cbwci-purple);
+        }
+
+        .recipient-select .btn-toggle.active {
+            background: var(--cbwci-purple);
+            border-color: var(--cbwci-purple);
+            color: white;
+        }
+
+        .recipient-select .btn-toggle .count {
+            background: rgba(255,255,255,0.2);
+            padding: 0 8px;
+            border-radius: 50px;
+            font-size: 11px;
+            margin-left: 4px;
+        }
+
+        .recipient-select .btn-toggle:not(.active) .count {
+            background: var(--cbwci-cream);
+            color: var(--cbwci-muted);
+        }
+
+        /* ===== MESSAGE TEMPLATES ===== */
+        .message-template {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-bottom: 12px;
+        }
+
+        .message-template .template-btn {
+            padding: 4px 14px;
+            border-radius: 50px;
+            border: 1px solid rgba(201, 168, 76, 0.2);
+            background: var(--cbwci-cream);
+            font-size: 12px;
+            color: var(--cbwci-muted);
+            transition: var(--transition);
+            cursor: pointer;
+        }
+
+        .message-template .template-btn:hover {
+            border-color: var(--cbwci-gold);
+            color: var(--cbwci-purple);
+            background: white;
+        }
+
+        .message-template .template-btn i {
+            margin-right: 4px;
+        }
+
+        /* ===== TEXTAREA ===== */
+        .composer-card textarea {
+            border: 2px solid #E8DCC8;
+            border-radius: 10px;
+            padding: 14px 16px;
+            font-size: 14px;
+            transition: var(--transition);
+            background: #FDFAF5;
+            color: var(--cbwci-text);
+            width: 100%;
+            min-height: 120px;
+            resize: vertical;
+            font-family: inherit;
+        }
+
+        .composer-card textarea:focus {
+            border-color: var(--cbwci-gold);
+            box-shadow: 0 0 0 4px rgba(201, 168, 76, 0.12);
+            background: white;
+            outline: none;
+        }
+
+        .composer-card .message-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-top: 12px;
+        }
+
+        .composer-card .message-footer .char-count {
+            font-size: 12px;
+            color: var(--cbwci-muted);
+        }
+
+        /* ===== BUTTONS ===== */
+        .btn-primary-custom {
+            background: linear-gradient(135deg, var(--cbwci-purple), var(--cbwci-purple-dark));
+            border: none;
+            border-radius: 10px;
+            padding: 12px 30px;
+            font-weight: 600;
+            font-size: 15px;
+            color: white;
+            transition: var(--transition);
+        }
+
+        .btn-primary-custom:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(74, 25, 66, 0.35);
+            color: white;
+        }
+
+        .btn-outline-custom {
+            background: transparent;
+            border: 2px solid #E8DCC8;
+            border-radius: 10px;
+            padding: 12px 30px;
+            font-weight: 600;
+            font-size: 15px;
+            color: var(--cbwci-muted);
+            transition: var(--transition);
+        }
+
+        .btn-outline-custom:hover {
+            border-color: var(--cbwci-purple);
+            color: var(--cbwci-purple);
+        }
+
+        .btn-success-custom {
+            background: var(--success);
+            border: none;
+            border-radius: 8px;
+            padding: 6px 18px;
+            font-weight: 600;
+            font-size: 13px;
+            color: white;
+            transition: var(--transition);
+        }
+
+        .btn-success-custom:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(45, 143, 92, 0.3);
+            color: white;
+        }
+
+        .btn-send-whatsapp {
+            background: #25D366;
+            border: none;
+            border-radius: 10px;
+            padding: 12px 35px;
+            font-weight: 600;
+            font-size: 15px;
+            color: white;
+            transition: var(--transition);
+        }
+
+        .btn-send-whatsapp:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(37, 211, 102, 0.35);
+            color: white;
+        }
+
+        .btn-send-whatsapp:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .btn-send-sms {
+            background: var(--info);
+            border: none;
+            border-radius: 10px;
+            padding: 12px 35px;
+            font-weight: 600;
+            font-size: 15px;
+            color: white;
+            transition: var(--transition);
+        }
+
+        .btn-send-sms:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(41, 128, 185, 0.35);
+            color: white;
+        }
+
+        .btn-send-sms:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .btn-sm {
+            padding: 4px 14px;
+            font-size: 12px;
+            border-radius: 6px;
+        }
+
+        /* ===== GUEST LIST ===== */
+        .guest-list-card {
+            background: white;
+            border-radius: 16px;
+            padding: 24px 28px;
+            box-shadow: var(--shadow);
+            border: 1px solid rgba(201, 168, 76, 0.1);
+        }
+
+        .guest-list-card .list-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #f0ebe4;
+        }
+
+        .guest-list-card .list-header h5 {
+            font-weight: 700;
+            color: var(--cbwci-purple);
+            margin: 0;
+        }
+
+        .guest-list-card .list-header .list-actions {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .guest-list-card .list-header .list-actions .btn-sm {
+            padding: 4px 14px;
+            font-size: 12px;
+            border-radius: 6px;
+        }
+
+        /* ===== TABLE ===== */
+        .guest-table-wrapper {
+            overflow-x: auto;
+        }
+
+        .guest-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 14px;
+        }
+
+        .guest-table th {
+            background: var(--cbwci-cream);
+            padding: 12px 16px;
+            text-align: left;
+            font-weight: 600;
+            color: var(--cbwci-purple);
+            border-bottom: 2px solid var(--cbwci-gold);
+            white-space: nowrap;
+        }
+
+        .guest-table td {
+            padding: 12px 16px;
+            border-bottom: 1px solid #f0ebe4;
+            vertical-align: middle;
+        }
+
+        .guest-table tr:hover td {
+            background: rgba(74, 25, 66, 0.02);
+        }
+
+        /* Highlight newly added guest */
+        .guest-table tr.highlight-new td {
+            background: rgba(201, 168, 76, 0.15);
+            animation: highlightFade 3s ease-out;
+        }
+
+        @keyframes highlightFade {
+            0% { background: rgba(201, 168, 76, 0.4); }
+            100% { background: rgba(201, 168, 76, 0.05); }
+        }
+
+        .guest-table .checkbox-cell {
+            width: 40px;
+            text-align: center;
+        }
+
+        .guest-table input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            accent-color: var(--cbwci-purple);
+            cursor: pointer;
+        }
+
+        .guest-table .status-badge {
+            padding: 3px 12px;
+            border-radius: 50px;
+            font-size: 12px;
+            font-weight: 600;
+            white-space: nowrap;
+        }
+
+        .guest-table .status-badge.confirmed {
+            background: rgba(45, 143, 92, 0.12);
+            color: var(--success);
+        }
+
+        .guest-table .status-badge.pending {
+            background: rgba(230, 126, 34, 0.12);
+            color: var(--warning);
+        }
+
+        .guest-table .status-badge.declined {
+            background: rgba(192, 57, 43, 0.12);
+            color: var(--danger);
+        }
+
+        .guest-table .status-badge.contacted {
+            background: rgba(41, 128, 185, 0.12);
+            color: var(--info);
+        }
+
+        .guest-table .invited-by {
+            font-size: 12px;
+            color: var(--cbwci-muted);
+        }
+
+        .guest-table .invited-by strong {
+            color: var(--cbwci-text);
+        }
+
+        .guest-table .phone-number {
+            font-family: monospace;
+            font-size: 13px;
+        }
+
+        .guest-table .guest-type {
+            font-size: 11px;
+            padding: 2px 10px;
+            border-radius: 50px;
+            background: rgba(41, 128, 185, 0.1);
+            color: var(--info);
+            font-weight: 600;
+        }
+
+        .guest-table .guest-type.visitor {
+            background: rgba(230, 126, 34, 0.1);
+            color: var(--warning);
+        }
+
+        /* ===== FILTER BAR ===== */
+        .filter-bar {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+            margin-bottom: 20px;
+            padding: 14px 18px;
+            background: var(--cbwci-cream);
+            border-radius: 12px;
+            align-items: center;
+            border: 1px solid rgba(201, 168, 76, 0.08);
+        }
+
+        .filter-bar .form-select,
+        .filter-bar .form-control {
+            width: auto;
+            min-width: 140px;
+            padding: 8px 14px;
+            font-size: 13px;
+            border: 2px solid #E8DCC8;
+            border-radius: 8px;
+            background: white;
+            transition: var(--transition);
+        }
+
+        .filter-bar .form-select:focus,
+        .filter-bar .form-control:focus {
+            border-color: var(--cbwci-gold);
+            box-shadow: 0 0 0 4px rgba(201, 168, 76, 0.12);
+            outline: none;
+        }
+
+        .filter-bar .btn {
+            padding: 8px 20px;
+            font-size: 13px;
+            border-radius: 8px;
+        }
+
+        /* ===== BULK ACTIONS ===== */
+        .bulk-actions {
+            background: white;
+            border-radius: 12px;
+            padding: 12px 18px;
+            box-shadow: var(--shadow);
+            border: 1px solid rgba(201, 168, 76, 0.1);
+            display: none;
+            align-items: center;
+            gap: 12px;
+            flex-wrap: wrap;
+            margin-bottom: 20px;
+        }
+
+        .bulk-actions.show {
+            display: flex;
+        }
+
+        .bulk-actions .selected-count {
+            font-weight: 600;
+            font-size: 14px;
+            color: var(--cbwci-purple);
+        }
+
+        /* ===== TOAST ===== */
+        .toast-container {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            z-index: 9999;
+        }
+
+        .toast-custom {
+            background: white;
+            border-radius: 12px;
+            padding: 16px 24px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.15);
+            border-left: 4px solid var(--success);
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            animation: slideUp 0.4s ease;
+            margin-top: 10px;
+            min-width: 300px;
+            max-width: 450px;
+        }
+
+        .toast-custom i {
+            font-size: 24px;
+            color: var(--success);
+        }
+
+        .toast-custom .msg h6 {
+            margin: 0;
+            font-weight: 600;
+        }
+
+        .toast-custom .msg small {
+            color: var(--cbwci-muted);
+        }
+
+        .toast-custom.toast-danger {
+            border-left-color: var(--danger);
+        }
+
+        .toast-custom.toast-danger i {
+            color: var(--danger);
+        }
+
+        .toast-custom.toast-warning {
+            border-left-color: var(--warning);
+        }
+
+        .toast-custom.toast-warning i {
+            color: var(--warning);
+        }
+
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* ===== RESPONSIVE ===== */
+        @media (max-width: 992px) {
+            .filter-bar {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            .filter-bar .form-select,
+            .filter-bar .form-control {
+                width: 100%;
+                min-width: unset;
+            }
+            .composer-card {
+                padding: 20px 18px;
+            }
+            .guest-list-card {
+                padding: 18px 16px;
+            }
+            .manual-add-section .add-row {
+                flex-direction: column;
+            }
+            .manual-add-section .add-row .form-group {
+                width: 100%;
+            }
+            .manual-add-section .btn-add-guest {
+                width: 100%;
+                text-align: center;
+            }
+        }
+
+        @media (max-width: 768px) {
+            body {
+                padding-top: 70px;
+            }
+            .page-header-section h2 {
+                font-size: 24px;
+            }
+            .composer-card .composer-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 10px;
+            }
+            .composer-card .recipient-select {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            .composer-card .recipient-select .btn-group-toggle {
+                justify-content: center;
+            }
+            .guest-list-card .list-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 10px;
+            }
+            .guest-table {
+                font-size: 12px;
+            }
+            .guest-table th,
+            .guest-table td {
+                padding: 8px 10px;
+            }
+            .navbar-brand {
+                font-size: 16px;
+            }
+            .navbar-brand .gold {
+                font-size: 11px;
+            }
+            .composer-card .message-footer {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            .composer-card .message-footer .btn {
+                width: 100%;
+                text-align: center;
+            }
+            .bulk-actions {
+                flex-direction: column;
+                align-items: center;
+            }
+        }
+
+        @media (max-width: 576px) {
+            .page-header-section h2 {
+                font-size: 20px;
+            }
+            .composer-card {
+                padding: 16px 14px;
+            }
+            .guest-list-card {
+                padding: 14px 12px;
+            }
+            .guest-table th,
+            .guest-table td {
+                padding: 6px 8px;
+                font-size: 11px;
+            }
+            .guest-table .checkbox-cell {
+                width: 24px;
+            }
+            .filter-bar {
+                padding: 10px 12px;
+            }
+            .toast-custom {
+                min-width: unset;
+                max-width: 90vw;
+                padding: 14px 18px;
+            }
+            .manual-add-section {
+                padding: 14px 16px;
+            }
+        }
+
+        /* ===== SCROLLBAR ===== */
+        ::-webkit-scrollbar {
+            width: 10px;
+        }
+        ::-webkit-scrollbar-track {
+            background: var(--cbwci-cream);
+        }
+        ::-webkit-scrollbar-thumb {
+            background: var(--cbwci-purple);
+            border-radius: 10px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--cbwci-gold);
+        }
+
+        /* ===== ANIMATIONS ===== */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .fade-in {
+            animation: fadeIn 0.4s ease;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- ======================================== -->
+    <!-- NAVBAR -->
+    <!-- ======================================== -->
+    <nav class="navbar navbar-expand-lg fixed-top">
+        <div class="container">
+            <a class="navbar-brand" href="index.html">
+                <i class="fas fa-church"></i>
+                CBWCI
+                <span class="gold">Changed By The Word</span>
+            </a>
+            <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon" style="filter: invert(1);"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto align-items-lg-center">
+                    <li class="nav-item">
+                        <a class="nav-link" href="profile.html"><i class="fas fa-chart-pie"></i> Overview</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="edit_profile.html"><i class="fas fa-user-edit"></i> Edit Profile</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="taxi.html"><i class="fas fa-taxi"></i> Book a Ride</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="profile.html#tab-zoom"><i class="fas fa-video"></i> CBWCI Virtual Meeting</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active" href="followup.html"><i class="fas fa-users"></i> Follow-Ups</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="notification.html"><i class="fas fa-bell"></i> Notifications</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="security.html"><i class="fas fa-shield-alt"></i> Security</a>
+                    </li>
+                    <li class="nav-item ms-lg-2">
+                        <a href="profile.html" class="btn btn-back me-2">
+                            <i class="fas fa-arrow-left"></i> Back
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="#" class="btn btn-logout" onclick="logoutUser(event)">
+                            <i class="fas fa-sign-out-alt"></i> Logout
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- ======================================== -->
+    <!-- PAGE HEADER -->
+    <!-- ======================================== -->
+    <section class="page-header-section">
+        <div class="container">
+            <div data-aos="fade-up">
+                <div class="breadcrumb-custom">
+                    <a href="index.html"><i class="fas fa-home"></i> Home</a>
+                    <span class="separator">/</span>
+                    <a href="profile.html">Profile</a>
+                    <span class="separator">/</span>
+                    <span style="color: var(--cbwci-gold-dark); font-weight: 500;">Follow-Up Management</span>
+                </div>
+                <h2>
+                    <i class="fas fa-phone-alt" style="color: var(--cbwci-gold);"></i> 
+                    Follow-Up Management
+                    <span class="team-badge"><i class="fas fa-user-shield"></i> Team Access</span>
+                </h2>
+                <p style="color: var(--cbwci-muted); font-size: 16px; max-width: 600px;">
+                    Send WhatsApp/SMS messages to guests. Track who confirmed and who declined the invitation.
+                </p>
+            </div>
+        </div>
+    </section>
+
+    <!-- ======================================== -->
+    <!-- FOLLOW-UP CONTENT -->
+    <!-- ======================================== -->
+    <section class="followup-wrapper">
+        <div class="container">
+
+            <!-- ===== STATS ROW ===== -->
+            <div class="row g-3 mb-4" data-aos="fade-up">
+                <div class="col-md-3 col-6">
+                    <div class="stat-card">
+                        <div class="stat-icon"><i class="fas fa-users"></i></div>
+                        <div class="stat-number" id="totalGuests">0</div>
+                        <div class="stat-label">Total Guests</div>
+                    </div>
+                </div>
+                <div class="col-md-3 col-6">
+                    <div class="stat-card">
+                        <div class="stat-icon"><i class="fas fa-clock" style="color: var(--warning);"></i></div>
+                        <div class="stat-number" id="pendingGuests">0</div>
+                        <div class="stat-label">Pending Response</div>
+                    </div>
+                </div>
+                <div class="col-md-3 col-6">
+                    <div class="stat-card">
+                        <div class="stat-icon"><i class="fas fa-check-circle" style="color: var(--success);"></i></div>
+                        <div class="stat-number" id="confirmedGuests">0</div>
+                        <div class="stat-label">Confirmed</div>
+                    </div>
+                </div>
+                <div class="col-md-3 col-6">
+                    <div class="stat-card">
+                        <div class="stat-icon"><i class="fas fa-times-circle" style="color: var(--danger);"></i></div>
+                        <div class="stat-number" id="declinedGuests">0</div>
+                        <div class="stat-label">Declined</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ===== MESSAGE COMPOSER ===== -->
+            <div class="composer-card" data-aos="fade-up" data-aos-delay="100">
+                <div class="composer-header">
+                    <h5><i class="fas fa-comment-dots"></i> Send Follow-Up Message</h5>
+                    <span style="font-size: 13px; color: var(--cbwci-muted);">
+                        <i class="fas fa-users"></i> <span id="selectedCountDisplay">0</span> guests selected
+                    </span>
+                </div>
+
+                <!-- ===== MANUAL ADD GUEST SECTION ===== -->
+                <div class="manual-add-section" id="manualAddSection">
+                    <div class="add-header">
+                        <h6><i class="fas fa-user-plus"></i> Manually Add First-Time Visitor</h6>
+                        <span style="font-size: 12px; color: var(--cbwci-muted);">
+                            <i class="fas fa-info-circle"></i> For visitors who don't have an account yet
+                        </span>
+                    </div>
+                    <div class="add-row">
+                        <div class="form-group">
+                            <label><i class="fas fa-user"></i> Full Name</label>
+                            <input type="text" id="manualName" placeholder="e.g., John Doe" class="form-control">
+                        </div>
+                        <div class="form-group">
+                            <label><i class="fas fa-phone"></i> Phone Number</label>
+                            <input type="tel" id="manualPhone" placeholder="+27 82 123 4567" class="form-control">
+                        </div>
+                        <div class="form-group">
+                            <label><i class="fas fa-map-marker-alt"></i> Location</label>
+                            <select id="manualLocation" class="form-select">
+                                <option value="Sonheuwel">Sonheuwel</option>
+                                <option value="West Acres">West Acres</option>
+                                <option value="Stonehenge">Stonehenge</option>
+                                <option value="Belladonna">Belladonna</option>
+                                <option value="Mataffin">Mataffin</option>
+                                <option value="Nelspruit Town CBD">Nelspruit Town CBD</option>
+                                <option value="Msholozi">Msholozi</option>
+                                <option value="WhiteRiver">WhiteRiver</option>
+                                <option value="Ngodini">Ngodini</option>
+                                <option value="HazyView">HazyView</option>
+                            </select>
+                        </div>
+                        <button class="btn-add-guest" onclick="addManualGuest()" id="addGuestBtn">
+                            <i class="fas fa-plus"></i> Add & Invite
+                        </button>
+                    </div>
+                    <!-- Success message area for manual add -->
+                    <div id="addSuccessMessage" style="display: none; margin-top: 12px; padding: 10px 16px; background: rgba(45, 143, 92, 0.08); border-radius: 8px; border-left: 4px solid var(--success);">
+                        <span style="color: var(--success); font-weight: 600;"><i class="fas fa-check-circle"></i> Guest added successfully!</span>
+                        <span style="color: var(--cbwci-muted); font-size: 13px; margin-left: 8px;" id="addedGuestName"></span>
+                    </div>
+                </div>
+
+                <!-- Recipient Selection -->
+                <div class="recipient-select">
+                    <span style="font-weight: 600; font-size: 14px; color: var(--cbwci-text);">Send to:</span>
+                    <div class="btn-group-toggle">
+                        <button class="btn-toggle active" onclick="selectRecipients('all', this)">
+                            All Guests <span class="count" id="countAll">0</span>
+                        </button>
+                        <button class="btn-toggle" onclick="selectRecipients('pending', this)">
+                            Pending <span class="count" id="countPending">0</span>
+                        </button>
+                        <button class="btn-toggle" onclick="selectRecipients('confirmed', this)">
+                            Confirmed <span class="count" id="countConfirmed">0</span>
+                        </button>
+                        <button class="btn-toggle" onclick="selectRecipients('declined', this)">
+                            Declined <span class="count" id="countDeclined">0</span>
+                        </button>
+                        <button class="btn-toggle" onclick="selectRecipients('contacted', this)">
+                            Contacted <span class="count" id="countContacted">0</span>
+                        </button>
+                    </div>
+                    <button class="btn btn-outline-custom btn-sm" onclick="clearSelection()" style="padding: 4px 14px; font-size: 12px;">
+                        <i class="fas fa-times"></i> Clear
+                    </button>
+                </div>
+
+                <!-- Message Templates -->
+                <div class="message-template">
+                    <span style="font-size: 12px; color: var(--cbwci-muted); font-weight: 600;">Templates:</span>
+                    <button class="template-btn" onclick="insertTemplate('invite')">
+                        <i class="fas fa-handshake"></i> Invitation
+                    </button>
+                    <button class="template-btn" onclick="insertTemplate('reminder')">
+                        <i class="fas fa-clock"></i> Reminder
+                    </button>
+                    <button class="template-btn" onclick="insertTemplate('followup')">
+                        <i class="fas fa-phone-alt"></i> Follow-Up
+                    </button>
+                    <button class="template-btn" onclick="insertTemplate('thanks')">
+                        <i class="fas fa-heart"></i> Thank You
+                    </button>
+                    <button class="template-btn" onclick="insertTemplate('visitor')">
+                        <i class="fas fa-user-plus"></i> First-Time Visitor
+                    </button>
+                </div>
+
+                <!-- Message Input -->
+                <textarea id="messageInput" placeholder="Type your message here... Use {name} for guest's name."></textarea>
+
+                <!-- Message Footer -->
+                <div class="message-footer">
+                    <div class="char-count" id="charCount">0 characters</div>
+                    <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+                        <button class="btn-send-whatsapp" onclick="sendWhatsApp()" id="sendWhatsAppBtn">
+                            <i class="fab fa-whatsapp"></i> Send via WhatsApp
+                        </button>
+                        <button class="btn-send-sms" onclick="sendSMS()" id="sendSMSBtn">
+                            <i class="fas fa-sms"></i> Send via SMS
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ===== FILTER BAR ===== -->
+            <div class="filter-bar" data-aos="fade-up" data-aos-delay="150">
+                <select class="form-select" id="statusFilter" onchange="applyFilters()">
+                    <option value="all">All Statuses</option>
+                    <option value="pending">Pending</option>
+                    <option value="confirmed">Confirmed</option>
+                    <option value="declined">Declined</option>
+                    <option value="contacted">Contacted</option>
+                </select>
+                <select class="form-select" id="locationFilter" onchange="applyFilters()">
+                    <option value="all">All Locations</option>
+                    <option value="Sonheuwel">Sonheuwel</option>
+                    <option value="West Acres">West Acres</option>
+                    <option value="Stonehenge">Stonehenge</option>
+                    <option value="Belladonna">Belladonna</option>
+                    <option value="Mataffin">Mataffin</option>
+                    <option value="Nelspruit Town CBD">Nelspruit Town CBD</option>
+                    <option value="Msholozi">Msholozi</option>
+                    <option value="WhiteRiver">WhiteRiver</option>
+                    <option value="Ngodini">Ngodini</option>
+                    <option value="HazyView">HazyView</option>
+                </select>
+                <select class="form-select" id="typeFilter" onchange="applyFilters()">
+                    <option value="all">All Types</option>
+                    <option value="member">Member Invited</option>
+                    <option value="visitor">First-Time Visitor</option>
+                </select>
+                <input type="text" class="form-control" placeholder="Search guest..." id="searchInput" oninput="applyFilters()" style="min-width: 160px;">
+                <button class="btn btn-primary-custom" onclick="applyFilters()">
+                    <i class="fas fa-search"></i> Filter
+                </button>
+                <button class="btn btn-outline-custom" onclick="resetFilters()">
+                    <i class="fas fa-sync"></i> Reset
+                </button>
+            </div>
+
+            <!-- ===== BULK ACTIONS ===== -->
+            <div class="bulk-actions" id="bulkActions">
+                <span class="selected-count" id="bulkSelectedCount">0 selected</span>
+                <span style="color: var(--cbwci-muted); opacity: 0.4;">|</span>
+                <button class="btn btn-success-custom" onclick="markSelectedContacted()">
+                    <i class="fas fa-check"></i> Mark as Contacted
+                </button>
+                <button class="btn btn-warning-custom" onclick="markSelectedPending()" style="background: var(--warning); border: none; padding: 6px 18px; border-radius: 8px; font-weight: 600; font-size: 13px; color: white; transition: var(--transition);">
+                    <i class="fas fa-clock"></i> Mark as Pending
+                </button>
+                <span style="flex:1;"></span>
+                <button class="btn btn-outline-custom btn-sm" onclick="clearBulkSelection()">
+                    <i class="fas fa-times"></i> Clear
+                </button>
+            </div>
+
+            <!-- ===== GUEST LIST ===== -->
+            <div class="guest-list-card" data-aos="fade-up" data-aos-delay="200">
+                <div class="list-header">
+                    <h5><i class="fas fa-list" style="color: var(--cbwci-gold);"></i> Guest List 
+                        <span style="font-size: 13px; font-weight: 400; color: var(--cbwci-muted);" id="guestCountDisplay">(0 guests)</span>
+                    </h5>
+                    <div class="list-actions">
+                        <button class="btn btn-outline-custom btn-sm" onclick="selectAll()">
+                            <i class="fas fa-check-double"></i> Select All
+                        </button>
+                        <button class="btn btn-outline-custom btn-sm" onclick="deselectAll()">
+                            <i class="fas fa-times"></i> Deselect All
+                        </button>
+                        <button class="btn btn-outline-custom btn-sm" onclick="exportSelected()">
+                            <i class="fas fa-file-export"></i> Export
+                        </button>
+                    </div>
+                </div>
+
+                <div class="guest-table-wrapper">
+                    <table class="guest-table" id="guestTable">
+                        <thead>
+                            <tr>
+                                <th class="checkbox-cell">
+                                    <input type="checkbox" id="selectAllCheckbox" onchange="toggleSelectAll()">
+                                </th>
+                                <th>Guest Name</th>
+                                <th>Phone Number</th>
+                                <th>Location</th>
+                                <th>Type</th>
+                                <th>Invited By</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="guestTableBody">
+                            <!-- Rows will be rendered by JavaScript -->
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Pagination -->
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 20px; flex-wrap: wrap; gap: 10px;">
+                    <span style="font-size: 13px; color: var(--cbwci-muted);" id="paginationInfo">
+                        Showing 0 guests
+                    </span>
+                    <div style="display: flex; gap: 4px;">
+                        <button class="btn btn-outline-custom btn-sm" onclick="prevPage()" style="padding: 4px 14px; font-size: 13px;">
+                            <i class="fas fa-chevron-left"></i>
+                        </button>
+                        <button class="btn btn-primary-custom btn-sm" style="padding: 4px 14px; font-size: 13px;">1</button>
+                        <button class="btn btn-outline-custom btn-sm" onclick="nextPage()" style="padding: 4px 14px; font-size: 13px;">
+                            <i class="fas fa-chevron-right"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </section>
+
+    <!-- ======================================== -->
+    <!-- TOAST CONTAINER -->
+    <!-- ======================================== -->
+    <div class="toast-container" id="toastContainer"></div>
+
+    <!-- ======================================== -->
+    <!-- SCRIPTS -->
+    <!-- ======================================== -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js">
+    </script>
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js">
+    </script>
+
+    <script>
+        // ========================================
+        // INITIALIZE AOS
+        // ========================================
+        AOS.init({
+            duration: 800,
+            once: true
+        });
+
+        // ========================================
+        // GUEST DATA
+        // ========================================
+        let guests = [
+            { id: 1, name: 'Sarah M.', phone: '+27 72 345 6789', location: 'Belladonna', invitedBy: 'John D.', status: 'confirmed', type: 'member' },
+            { id: 2, name: 'Peter K.', phone: '+27 64 567 8901', location: 'HazyView', invitedBy: 'Mary S.', status: 'pending', type: 'member' },
+            { id: 3, name: 'Mary T.', phone: '+27 73 456 7890', location: 'Msholozi', invitedBy: 'John D.', status: 'declined', type: 'member' },
+            { id: 4, name: 'David L.', phone: '+27 82 987 6543', location: 'Stonehenge', invitedBy: 'Grace N.', status: 'pending', type: 'member' },
+            { id: 5, name: 'Grace N.', phone: '+27 71 234 5678', location: 'West Acres', invitedBy: 'Peter K.', status: 'confirmed', type: 'member' },
+            { id: 6, name: 'Samuel R.', phone: '+27 65 432 1098', location: 'Ngodini', invitedBy: 'Mary S.', status: 'pending', type: 'member' },
+            { id: 7, name: 'Joyce M.', phone: '+27 74 321 9876', location: 'Nelspruit Town CBD', invitedBy: 'David L.', status: 'contacted', type: 'member' },
+            { id: 8, name: 'Thomas W.', phone: '+27 63 789 0123', location: 'WhiteRiver', invitedBy: 'Grace N.', status: 'pending', type: 'member' },
+            { id: 9, name: 'Anna K.', phone: '+27 72 890 1234', location: 'Mataffin', invitedBy: 'John D.', status: 'confirmed', type: 'member' },
+            { id: 10, name: 'Paul M.', phone: '+27 61 456 7890', location: 'Sonheuwel', invitedBy: 'Mary S.', status: 'pending', type: 'member' }
+        ];
+
+        let nextId = guests.length + 1;
+
+        // ========================================
+        // MANUAL ADD GUEST
+        // ========================================
+        function addManualGuest() {
+            const name = document.getElementById('manualName').value.trim();
+            const phone = document.getElementById('manualPhone').value.trim();
+            const location = document.getElementById('manualLocation').value;
+
+            // Validate inputs
+            if (!name) {
+                showToast('Error', 'Please enter the guest\'s name.', 'danger');
+                document.getElementById('manualName').focus();
+                return;
+            }
+
+            if (!phone) {
+                showToast('Error', 'Please enter the guest\'s phone number.', 'danger');
+                document.getElementById('manualPhone').focus();
+                return;
+            }
+
+            // Validate phone number format
+            const phoneRegex = /^[\+\d\s\-\(\)]{7,20}$/;
+            if (!phoneRegex.test(phone)) {
+                showToast('Error', 'Please enter a valid phone number (e.g., +27 82 123 4567).', 'danger');
+                document.getElementById('manualPhone').focus();
+                return;
+            }
+
+            // Check if guest already exists
+            const exists = guests.some(g => g.phone === phone);
+            if (exists) {
+                showToast('Duplicate', 'This guest already exists in the system.', 'warning');
+                return;
+            }
+
+            // Disable button while adding
+            const addBtn = document.getElementById('addGuestBtn');
+            addBtn.disabled = true;
+            addBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Adding...';
+
+            // Create new guest
+            const newGuest = {
+                id: nextId++,
+                name: name,
+                phone: phone,
+                location: location,
+                invitedBy: 'Manual Add (First-Time Visitor)',
+                status: 'pending',
+                type: 'visitor'
+            };
+
+            // Add to guests array
+            guests.push(newGuest);
+
+            // Clear form fields
+            document.getElementById('manualName').value = '';
+            document.getElementById('manualPhone').value = '';
+
+            // Show success message
+            const successMsg = document.getElementById('addSuccessMessage');
+            document.getElementById('addedGuestName').textContent = `${name} has been added to the guest list!`;
+            successMsg.style.display = 'block';
+
+            // Auto-hide success message after 5 seconds
+            setTimeout(() => {
+                successMsg.style.display = 'none';
+            }, 5000);
+
+            // Auto-select the newly added guest
+            selectedGuests.clear();
+            selectedGuests.add(newGuest.id);
+
+            // Re-render everything
+            filteredGuests = [...guests];
+            renderTable();
+            updateStats();
+            updateSelectedCount();
+            updateBulkActions();
+
+            // Re-apply recipient filter if needed
+            if (recipientFilter !== 'all') {
+                const filtered = filteredGuests.filter(g => g.status === recipientFilter);
+                selectedGuests.clear();
+                filtered.forEach(g => selectedGuests.add(g.id));
+                renderTable();
+                updateSelectedCount();
+                updateBulkActions();
+            }
+
+            // Enable button
+            addBtn.disabled = false;
+            addBtn.innerHTML = '<i class="fas fa-plus"></i> Add & Invite';
+
+            // Show success toast with more details
+            showToast(
+                '✅ Guest Added Successfully!',
+                `${name} has been added to the guest list. They are now visible in the table below and selected for messaging.`,
+                'success'
+            );
+
+            // Scroll to the guest list to show the new entry
+            document.querySelector('.guest-list-card').scrollIntoView({ behavior: 'smooth', block: 'start' });
+
+            // Flash the new row (highlight it)
+            setTimeout(() => {
+                highlightNewGuest(newGuest.id);
+            }, 300);
+        }
+
+        // ========================================
+        // HIGHLIGHT NEW GUEST
+        // ========================================
+        function highlightNewGuest(guestId) {
+            const rows = document.querySelectorAll('#guestTableBody tr');
+            rows.forEach(row => {
+                const checkbox = row.querySelector('input[type="checkbox"]');
+                if (checkbox) {
+                    const onclickAttr = checkbox.getAttribute('onchange');
+                    if (onclickAttr && onclickAttr.includes(guestId)) {
+                        row.classList.add('highlight-new');
+                        setTimeout(() => {
+                            row.classList.remove('highlight-new');
+                        }, 3000);
+                    }
+                }
+            });
+        }
+
+        // ========================================
+        // STATE
+        // ========================================
+        let selectedGuests = new Set();
+        let currentPage = 1;
+        const itemsPerPage = 10;
+        let filteredGuests = [...guests];
+        let recipientFilter = 'all';
+
+        // ========================================
+        // RENDER GUEST TABLE
+        // ========================================
+        function renderTable() {
+            const tbody = document.getElementById('guestTableBody');
+            const start = (currentPage - 1) * itemsPerPage;
+            const end = start + itemsPerPage;
+            const pageItems = filteredGuests.slice(start, end);
+
+            // Update guest count
+            document.getElementById('guestCountDisplay').textContent = `(${filteredGuests.length} guests)`;
+
+            if (pageItems.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="8" style="text-align: center; padding: 40px; color: var(--cbwci-muted);">
+                            <i class="fas fa-users" style="font-size: 32px; display: block; margin-bottom: 10px; opacity: 0.3;"></i>
+                            No guests found matching your filters.
+                        </td>
+                    </tr>
+                `;
+                updatePaginationInfo();
+                return;
+            }
+
+            let html = '';
+            pageItems.forEach(guest => {
+                const isSelected = selectedGuests.has(guest.id);
+                const statusClass = getStatusClass(guest.status);
+                const statusIcon = getStatusIcon(guest.status);
+                const typeClass = guest.type === 'visitor' ? 'visitor' : '';
+                const typeLabel = guest.type === 'visitor' ? 'First-Time Visitor' : 'Member Invited';
+                
+                html += `
+                    <tr class="fade-in" data-guest-id="${guest.id}">
+                        <td class="checkbox-cell">
+                            <input type="checkbox" 
+                                   onchange="toggleGuest(${guest.id}, this)" 
+                                   ${isSelected ? 'checked' : ''}>
+                        </td>
+                        <td><strong>${guest.name}</strong></td>
+                        <td class="phone-number">${guest.phone}</td>
+                        <td>${guest.location}</td>
+                        <td><span class="guest-type ${typeClass}"><i class="fas ${guest.type === 'visitor' ? 'fa-user-plus' : 'fa-user-check'}"></i> ${typeLabel}</span></td>
+                        <td class="invited-by"><strong>${guest.invitedBy}</strong></td>
+                        <td>
+                            <span class="status-badge ${statusClass}">
+                                <i class="fas ${statusIcon}"></i> ${capitalize(guest.status)}
+                            </span>
+                        </td>
+                        <td>
+                            <button class="btn btn-success-custom btn-sm" onclick="sendIndividualMessage(${guest.id})" style="padding: 2px 10px; font-size: 11px;">
+                                <i class="fab fa-whatsapp"></i>
+                            </button>
+                            <button class="btn btn-outline-custom btn-sm" onclick="viewGuest(${guest.id})" style="padding: 2px 10px; font-size: 11px;">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                            ${guest.status === 'declined' ? `
+                                <button class="btn btn-gold-custom btn-sm" onclick="reinviteGuest(${guest.id})" style="padding: 2px 10px; font-size: 11px;">
+                                    <i class="fas fa-redo"></i> Re-invite
+                                </button>
+                            ` : ''}
+                            ${guest.status === 'confirmed' && guest.type === 'visitor' ? `
+                                <button class="btn btn-primary-custom btn-sm" onclick="promptRegistration(${guest.id})" style="padding: 2px 10px; font-size: 11px;">
+                                    <i class="fas fa-user-plus"></i> Register
+                                </button>
+                            ` : ''}
+                        </td>
+                    </tr>
+                `;
+            });
+
+            tbody.innerHTML = html;
+            updatePaginationInfo();
+            updateStats();
+            updateSelectedCount();
+            updateBulkActions();
+        }
+
+        // ========================================
+        // HELPER FUNCTIONS
+        // ========================================
+        function getStatusClass(status) {
+            const map = {
+                'confirmed': 'confirmed',
+                'pending': 'pending',
+                'declined': 'declined',
+                'contacted': 'contacted'
+            };
+            return map[status] || 'pending';
+        }
+
+        function getStatusIcon(status) {
+            const map = {
+                'confirmed': 'fa-check-circle',
+                'pending': 'fa-clock',
+                'declined': 'fa-times-circle',
+                'contacted': 'fa-phone'
+            };
+            return map[status] || 'fa-clock';
+        }
+
+        function capitalize(str) {
+            return str.charAt(0).toUpperCase() + str.slice(1);
+        }
+
+        // ========================================
+        // UPDATE STATS
+        // ========================================
+        function updateStats() {
+            const total = guests.length;
+            const pending = guests.filter(g => g.status === 'pending').length;
+            const confirmed = guests.filter(g => g.status === 'confirmed').length;
+            const declined = guests.filter(g => g.status === 'declined').length;
+            const contacted = guests.filter(g => g.status === 'contacted').length;
+
+            document.getElementById('totalGuests').textContent = total;
+            document.getElementById('pendingGuests').textContent = pending;
+            document.getElementById('confirmedGuests').textContent = confirmed;
+            document.getElementById('declinedGuests').textContent = declined;
+            document.getElementById('contactedGuests').textContent = contacted;
+
+            document.getElementById('countAll').textContent = total;
+            document.getElementById('countPending').textContent = pending;
+            document.getElementById('countConfirmed').textContent = confirmed;
+            document.getElementById('countDeclined').textContent = declined;
+            document.getElementById('countContacted').textContent = contacted;
+        }
+
+        // ========================================
+        // UPDATE PAGINATION
+        // ========================================
+        function updatePaginationInfo() {
+            const total = filteredGuests.length;
+            const start = (currentPage - 1) * itemsPerPage + 1;
+            const end = Math.min(currentPage * itemsPerPage, total);
+            
+            if (total === 0) {
+                document.getElementById('paginationInfo').textContent = 'No guests found';
+            } else {
+                document.getElementById('paginationInfo').textContent = `Showing ${start}-${end} of ${total} guests`;
+            }
+        }
+
+        // ========================================
+        // SELECT / DESELECT
+        // ========================================
+        function toggleGuest(id, checkbox) {
+            if (checkbox.checked) {
+                selectedGuests.add(id);
+            } else {
+                selectedGuests.delete(id);
+            }
+            updateSelectedCount();
+            updateBulkActions();
+            document.getElementById('selectAllCheckbox').checked = false;
+        }
+
+        function toggleSelectAll() {
+            const checked = document.getElementById('selectAllCheckbox').checked;
+            const start = (currentPage - 1) * itemsPerPage;
+            const end = start + itemsPerPage;
+            const pageItems = filteredGuests.slice(start, end);
+
+            pageItems.forEach(guest => {
+                if (checked) {
+                    selectedGuests.add(guest.id);
+                } else {
+                    selectedGuests.delete(guest.id);
+                }
+            });
+
+            renderTable();
+            updateSelectedCount();
+            updateBulkActions();
+        }
+
+        function selectAll() {
+            filteredGuests.forEach(guest => {
+                selectedGuests.add(guest.id);
+            });
+            renderTable();
+            updateSelectedCount();
+            updateBulkActions();
+            showToast('Selected All', `All ${filteredGuests.length} guests selected.`, 'info');
+        }
+
+        function deselectAll() {
+            selectedGuests.clear();
+            renderTable();
+            updateSelectedCount();
+            updateBulkActions();
+        }
+
+        function clearSelection() {
+            selectedGuests.clear();
+            renderTable();
+            updateSelectedCount();
+            updateBulkActions();
+            document.getElementById('selectAllCheckbox').checked = false;
+        }
+
+        function clearBulkSelection() {
+            clearSelection();
+        }
+
+        function updateSelectedCount() {
+            const count = selectedGuests.size;
+            document.getElementById('selectedCountDisplay').textContent = count;
+            document.getElementById('bulkSelectedCount').textContent = `${count} selected`;
+        }
+
+        function updateBulkActions() {
+            const container = document.getElementById('bulkActions');
+            if (selectedGuests.size > 0) {
+                container.classList.add('show');
+            } else {
+                container.classList.remove('show');
+            }
+        }
+
+        // ========================================
+        // RECIPIENT FILTERS
+        // ========================================
+        function selectRecipients(filter, btn) {
+            recipientFilter = filter;
+            
+            document.querySelectorAll('.btn-toggle').forEach(b => b.classList.remove('active'));
+            if (btn) btn.classList.add('active');
+            
+            let guestsToSelect = [];
+            if (filter === 'all') {
+                guestsToSelect = filteredGuests;
+            } else {
+                guestsToSelect = filteredGuests.filter(g => g.status === filter);
+            }
+            
+            selectedGuests.clear();
+            guestsToSelect.forEach(g => selectedGuests.add(g.id));
+            
+            renderTable();
+            updateSelectedCount();
+            updateBulkActions();
+            
+            showToast('Recipients Selected', `${selectedGuests.size} guests selected.`, 'success');
+        }
+
+        // ========================================
+        // FILTERS
+        // ========================================
+        function applyFilters() {
+            const status = document.getElementById('statusFilter').value;
+            const location = document.getElementById('locationFilter').value;
+            const type = document.getElementById('typeFilter').value;
+            const search = document.getElementById('searchInput').value.toLowerCase();
+
+            filteredGuests = guests.filter(guest => {
+                let match = true;
+                if (status !== 'all' && guest.status !== status) match = false;
+                if (location !== 'all' && guest.location !== location) match = false;
+                if (type !== 'all' && guest.type !== type) match = false;
+                if (search && !guest.name.toLowerCase().includes(search) && !guest.phone.includes(search)) match = false;
+                return match;
+            });
+
+            currentPage = 1;
+            renderTable();
+        }
+
+        function resetFilters() {
+            document.getElementById('statusFilter').value = 'all';
+            document.getElementById('locationFilter').value = 'all';
+            document.getElementById('typeFilter').value = 'all';
+            document.getElementById('searchInput').value = '';
+            filteredGuests = [...guests];
+            currentPage = 1;
+            renderTable();
+            showToast('Filters Reset', 'All filters have been cleared.', 'info');
+        }
+
+        // ========================================
+        // PAGINATION
+        // ========================================
+        function prevPage() {
+            if (currentPage > 1) {
+                currentPage--;
+                renderTable();
+            }
+        }
+
+        function nextPage() {
+            const totalPages = Math.ceil(filteredGuests.length / itemsPerPage);
+            if (currentPage < totalPages) {
+                currentPage++;
+                renderTable();
+            }
+        }
+
+        // ========================================
+        // MESSAGE TEMPLATES
+        // ========================================
+        function insertTemplate(type) {
+            const textarea = document.getElementById('messageInput');
+            const templates = {
+                'invite': `🙏 Hello {name}!\n\nWe invite you to join us this Sunday at CBWCI - Changed By The Word Church International.\n\n📍 Location: CBWCI Sanctuary\n⏰ Time: 9:00 AM & 11:00 AM\n\nPlease reply "YES" if you're coming or "NO" if you can't make it.\n\nWe can't wait to see you! 🎉\n\n"Change, Dominate and Walk in Glory" ✝️`,
+                
+                'reminder': `🔔 Reminder: {name}!\n\nThis is a gentle reminder about our Sunday Service at CBWCI.\n\n📅 This Sunday\n⏰ 9:00 AM & 11:00 AM\n📍 CBWCI Sanctuary\n\nPlease reply "YES" or "NO" to confirm your attendance.\n\n"Change, Dominate and Walk in Glory" ✝️`,
+                
+                'followup': `👋 Hi {name}!\n\nWe noticed you haven't confirmed your attendance for Sunday Service yet.\n\nWould you be able to join us this Sunday? We'd love to have you! 🙏\n\nPlease reply "YES" or "NO" so we can plan accordingly.\n\nGod bless you! ✝️`,
+                
+                'thanks': `❤️ Thank you {name}!\n\nThank you for confirming your attendance for Sunday Service. We're so excited to have you join us!\n\nYour taxi has been arranged. See you soon! 🎉\n\n"Change, Dominate and Walk in Glory" ✝️`,
+                
+                'visitor': `👋 Hello {name}!\n\nWe noticed you were invited to CBWCI - Changed By The Word Church International.\n\nWe'd love to have you join us this Sunday! 🙏\n\n📍 Location: CBWCI Sanctuary\n⏰ Time: 9:00 AM & 11:00 AM\n\nPlease reply "YES" if you're coming or "NO" if you can't make it.\n\nIf you're a first-time visitor, we'll help you get registered! 🎉\n\n"Change, Dominate and Walk in Glory" ✝️`
+            };
+
+            const template = templates[type] || templates.invite;
+            textarea.value = template;
+            updateCharCount();
+        }
+
+        // ========================================
+        // CHAR COUNT
+        // ========================================
+        document.getElementById('messageInput').addEventListener('input', updateCharCount);
+
+        function updateCharCount() {
+            const textarea = document.getElementById('messageInput');
+            const count = textarea.value.length;
+            const display = document.getElementById('charCount');
+            display.textContent = `${count} characters`;
+        }
+
+        // ========================================
+        // SEND WHATSAPP MESSAGES
+        // ========================================
+        function sendWhatsApp() {
+            const message = document.getElementById('messageInput').value.trim();
+            if (!message) {
+                showToast('Error', 'Please enter a message to send.', 'danger');
+                return;
+            }
+
+            const selected = guests.filter(g => selectedGuests.has(g.id));
+            if (selected.length === 0) {
+                showToast('Error', 'Please select at least one guest to message.', 'danger');
+                return;
+            }
+
+            let sent = 0;
+            selected.forEach(guest => {
+                const phone = guest.phone.replace(/[^0-9]/g, '');
+                const personalizedMessage = message.replace(/{name}/g, guest.name);
+                const waLink = `https://wa.me/${phone}?text=${encodeURIComponent(personalizedMessage)}`;
+                window.open(waLink, '_blank');
+                sent++;
+            });
+
+            selected.forEach(guest => {
+                const guestObj = guests.find(g => g.id === guest.id);
+                if (guestObj && guestObj.status === 'pending') {
+                    guestObj.status = 'contacted';
+                }
+            });
+
+            renderTable();
+            updateStats();
+            
+            showToast(
+                'Messages Sent via WhatsApp',
+                `${sent} WhatsApp message(s) opened. Please send each message manually.`,
+                'success'
+            );
+        }
+
+        // ========================================
+        // SEND SMS MESSAGES
+        // ========================================
+        function sendSMS() {
+            const message = document.getElementById('messageInput').value.trim();
+            if (!message) {
+                showToast('Error', 'Please enter a message to send.', 'danger');
+                return;
+            }
+
+            const selected = guests.filter(g => selectedGuests.has(g.id));
+            if (selected.length === 0) {
+                showToast('Error', 'Please select at least one guest to message.', 'danger');
+                return;
+            }
+
+            let sent = 0;
+            selected.forEach(guest => {
+                const phone = guest.phone.replace(/[^0-9]/g, '');
+                const personalizedMessage = message.replace(/{name}/g, guest.name);
+                const smsLink = `sms:${phone}?body=${encodeURIComponent(personalizedMessage)}`;
+                window.open(smsLink, '_blank');
+                sent++;
+            });
+
+            selected.forEach(guest => {
+                const guestObj = guests.find(g => g.id === guest.id);
+                if (guestObj && guestObj.status === 'pending') {
+                    guestObj.status = 'contacted';
+                }
+            });
+
+            renderTable();
+            updateStats();
+            
+            showToast(
+                'Messages Sent via SMS',
+                `${sent} SMS message(s) opened. Please send each message manually.`,
+                'success'
+            );
+        }
+
+        // ========================================
+        // SEND INDIVIDUAL MESSAGE
+        // ========================================
+        function sendIndividualMessage(id) {
+            const guest = guests.find(g => g.id === id);
+            if (!guest) return;
+            
+            const textarea = document.getElementById('messageInput');
+            const template = guest.type === 'visitor' 
+                ? `👋 Hello ${guest.name}!\n\nWe noticed you were invited to CBWCI. We'd love to have you join us this Sunday! 🙏\n\nPlease reply "YES" or "NO".\n\n"Change, Dominate and Walk in Glory" ✝️`
+                : `👋 Hi ${guest.name}!\n\nWe're looking forward to seeing you at CBWCI this Sunday! 🙏\n\nPlease reply "YES" or "NO" to confirm.\n\n"Change, Dominate and Walk in Glory" ✝️`;
+            textarea.value = template;
+            updateCharCount();
+            
+            selectedGuests.clear();
+            selectedGuests.add(id);
+            renderTable();
+            updateSelectedCount();
+            updateBulkActions();
+            
+            document.querySelector('.composer-card').scrollIntoView({ behavior: 'smooth', block: 'start' });
+            showToast('Guest Selected', `${guest.name} selected. Send your message below.`, 'info');
+        }
+
+        // ========================================
+        // VIEW GUEST
+        // ========================================
+        function viewGuest(id) {
+            const guest = guests.find(g => g.id === id);
+            if (!guest) return;
+            
+            showToast(
+                `👤 ${guest.name}`,
+                `Phone: ${guest.phone}\nLocation: ${guest.location}\nInvited By: ${guest.invitedBy}\nStatus: ${capitalize(guest.status)}\nType: ${guest.type === 'visitor' ? 'First-Time Visitor' : 'Member Invited'}`,
+                'info'
+            );
+        }
+
+        // ========================================
+        // RE-INVITE GUEST (for Declined guests)
+        // ========================================
+        function reinviteGuest(id) {
+            const guest = guests.find(g => g.id === id);
+            if (!guest) return;
+
+            if (confirm(`Do you want to re-invite ${guest.name}? This will change their status back to "Pending".`)) {
+                guest.status = 'pending';
+                renderTable();
+                updateStats();
+                showToast('Re-invited', `${guest.name} has been re-invited and is now "Pending".`, 'success');
+            }
+        }
+
+        // ========================================
+        // PROMPT REGISTRATION (for first-time visitors who confirmed)
+        // ========================================
+        function promptRegistration(id) {
+            const guest = guests.find(g => g.id === id);
+            if (!guest) return;
+
+            showToast(
+                '📝 Registration Required',
+                `${guest.name} needs to create an account. In production, this would open the registration form.`,
+                'info'
+            );
+        }
+
+        // ========================================
+        // BULK STATUS UPDATES
+        // ========================================
+        function markSelectedContacted() {
+            if (selectedGuests.size === 0) return;
+            
+            selectedGuests.forEach(id => {
+                const guest = guests.find(g => g.id === id);
+                if (guest && guest.status === 'pending') {
+                    guest.status = 'contacted';
+                }
+            });
+            
+            renderTable();
+            updateStats();
+            showToast('Status Updated', `${selectedGuests.size} guests marked as contacted.`, 'success');
+            clearSelection();
+        }
+
+        function markSelectedPending() {
+            if (selectedGuests.size === 0) return;
+            
+            selectedGuests.forEach(id => {
+                const guest = guests.find(g => g.id === id);
+                if (guest && guest.status === 'contacted') {
+                    guest.status = 'pending';
+                }
+            });
+            
+            renderTable();
+            updateStats();
+            showToast('Status Updated', `${selectedGuests.size} guests marked as pending.`, 'warning');
+            clearSelection();
+        }
+
+        // ========================================
+        // EXPORT SELECTED
+        // ========================================
+        function exportSelected() {
+            const selected = guests.filter(g => selectedGuests.has(g.id));
+            if (selected.length === 0) {
+                showToast('Error', 'No guests selected to export.', 'danger');
+                return;
+            }
+            
+            let csv = 'Name,Phone,Location,Invited By,Status,Type\n';
+            selected.forEach(g => {
+                csv += `${g.name},${g.phone},${g.location},${g.invitedBy},${g.status},${g.type}\n`;
+            });
+            
+            const blob = new Blob([csv], { type: 'text/csv' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `followup-guests-${new Date().toISOString().split('T')[0]}.csv`;
+            a.click();
+            window.URL.revokeObjectURL(url);
+            
+            showToast('Exported', `${selected.length} guests exported successfully.`, 'success');
+        }
+
+        // ========================================
+        // LOGOUT
+        // ========================================
+        function logoutUser(event) {
+            event.preventDefault();
+            if (confirm('Are you sure you want to logout?')) {
+                sessionStorage.clear();
+                showToast('Logged Out', 'You have been successfully logged out.', 'info');
+                setTimeout(() => {
+                    window.location.href = 'login.html';
+                }, 1500);
+            }
+        }
+
+        // ========================================
+        // TOAST NOTIFICATIONS
+        // ========================================
+        function showToast(title, message, type = 'success') {
+            const container = document.getElementById('toastContainer');
+            const iconMap = {
+                'success': 'fa-check-circle',
+                'danger': 'fa-exclamation-circle',
+                'warning': 'fa-exclamation-triangle',
+                'info': 'fa-info-circle'
+            };
+            const colorMap = {
+                'success': 'var(--success)',
+                'danger': 'var(--danger)',
+                'warning': 'var(--warning)',
+                'info': 'var(--info)'
+            };
+
+            const toast = document.createElement('div');
+            toast.className = `toast-custom ${type === 'danger' ? 'toast-danger' : ''} ${type === 'warning' ? 'toast-warning' : ''}`;
+            toast.innerHTML = `
+                <i class="fas ${iconMap[type] || 'fa-check-circle'}" style="color: ${colorMap[type] || 'var(--success)'};"></i>
+                <div class="msg">
+                    <h6>${title}</h6>
+                    <small>${message}</small>
+                </div>
+            `;
+            
+            container.appendChild(toast);
+            
+            setTimeout(() => {
+                toast.style.opacity = '0';
+                toast.style.transform = 'translateX(50px)';
+                setTimeout(() => toast.remove(), 400);
+            }, 4000);
+        }
+
+        // ========================================
+        // KEYBOARD SHORTCUTS
+        // ========================================
+        document.addEventListener('keydown', function(e) {
+            if (e.ctrlKey && e.key === 'Enter') {
+                e.preventDefault();
+                sendWhatsApp();
+            }
+            if (e.key === 'Escape') {
+                clearSelection();
+            }
+        });
+
+        // ========================================
+        // CONSOLE BRANDING
+        // ========================================
+        console.log('%c✝ CBWCI - Follow-Up Management ✝', 'font-size: 18px; color: #C9A84C; font-weight: bold;');
+        console.log('%c"Change, Dominate and Walk in Glory"', 'font-size: 14px; color: #4A1942; font-style: italic;');
+        console.log(`📱 ${guests.filter(g => g.status === 'pending').length} guests need follow-up`);
+        console.log(`❌ ${guests.filter(g => g.status === 'declined').length} guests declined`);
+
+        // ========================================
+        // INITIAL RENDER
+        // ========================================
+        filteredGuests = [...guests];
+        renderTable();
+        updateStats();
+        insertTemplate('invite');
+    </script>
+
+</body>
+</html>

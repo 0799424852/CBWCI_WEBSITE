@@ -1,0 +1,966 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Follow-Up Management · CBWCI Admin</title>
+    <!-- Bootstrap 5 -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome 6 -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- AOS -->
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+    <!-- Firebase -->
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+
+    <style>
+        :root {
+            --cbwci-purple: #4A1942;
+            --cbwci-purple-light: #6B2D5F;
+            --cbwci-purple-dark: #2E0F28;
+            --cbwci-gold: #C9A84C;
+            --cbwci-gold-light: #E8CD7A;
+            --cbwci-gold-dark: #A8893A;
+            --cbwci-cream: #FDF8F0;
+            --cbwci-dark: #1A0F16;
+            --cbwci-text: #2C1A24;
+            --cbwci-muted: #7A6A72;
+            --shadow: 0 10px 40px rgba(74, 25, 66, 0.12);
+            --shadow-hover: 0 15px 50px rgba(74, 25, 66, 0.2);
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            --success: #2D8F5C;
+            --danger: #C0392B;
+            --warning: #E67E22;
+            --info: #2980B9;
+        }
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body { font-family:'Inter',sans-serif; background:#f5f0eb; color:var(--cbwci-text); padding-top:76px; min-height:100vh; }
+
+        .navbar { background: linear-gradient(135deg, var(--cbwci-purple), var(--cbwci-purple-dark)); padding:10px 0; box-shadow:0 4px 30px rgba(0,0,0,0.3); border-bottom:3px solid var(--cbwci-gold); }
+        .navbar-brand { font-family:'Playfair Display',serif; font-weight:900; font-size:20px; color:#fff!important; letter-spacing:2px; }
+        .navbar-brand .gold { color:var(--cbwci-gold); display:block; font-size:12px; letter-spacing:4px; }
+        .navbar-brand i { color:var(--cbwci-gold); margin-right:10px; }
+        .nav-link { color:rgba(255,255,255,0.8)!important; font-weight:500; font-size:13px; letter-spacing:1px; transition:var(--transition); padding:6px 16px!important; border-radius:8px; }
+        .nav-link:hover { color:var(--cbwci-gold)!important; background:rgba(201,168,76,0.1); }
+        .nav-link.active { color:var(--cbwci-gold)!important; }
+        .navbar .btn-back { background:transparent; border:2px solid rgba(255,255,255,0.2); color:#fff; padding:4px 16px; border-radius:8px; font-weight:600; font-size:12px; transition:var(--transition); text-decoration:none; }
+        .navbar .btn-back:hover { background:rgba(255,255,255,0.1); border-color:#fff; transform:translateY(-2px); color:#fff; }
+        .navbar .btn-logout { background:transparent; border:2px solid rgba(255,255,255,0.2); color:#fff; padding:4px 16px; border-radius:8px; font-weight:600; font-size:12px; transition:var(--transition); text-decoration:none; cursor:pointer; }
+        .navbar .btn-logout:hover { background:var(--danger); border-color:var(--danger); transform:translateY(-2px); color:#fff; }
+        .navbar .admin-badge { background:var(--cbwci-gold); color:var(--cbwci-purple-dark); font-size:10px; font-weight:700; padding:2px 12px; border-radius:50px; margin-left:8px; letter-spacing:1px; }
+
+        .admin-wrapper { padding:10px 0 40px; }
+        .breadcrumb-custom { color:var(--cbwci-muted); font-size:12px; margin-bottom:2px; }
+        .breadcrumb-custom a { color:var(--cbwci-purple); text-decoration:none; transition:var(--transition); }
+        .breadcrumb-custom a:hover { color:var(--cbwci-gold); }
+        .breadcrumb-custom .separator { margin:0 6px; color:var(--cbwci-gold); }
+        .page-title { font-family:'Playfair Display',serif; font-weight:700; color:var(--cbwci-purple); font-size:24px; margin:0; }
+        .page-title i { color:var(--cbwci-gold); }
+        .page-subtitle { color:var(--cbwci-muted); font-size:13px; margin:0; }
+        .welcome-text { color:var(--cbwci-muted); font-size:13px; font-weight:400; }
+        .welcome-text strong { color:var(--cbwci-purple); }
+
+        .admin-sidebar { background:#fff; border-radius:12px; padding:16px 14px; box-shadow:0 2px 12px rgba(0,0,0,0.06); border:1px solid rgba(201,168,76,0.06); position:sticky; top:96px; }
+        .admin-sidebar .sidebar-brand { text-align:center; padding-bottom:12px; border-bottom:2px solid #f5f0eb; margin-bottom:12px; }
+        .admin-sidebar .sidebar-brand .brand-icon { font-size:28px; color:var(--cbwci-gold); }
+        .admin-sidebar .sidebar-brand h6 { font-family:'Playfair Display',serif; font-weight:700; color:var(--cbwci-purple); margin-top:2px; font-size:14px; }
+        .admin-sidebar .sidebar-brand small { color:var(--cbwci-muted); font-size:10px; }
+        .admin-sidebar .sidebar-nav { list-style:none; padding:0; margin:0; }
+        .admin-sidebar .sidebar-nav li { margin-bottom:2px; }
+        .admin-sidebar .sidebar-nav li a { display:flex; align-items:center; gap:8px; padding:8px 12px; border-radius:8px; color:var(--cbwci-text); text-decoration:none; transition:var(--transition); font-weight:500; font-size:12px; }
+        .admin-sidebar .sidebar-nav li a i { width:16px; color:var(--cbwci-muted); transition:var(--transition); font-size:13px; }
+        .admin-sidebar .sidebar-nav li a:hover { background:rgba(74,25,66,0.05); color:var(--cbwci-purple); }
+        .admin-sidebar .sidebar-nav li a.active { background:linear-gradient(135deg,var(--cbwci-purple),var(--cbwci-purple-dark)); color:#fff; box-shadow:0 4px 15px rgba(74,25,66,0.25); }
+        .admin-sidebar .sidebar-nav li a.active i { color:#fff; }
+        .admin-sidebar .sidebar-nav li a .badge-nav { margin-left:auto; background:var(--cbwci-gold); color:var(--cbwci-purple-dark); font-size:9px; padding:1px 8px; border-radius:50px; }
+        .admin-sidebar .sidebar-nav li a .badge-nav-danger { margin-left:auto; background:var(--danger); color:#fff; font-size:9px; padding:1px 8px; border-radius:50px; }
+        .admin-sidebar .sidebar-footer { margin-top:12px; padding-top:12px; border-top:2px solid #f5f0eb; text-align:center; }
+        .admin-sidebar .sidebar-footer small { color:var(--cbwci-muted); font-size:10px; }
+        .admin-sidebar .sidebar-footer i { color:var(--cbwci-gold); }
+
+        .followup-content { background:#fff; border-radius:12px; padding:18px 20px; box-shadow:0 2px 12px rgba(0,0,0,0.06); border:1px solid rgba(201,168,76,0.06); }
+        .followup-content .content-header { display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; margin-bottom:16px; padding-bottom:12px; border-bottom:2px solid #f5f0eb; }
+        .followup-content .content-header h6 { font-weight:700; color:var(--cbwci-purple); margin:0; font-size:15px; }
+        .followup-content .content-header h6 i { color:var(--cbwci-gold); margin-right:8px; }
+
+        .followup-stats { display:grid; grid-template-columns:repeat(auto-fit, minmax(120px, 1fr)); gap:10px; margin-bottom:16px; }
+        .followup-stats .stat-mini { background:#f8f4f0; border-radius:8px; padding:10px 14px; text-align:center; }
+        .followup-stats .stat-mini .number { font-family:'Playfair Display',serif; font-weight:900; font-size:22px; color:var(--cbwci-purple); }
+        .followup-stats .stat-mini .label { font-size:11px; color:var(--cbwci-muted); }
+        .followup-stats .stat-mini .label i { margin-right:4px; }
+        .followup-stats .stat-mini.pending .number { color:var(--warning); }
+        .followup-stats .stat-mini.confirmed .number { color:var(--success); }
+        .followup-stats .stat-mini.not-coming .number { color:var(--danger); }
+        .followup-stats .stat-mini.total .number { color:var(--cbwci-purple); }
+
+        .bulk-message-section { background:linear-gradient(135deg,rgba(74,25,66,0.03),rgba(201,168,76,0.05)); border-radius:10px; padding:16px 18px; border:2px dashed rgba(201,168,76,0.2); margin-bottom:16px; }
+        .bulk-message-section .bulk-header { display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; margin-bottom:12px; }
+        .bulk-message-section .bulk-header h6 { font-weight:700; color:var(--cbwci-purple); margin:0; font-size:14px; }
+        .bulk-message-section .bulk-header h6 i { color:var(--cbwci-gold); margin-right:8px; }
+        .bulk-message-section .bulk-controls { display:flex; gap:10px; flex-wrap:wrap; align-items:center; }
+        .bulk-message-section .bulk-controls .select-all { display:flex; align-items:center; gap:6px; font-size:12px; color:var(--cbwci-muted); }
+        .bulk-message-section .bulk-controls .select-all input[type="checkbox"] { width:16px; height:16px; accent-color:var(--cbwci-purple); }
+        .bulk-message-section .bulk-controls .message-template { flex:1; min-width:200px; }
+        .bulk-message-section .bulk-controls .message-template textarea { width:100%; padding:8px 12px; border-radius:8px; border:2px solid #E8DCC8; background:#FDFAF5; font-size:13px; resize:vertical; min-height:60px; transition:var(--transition); }
+        .bulk-message-section .bulk-controls .message-template textarea:focus { border-color:var(--cbwci-gold); outline:none; box-shadow:0 0 0 3px rgba(201,168,76,0.1); }
+        .bulk-message-section .bulk-controls .send-btns { display:flex; gap:8px; flex-wrap:wrap; }
+        .bulk-message-section .bulk-controls .send-btns .btn-send { padding:8px 20px; border-radius:8px; border:none; font-weight:600; font-size:13px; transition:var(--transition); white-space:nowrap; }
+        .bulk-message-section .bulk-controls .send-btns .btn-send.whatsapp { background:#25D366; color:#fff; }
+        .bulk-message-section .bulk-controls .send-btns .btn-send.whatsapp:hover { transform:translateY(-2px); box-shadow:0 4px 15px rgba(37,211,102,0.3); }
+        .bulk-message-section .bulk-controls .send-btns .btn-send.sms { background:var(--info); color:#fff; }
+        .bulk-message-section .bulk-controls .send-btns .btn-send.sms:hover { transform:translateY(-2px); box-shadow:0 4px 15px rgba(41,128,185,0.3); }
+        .bulk-message-section .bulk-controls .send-btns .btn-send:disabled { opacity:0.5; cursor:not-allowed; transform:none!important; }
+        .bulk-message-section .selected-count-badge { font-size:12px; color:var(--cbwci-muted); font-weight:500; }
+        .bulk-message-section .selected-count-badge strong { color:var(--cbwci-purple); }
+
+        .send-progress { display:none; margin-top:8px; padding:10px 14px; background:rgba(74,25,66,0.05); border-radius:8px; }
+        .send-progress.show { display:block; }
+        .send-progress .progress-bar { height:6px; background:#E8DCC8; border-radius:10px; overflow:hidden; margin-top:6px; }
+        .send-progress .progress-bar .fill { height:100%; background:linear-gradient(90deg,var(--cbwci-gold),var(--cbwci-gold-dark)); border-radius:10px; transition:width 0.5s ease; width:0%; }
+        .send-progress .progress-text { font-size:12px; color:var(--cbwci-muted); }
+
+        .search-filter-bar { display:flex; gap:10px; flex-wrap:wrap; margin-bottom:16px; }
+        .search-filter-bar .search-box { flex:1; min-width:200px; position:relative; }
+        .search-filter-bar .search-box input { width:100%; padding:8px 14px 8px 36px; border-radius:8px; border:2px solid #E8DCC8; background:#FDFAF5; font-size:13px; transition:var(--transition); }
+        .search-filter-bar .search-box input:focus { border-color:var(--cbwci-gold); outline:none; box-shadow:0 0 0 3px rgba(201,168,76,0.1); }
+        .search-filter-bar .search-box i { position:absolute; left:12px; top:50%; transform:translateY(-50%); color:var(--cbwci-muted); font-size:14px; }
+        .search-filter-bar .filter-group { display:flex; gap:6px; flex-wrap:wrap; }
+        .search-filter-bar .filter-group .filter-btn { padding:6px 14px; border-radius:50px; border:2px solid #E8DCC8; background:transparent; font-size:12px; font-weight:600; color:var(--cbwci-muted); transition:var(--transition); cursor:pointer; }
+        .search-filter-bar .filter-group .filter-btn:hover { border-color:var(--cbwci-purple); color:var(--cbwci-purple); }
+        .search-filter-bar .filter-group .filter-btn.active { background:var(--cbwci-purple); border-color:var(--cbwci-purple); color:#fff; }
+        .search-filter-bar .add-btn { padding:8px 20px; border-radius:8px; background:linear-gradient(135deg,var(--cbwci-gold),var(--cbwci-gold-dark)); border:none; font-weight:600; font-size:13px; color:var(--cbwci-purple-dark); transition:var(--transition); white-space:nowrap; }
+        .search-filter-bar .add-btn:hover { transform:translateY(-2px); box-shadow:0 4px 15px rgba(201,168,76,0.3); }
+
+        .table-container { overflow-x:auto; }
+        .table-container table { width:100%; border-collapse:collapse; font-size:13px; }
+        .table-container table thead th { background:#f8f4f0; padding:10px 12px; text-align:left; font-weight:600; color:var(--cbwci-purple); border-bottom:2px solid #f0ebe4; font-size:12px; text-transform:uppercase; letter-spacing:0.5px; white-space:nowrap; }
+        .table-container table thead th:first-child { width:40px; text-align:center; }
+        .table-container table thead th:first-child input[type="checkbox"] { width:16px; height:16px; accent-color:var(--cbwci-purple); }
+        .table-container table tbody td { padding:10px 12px; border-bottom:1px solid #f5f0eb; vertical-align:middle; }
+        .table-container table tbody td:first-child { text-align:center; }
+        .table-container table tbody td:first-child input[type="checkbox"] { width:16px; height:16px; accent-color:var(--cbwci-purple); }
+        .table-container table tbody tr:hover { background:rgba(74,25,66,0.02); }
+        .status-badge { padding:3px 12px; border-radius:50px; font-size:11px; font-weight:600; }
+        .status-badge.pending { background:rgba(230,126,34,0.12); color:var(--warning); }
+        .status-badge.confirmed { background:rgba(45,143,92,0.12); color:var(--success); }
+        .status-badge.not-coming { background:rgba(192,57,43,0.12); color:var(--danger); }
+        .status-badge.followed-up { background:rgba(41,128,185,0.12); color:var(--info); }
+        .action-btns { display:flex; gap:4px; flex-wrap:wrap; justify-content:center; }
+        .action-btns .btn-action { width:28px; height:28px; border-radius:6px; border:none; display:flex; align-items:center; justify-content:center; font-size:12px; transition:var(--transition); cursor:pointer; }
+        .action-btns .btn-action:hover { transform:scale(1.1); }
+        .action-btns .btn-action.whatsapp { background:rgba(37,211,102,0.12); color:#25D366; }
+        .action-btns .btn-action.whatsapp:hover { background:#25D366; color:#fff; }
+        .action-btns .btn-action.view { background:rgba(41,128,185,0.1); color:var(--info); }
+        .action-btns .btn-action.view:hover { background:var(--info); color:#fff; }
+        .action-btns .btn-action.edit { background:rgba(201,168,76,0.12); color:var(--cbwci-gold-dark); }
+        .action-btns .btn-action.edit:hover { background:var(--cbwci-gold); color:var(--cbwci-purple-dark); }
+        .action-btns .btn-action.delete { background:rgba(192,57,43,0.1); color:var(--danger); }
+        .action-btns .btn-action.delete:hover { background:var(--danger); color:#fff; }
+        .action-btns .btn-action.confirm { background:rgba(45,143,92,0.1); color:var(--success); }
+        .action-btns .btn-action.confirm:hover { background:var(--success); color:#fff; }
+        .action-btns .btn-action.cancel { background:rgba(192,57,43,0.1); color:var(--danger); }
+        .action-btns .btn-action.cancel:hover { background:var(--danger); color:#fff; }
+
+        .pagination-container { display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; margin-top:16px; padding-top:12px; border-top:2px solid #f5f0eb; }
+        .pagination-container .info { font-size:12px; color:var(--cbwci-muted); }
+        .pagination-container .pagination { display:flex; gap:4px; list-style:none; padding:0; margin:0; }
+        .pagination-container .pagination li a { display:flex; align-items:center; justify-content:center; width:30px; height:30px; border-radius:6px; border:2px solid #E8DCC8; color:var(--cbwci-muted); text-decoration:none; font-size:12px; font-weight:600; transition:var(--transition); }
+        .pagination-container .pagination li a:hover { border-color:var(--cbwci-purple); color:var(--cbwci-purple); }
+        .pagination-container .pagination li.active a { background:var(--cbwci-purple); border-color:var(--cbwci-purple); color:#fff; }
+        .pagination-container .pagination li.disabled a { opacity:0.4; cursor:not-allowed; }
+
+        .empty-state { text-align:center; padding:40px 20px; color:var(--cbwci-muted); }
+        .empty-state i { font-size:48px; color:var(--cbwci-gold-light); margin-bottom:12px; display:block; }
+        .empty-state h6 { font-size:16px; color:var(--cbwci-text); margin-bottom:4px; }
+        .empty-state p { font-size:13px; margin:0; }
+
+        .toast-container { position:fixed; bottom:20px; right:20px; z-index:9999; }
+        .toast-custom { background:#fff; border-radius:12px; padding:14px 20px; box-shadow:0 10px 40px rgba(0,0,0,0.15); border-left:4px solid var(--success); display:flex; align-items:center; gap:12px; animation:slideUp 0.4s ease; margin-top:10px; min-width:280px; max-width:420px; }
+        .toast-custom i { font-size:20px; color:var(--success); }
+        .toast-custom .msg h6 { margin:0; font-weight:600; font-size:14px; }
+        .toast-custom .msg small { color:var(--cbwci-muted); font-size:12px; }
+        .toast-custom.toast-danger { border-left-color:var(--danger); }
+        .toast-custom.toast-danger i { color:var(--danger); }
+        .toast-custom.toast-warning { border-left-color:var(--warning); }
+        .toast-custom.toast-warning i { color:var(--warning); }
+        @keyframes slideUp { from { opacity:0; transform:translateY(30px); } to { opacity:1; transform:translateY(0); } }
+
+        .modal-content { border-radius:12px; border:2px solid rgba(201,168,76,0.1); }
+        .modal-header { background:linear-gradient(135deg,var(--cbwci-purple),var(--cbwci-purple-dark)); color:#fff; border-radius:12px 12px 0 0; border-bottom:3px solid var(--cbwci-gold); }
+        .modal-header .btn-close { filter:invert(1); }
+        .modal-body .form-label { font-weight:600; font-size:13px; color:var(--cbwci-text); }
+        .modal-body .form-control, .modal-body .form-select { border:2px solid #E8DCC8; border-radius:8px; padding:8px 14px; font-size:13px; background:#FDFAF5; transition:var(--transition); }
+        .modal-body .form-control:focus, .modal-body .form-select:focus { border-color:var(--cbwci-gold); box-shadow:0 0 0 3px rgba(201,168,76,0.1); }
+        .modal-footer .btn-primary { background:linear-gradient(135deg,var(--cbwci-purple),var(--cbwci-purple-dark)); border:none; padding:8px 24px; font-weight:600; }
+        .modal-footer .btn-primary:hover { transform:translateY(-2px); box-shadow:0 4px 15px rgba(74,25,66,0.3); }
+        .modal-footer .btn-secondary { background:transparent; border:2px solid #E8DCC8; color:var(--cbwci-muted); padding:8px 24px; font-weight:600; }
+        .modal-footer .btn-secondary:hover { border-color:var(--cbwci-purple); color:var(--cbwci-purple); }
+        .modal-footer .btn-success { background:var(--success); border:none; padding:8px 24px; font-weight:600; color:#fff; }
+        .modal-footer .btn-success:hover { transform:translateY(-2px); box-shadow:0 4px 15px rgba(45,143,92,0.3); }
+
+        .badge-count { background:rgba(74,25,66,0.08); padding:4px 14px; border-radius:50px; font-size:12px; color:var(--cbwci-purple); }
+        .loading-spinner { display:flex; align-items:center; justify-content:center; padding:30px 0; flex-direction:column; gap:10px; }
+        .loading-spinner .spinner { width:30px; height:30px; border:3px solid #f0ebe4; border-top-color:var(--cbwci-gold); border-radius:50%; animation:spin 1s linear infinite; }
+        @keyframes spin { 0% { transform:rotate(0deg); } 100% { transform:rotate(360deg); } }
+
+        @media (max-width:992px) { .admin-sidebar { position:relative; top:0; margin-bottom:16px; } .search-filter-bar { flex-direction:column; } .search-filter-bar .search-box { min-width:100%; } .followup-stats { grid-template-columns:repeat(2,1fr); } .bulk-message-section .bulk-controls { flex-direction:column; align-items:stretch; } }
+        @media (max-width:768px) { body { padding-top:68px; } .page-title { font-size:20px; } .followup-content { padding:14px; } .table-container table { font-size:12px; } .search-filter-bar .filter-group .filter-btn { flex:1; text-align:center; font-size:11px; padding:4px 10px; } .bulk-message-section .bulk-controls .send-btns { width:100%; } .bulk-message-section .bulk-controls .send-btns .btn-send { flex:1; text-align:center; } }
+        @media (max-width:576px) { .page-title { font-size:18px; } .followup-content { padding:12px 10px; } .followup-stats { grid-template-columns:1fr 1fr; } .followup-stats .stat-mini .number { font-size:18px; } .status-badge { font-size:10px; padding:2px 8px; } .bulk-message-section { padding:12px 14px; } .bulk-message-section .bulk-header h6 { font-size:13px; } }
+        ::-webkit-scrollbar { width:6px; } ::-webkit-scrollbar-track { background:#f5f0eb; } ::-webkit-scrollbar-thumb { background:var(--cbwci-purple); border-radius:10px; } ::-webkit-scrollbar-thumb:hover { background:var(--cbwci-gold); }
+    </style>
+</head>
+<body>
+
+<!-- ===== NAVBAR ===== -->
+<nav class="navbar navbar-expand-lg fixed-top">
+    <div class="container">
+        <a class="navbar-brand" href="#">
+            <i class="fas fa-church"></i> CBWCI
+            <span class="gold">Changed By The Word</span>
+            <span class="admin-badge"><i class="fas fa-crown"></i> ADMIN</span>
+        </a>
+        <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+            <span class="navbar-toggler-icon" style="filter:invert(1);"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav ms-auto align-items-lg-center">
+                <li class="nav-item"><a class="nav-link" href="#">Home</a></li>
+                <li class="nav-item"><a class="nav-link active" href="#">Admin</a></li>
+                <li class="nav-item"><a class="nav-link" href="/admin/meetings"><i class="fas fa-video"></i> CBWCI Virtual Meeting</a></li>
+                <li class="nav-item"><a class="nav-link" href="#">Profile</a></li>
+                <li class="nav-item ms-lg-2"><a href="#" class="btn btn-back me-2"><i class="fas fa-arrow-left"></i> Back</a></li>
+                <li class="nav-item"><a href="#" class="btn btn-logout" onclick="logoutUser(event)"><i class="fas fa-sign-out-alt"></i> Logout</a></li>
+            </ul>
+        </div>
+    </div>
+</nav>
+
+<!-- ===== ADMIN CONTENT ===== -->
+<section class="admin-wrapper">
+    <div class="container">
+        <div class="row g-3">
+
+            <!-- SIDEBAR -->
+            <div class="col-lg-3" data-aos="fade-right" data-aos-duration="600">
+                <div class="admin-sidebar">
+                    <div class="sidebar-brand">
+                        <div class="brand-icon"><i class="fas fa-crown"></i></div>
+                        <h6>Admin Panel</h6>
+                        <small>CBWCI Church Management</small>
+                    </div>
+                    <ul class="sidebar-nav">
+                        <li><a href="Dashboard.html"><i class="fas fa-chart-pie"></i> Dashboard</a></li>
+                        <li><a href="Members.html"><i class="fas fa-users"></i> Members <span class="badge-nav" id="memberBadge">0</span></a></li>
+                        <li><a href="FollowUp.html" class="active"><i class="fas fa-user-plus"></i> Follow-Up <span class="badge-nav-danger" id="followupBadge">0</span></a></li>
+                        <li><a href="Drivers.html"><i class="fas fa-taxi"></i> Drivers <span class="badge-nav" id="driverBadge">0</span></a></li>
+                        <li><a href="transport.html"><i class="fas fa-route"></i> Transport</a></li>
+                        <li><a href="announcement.html"><i class="fas fa-bullhorn"></i> Announcements</a></li>
+                        <li><a href="/admin/meetings"><i class="fas fa-video"></i> CBWCI Virtual Meeting</a></li>
+                        <li><a href="reports.html"><i class="fas fa-file-alt"></i> Reports</a></li>
+                        <li style="margin-top:8px;border-top:1px solid #f5f0eb;padding-top:8px;">
+                            <a href="#" style="color:var(--danger);" onclick="logoutUser(event)"><i class="fas fa-sign-out-alt" style="color:var(--danger);"></i> Logout</a>
+                        </li>
+                    </ul>
+                    <div class="sidebar-footer">
+                        <small><i class="fas fa-shield-alt"></i><br>Logged in as <strong id="adminName">Admin</strong></small>
+                    </div>
+                </div>
+            </div>
+
+            <!-- MAIN -->
+            <div class="col-lg-9">
+
+                <!-- header -->
+                <div data-aos="fade-up" data-aos-duration="600">
+                    <div class="breadcrumb-custom">
+                        <a href="#"><i class="fas fa-home"></i> Home</a>
+                        <span class="separator">/</span>
+                        <a href="#">Admin</a>
+                        <span class="separator">/</span>
+                        <span style="color:var(--cbwci-gold-dark);font-weight:500;">Follow-Up</span>
+                    </div>
+                    <div class="d-flex flex-wrap justify-content-between align-items-center">
+                        <div>
+                            <h1 class="page-title"><i class="fas fa-user-plus"></i> Follow-Up Management</h1>
+                            <p class="page-subtitle">Track visitors and send bulk messages via WhatsApp or SMS</p>
+                        </div>
+                        <div class="welcome-text mt-1 mt-md-0">
+                            <span class="badge-count"><i class="fas fa-users"></i> <span id="totalFollowupsBadge">0</span> Follow-Ups</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- FOLLOW-UP CONTENT -->
+                <div class="followup-content mt-2" data-aos="fade-up" data-aos-delay="100">
+                    <div class="content-header">
+                        <h6><i class="fas fa-list"></i> All Follow-Ups</h6>
+                        <span style="font-size:12px;color:var(--cbwci-muted);">
+                            <i class="fas fa-sync-alt"></i> Last updated: <span id="lastUpdated">Just now</span>
+                        </span>
+                    </div>
+
+                    <!-- stats -->
+                    <div class="followup-stats">
+                        <div class="stat-mini total"><div class="number" id="totalCount">0</div><div class="label"><i class="fas fa-users"></i> Total</div></div>
+                        <div class="stat-mini pending"><div class="number" id="pendingCount">0</div><div class="label"><i class="fas fa-clock"></i> Pending</div></div>
+                        <div class="stat-mini confirmed"><div class="number" id="confirmedCount">0</div><div class="label"><i class="fas fa-check-circle"></i> Confirmed</div></div>
+                        <div class="stat-mini not-coming"><div class="number" id="notComingCount">0</div><div class="label"><i class="fas fa-times-circle"></i> Not Coming</div></div>
+                    </div>
+
+                    <!-- bulk message -->
+                    <div class="bulk-message-section" id="bulkMessageSection">
+                        <div class="bulk-header">
+                            <h6><i class="fas fa-bullhorn"></i> Bulk Messaging</h6>
+                            <span class="selected-count-badge">Selected: <strong id="selectedCount">0</strong> contacts</span>
+                        </div>
+                        <div class="bulk-controls">
+                            <div class="select-all">
+                                <input type="checkbox" id="selectAll" onchange="toggleSelectAll()">
+                                <label for="selectAll">Select All</label>
+                            </div>
+                            <div class="message-template">
+                                <textarea id="bulkMessage" placeholder="Type your message here...">🙏 CBWCI Church Invitation
+
+Hello! This is a friendly reminder from Changed By The Word Church International.
+
+We would love to have you join us for our upcoming service.
+
+📅 This Sunday
+🕙 10:00 AM
+📍 CBWCI Headquarters
+
+Come as you are and experience the presence of God!
+
+Please reply with:
+✅ Yes, I'll be there
+❌ No, I can't make it
+
+God bless you! 🙏</textarea>
+                            </div>
+                            <div class="send-btns">
+                                <button class="btn-send whatsapp" id="sendWhatsAppBtn" onclick="sendBulkWhatsApp()"><i class="fab fa-whatsapp"></i> WhatsApp</button>
+                                <button class="btn-send sms" id="sendSmsBtn" onclick="sendBulkSMS()"><i class="fas fa-sms"></i> SMS</button>
+                            </div>
+                        </div>
+                        <div class="send-progress" id="sendProgress">
+                            <div class="progress-text" id="progressText">Sending messages...</div>
+                            <div class="progress-bar"><div class="fill" id="progressFill"></div></div>
+                        </div>
+                    </div>
+
+                    <!-- search & filter -->
+                    <div class="search-filter-bar">
+                        <div class="search-box">
+                            <i class="fas fa-search"></i>
+                            <input type="text" placeholder="Search by name, phone, or invited by..." id="searchInput" oninput="filterFollowups()">
+                        </div>
+                        <div class="filter-group">
+                            <button class="filter-btn active" onclick="filterFollowups('all', this)">All</button>
+                            <button class="filter-btn" onclick="filterFollowups('pending', this)">Pending</button>
+                            <button class="filter-btn" onclick="filterFollowups('confirmed', this)">Confirmed</button>
+                            <button class="filter-btn" onclick="filterFollowups('not-coming', this)">Not Coming</button>
+                            <button class="filter-btn" onclick="filterFollowups('followed-up', this)">Followed Up</button>
+                        </div>
+                        <button class="add-btn" onclick="openAddFollowupModal()"><i class="fas fa-plus"></i> Add Visitor</button>
+                    </div>
+
+                    <!-- table -->
+                    <div class="table-container">
+                        <table>
+                            <thead>
+                                <tr><th><input type="checkbox" id="selectAllTable" onchange="toggleSelectAllTable()"></th><th>Visitor</th><th>Phone</th><th>Invited By</th><th>Service Date</th><th>Status</th><th style="text-align:center;">Actions</th></tr>
+                            </thead>
+                            <tbody id="followupTableBody">
+                                <tr><td colspan="7"><div class="loading-spinner"><div class="spinner"></div><p>Loading follow-ups...</p></div></td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- pagination -->
+                    <div class="pagination-container">
+                        <span class="info" id="paginationInfo">Showing 0 of 0 follow-ups</span>
+                        <ul class="pagination">
+                            <li class="disabled"><a href="#"><i class="fas fa-chevron-left"></i></a></li>
+                            <li class="active"><a href="#">1</a></li>
+                            <li class="disabled"><a href="#"><i class="fas fa-chevron-right"></i></a></li>
+                        </ul>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ===== ADD FOLLOW-UP MODAL ===== -->
+<div class="modal fade" id="addFollowupModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title"><i class="fas fa-user-plus" style="color:var(--cbwci-gold);"></i> Add Visitor</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="addFollowupForm">
+                    <div class="mb-3"><label class="form-label"><i class="fas fa-user"></i> Visitor Name <span class="text-danger">*</span></label><input type="text" class="form-control" id="visitorName" placeholder="Enter visitor's full name" required></div>
+                    <div class="mb-3"><label class="form-label"><i class="fas fa-phone"></i> Phone <span class="text-danger">*</span></label><input type="tel" class="form-control" id="visitorPhone" placeholder="Enter phone number" required></div>
+                    <div class="mb-3"><label class="form-label"><i class="fas fa-user-check"></i> Invited By</label><input type="text" class="form-control" id="invitedBy" placeholder="Who invited this visitor?" value="Admin"></div>
+                    <div class="mb-3"><label class="form-label"><i class="fas fa-calendar-alt"></i> Service Date</label>
+                        <select class="form-select" id="serviceDate">
+                            <option value="This Sunday">This Sunday</option><option value="Next Sunday">Next Sunday</option>
+                            <option value="Midweek Service">Midweek Service</option><option value="Special Event">Special Event</option>
+                        </select>
+                    </div>
+                    <div class="mb-3"><label class="form-label"><i class="fas fa-tag"></i> Status</label>
+                        <select class="form-select" id="visitorStatus">
+                            <option value="pending">Pending</option><option value="confirmed">Confirmed</option>
+                            <option value="not-coming">Not Coming</option><option value="followed-up">Followed Up</option>
+                        </select>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary" onclick="addFollowupToFirebase()"><i class="fas fa-save"></i> Add Visitor</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ===== VIEW FOLLOW-UP MODAL ===== -->
+<div class="modal fade" id="viewFollowupModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title"><i class="fas fa-user" style="color:var(--cbwci-gold);"></i> Visitor Details</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body" id="viewFollowupBody">
+                <div class="text-center mb-3">
+                    <div style="width:80px;height:80px;border-radius:50%;background:linear-gradient(135deg,var(--cbwci-purple),var(--cbwci-purple-dark));display:flex;align-items:center;justify-content:center;margin:0 auto;color:#fff;font-size:30px;font-weight:700;font-family:'Playfair Display',serif;">JD</div>
+                    <h5 class="mt-2" id="viewVisitorName">John Doe</h5>
+                    <span class="status-badge pending" id="viewVisitorStatus">Pending</span>
+                </div>
+                <div style="background:#f8f4f0;border-radius:8px;padding:14px;">
+                    <div style="display:flex;justify-content:space-between;padding:4px 0;border-bottom:1px solid #f0ebe4;"><span style="color:var(--cbwci-muted);font-size:13px;"><i class="fas fa-phone"></i> Phone</span><span style="font-weight:500;font-size:13px;" id="viewVisitorPhone">+27 82 123 4567</span></div>
+                    <div style="display:flex;justify-content:space-between;padding:4px 0;border-bottom:1px solid #f0ebe4;"><span style="color:var(--cbwci-muted);font-size:13px;"><i class="fas fa-user-check"></i> Invited By</span><span style="font-weight:500;font-size:13px;" id="viewInvitedBy">Admin</span></div>
+                    <div style="display:flex;justify-content:space-between;padding:4px 0;border-bottom:1px solid #f0ebe4;"><span style="color:var(--cbwci-muted);font-size:13px;"><i class="fas fa-calendar-alt"></i> Service Date</span><span style="font-weight:500;font-size:13px;" id="viewServiceDate">This Sunday</span></div>
+                    <div style="display:flex;justify-content:space-between;padding:4px 0;"><span style="color:var(--cbwci-muted);font-size:13px;"><i class="fas fa-clock"></i> Status</span><span style="font-weight:500;font-size:13px;" id="viewStatusDetail">Pending</span></div>
+                    <div style="display:flex;justify-content:space-between;padding:4px 0;border-top:1px solid #f0ebe4;margin-top:4px;padding-top:8px;"><span style="color:var(--cbwci-muted);font-size:13px;"><i class="fas fa-id-card"></i> ID</span><span style="font-weight:500;font-size:12px;color:var(--cbwci-muted);" id="viewFollowupId">-</span></div>
+                </div>
+                <div class="mt-3">
+                    <label class="form-label" style="font-weight:600;font-size:13px;"><i class="fas fa-comment"></i> Follow-Up Notes</label>
+                    <textarea class="form-control" rows="3" id="viewNotes" placeholder="Add follow-up notes..."></textarea>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-success" onclick="sendWhatsAppFromView()"><i class="fab fa-whatsapp"></i> WhatsApp</button>
+                <button type="button" class="btn btn-primary" onclick="updateFollowupStatus()"><i class="fas fa-save"></i> Update Status</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ===== TOAST ===== -->
+<div class="toast-container" id="toastContainer"></div>
+
+<!-- ===== SCRIPTS ===== -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+<script>
+    AOS.init({ duration:600, once:true });
+
+    // ===== FIREBASE =====
+    const firebaseConfig = {
+        apiKey: "AIzaSyBhXS5EOZjEAahTjk8XPd-9PkG3HeKV8bg",
+        authDomain: "cbwci-892de.firebaseapp.com",
+        projectId: "cbwci-892de",
+        storageBucket: "cbwci-892de.firebasestorage.app",
+        messagingSenderId: "187272132769",
+        appId: "1:187272132769:web:63a9fcba465e54867d98e0",
+        databaseURL: "https://cbwci-892de-default-rtdb.firebaseio.com"
+    };
+    if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
+
+    // ===== TOAST =====
+    function showToast(title, message, type='success') {
+        const container = document.getElementById('toastContainer');
+        const iconMap = { success:'fa-check-circle', danger:'fa-exclamation-circle', warning:'fa-exclamation-triangle', info:'fa-info-circle' };
+        const colorMap = { success:'var(--success)', danger:'var(--danger)', warning:'var(--warning)', info:'var(--info)' };
+        const toast = document.createElement('div');
+        toast.className = `toast-custom ${type==='danger'?'toast-danger':''}`;
+        toast.innerHTML = `<i class="fas ${iconMap[type]||'fa-check-circle'}" style="color:${colorMap[type]||'var(--success)'};"></i><div class="msg"><h6>${title}</h6><small>${message}</small></div>`;
+        container.appendChild(toast);
+        setTimeout(() => { toast.style.opacity='0'; toast.style.transform='translateX(50px)'; setTimeout(()=>toast.remove(),400); }, 4000);
+    }
+    window.showToast = showToast;
+
+    // ===== LOGOUT =====
+    function logoutUser(e) {
+        e.preventDefault();
+        if (confirm('Logout?')) {
+            firebase.auth().signOut().then(() => {
+                sessionStorage.clear();
+                showToast('Logged Out', 'See you soon!', 'info');
+                setTimeout(() => window.location.href='login.html', 1500);
+            }).catch(() => showToast('Error', 'Logout failed', 'danger'));
+        }
+    }
+
+    // ===== STATE =====
+    let allFollowups = [];
+    let filteredFollowups = [];
+    let currentFilter = 'all';
+    let currentSearch = '';
+    let selectedIds = new Set();
+    let currentViewId = null;
+
+    // ===== FIREBASE: FETCH FOLLOW-UPS =====
+    async function fetchFollowupsFromFirebase() {
+        try {
+            const snapshot = await firebase.database().ref('cbwci/followups').once('value');
+            const data = snapshot.val();
+            if (data) {
+                allFollowups = Object.keys(data).map(key => {
+                    const raw = data[key];
+                    return {
+                        id: key,
+                        name: raw.name || 'Unknown Visitor',
+                        phone: raw.phone || 'N/A',
+                        invitedBy: raw.invitedBy || 'Admin',
+                        serviceDate: raw.serviceDate || 'This Sunday',
+                        status: raw.status || 'pending',
+                        notes: raw.notes || '',
+                        dateAdded: raw.dateAdded || new Date().toLocaleDateString('en-ZA'),
+                        createdAt: raw.createdAt || Date.now()
+                    };
+                });
+                allFollowups.sort((a,b) => (b.createdAt || 0) - (a.createdAt || 0));
+            } else {
+                allFollowups = [];
+            }
+            document.getElementById('lastUpdated').textContent = new Date().toLocaleString();
+            applyFiltersAndRender();
+            updateStats(allFollowups);
+            updateBadges(allFollowups);
+            updateSelectedCount();
+            if (allFollowups.length === 0) {
+                console.log('No follow-ups found in database.');
+            } else {
+                showToast('Follow-Ups Loaded', `${allFollowups.length} records loaded.`, 'success');
+            }
+        } catch (err) {
+            console.error('Error fetching follow-ups:', err);
+            showToast('Error', 'Failed to load follow-ups.', 'danger');
+            document.getElementById('followupTableBody').innerHTML = `<tr><td colspan="7"><div class="empty-state"><i class="fas fa-database"></i><h6>Error loading</h6><p>${err.message}</p></div></td></tr>`;
+        }
+    }
+
+    // ===== UPDATE BADGES =====
+    function updateBadges(data) {
+        const pending = data.filter(f => f.status === 'pending').length;
+        document.getElementById('followupBadge').textContent = pending;
+        document.getElementById('totalFollowupsBadge').textContent = data.length;
+    }
+
+    // ===== UPDATE STATS =====
+    function updateStats(data) {
+        const total = data.length;
+        const pending = data.filter(f => f.status === 'pending').length;
+        const confirmed = data.filter(f => f.status === 'confirmed').length;
+        const notComing = data.filter(f => f.status === 'not-coming').length;
+        document.getElementById('totalCount').textContent = total;
+        document.getElementById('pendingCount').textContent = pending;
+        document.getElementById('confirmedCount').textContent = confirmed;
+        document.getElementById('notComingCount').textContent = notComing;
+    }
+
+    // ===== UPDATE SELECTED COUNT =====
+    function updateSelectedCount() {
+        document.getElementById('selectedCount').textContent = selectedIds.size;
+        const sendBtns = document.querySelectorAll('.send-btns .btn-send');
+        sendBtns.forEach(btn => { btn.disabled = selectedIds.size === 0; });
+    }
+
+    // ===== UPDATE SELECT ALL STATE =====
+    function updateSelectAllState() {
+        const checkboxes = document.querySelectorAll('.row-checkbox');
+        const checked = document.querySelectorAll('.row-checkbox:checked');
+        const selectAll = document.getElementById('selectAllTable');
+        const selectAllBulk = document.getElementById('selectAll');
+        if (checkboxes.length > 0 && checked.length === checkboxes.length) {
+            selectAll.checked = true;
+            selectAllBulk.checked = true;
+        } else {
+            selectAll.checked = false;
+            selectAllBulk.checked = false;
+        }
+    }
+
+    // ===== TOGGLE ROW SELECT =====
+    function toggleRowSelect(id) {
+        if (selectedIds.has(id)) selectedIds.delete(id);
+        else selectedIds.add(id);
+        updateSelectedCount();
+        updateSelectAllState();
+    }
+    window.toggleRowSelect = toggleRowSelect;
+
+    // ===== TOGGLE SELECT ALL (Table) =====
+    function toggleSelectAllTable() {
+        const checkboxes = document.querySelectorAll('.row-checkbox');
+        const isChecked = document.getElementById('selectAllTable').checked;
+        checkboxes.forEach(cb => {
+            cb.checked = isChecked;
+            const id = cb.dataset.id;
+            if (isChecked) selectedIds.add(id);
+            else selectedIds.delete(id);
+        });
+        updateSelectedCount();
+        updateSelectAllState();
+    }
+    window.toggleSelectAllTable = toggleSelectAllTable;
+
+    // ===== TOGGLE SELECT ALL (Bulk) =====
+    function toggleSelectAll() {
+        const isChecked = document.getElementById('selectAll').checked;
+        document.getElementById('selectAllTable').checked = isChecked;
+        const checkboxes = document.querySelectorAll('.row-checkbox');
+        checkboxes.forEach(cb => {
+            cb.checked = isChecked;
+            const id = cb.dataset.id;
+            if (isChecked) selectedIds.add(id);
+            else selectedIds.delete(id);
+        });
+        updateSelectedCount();
+        updateSelectAllState();
+    }
+    window.toggleSelectAll = toggleSelectAll;
+
+    // ===== RENDER FOLLOW-UPS TABLE =====
+    function renderFollowupsTable(data) {
+        const tbody = document.getElementById('followupTableBody');
+        if (!data || data.length === 0) {
+            tbody.innerHTML = `
+                <tr><td colspan="7">
+                    <div class="empty-state">
+                        <i class="fas fa-user-plus"></i>
+                        <h6>No Follow-Ups</h6>
+                        <p>Add your first visitor to start tracking follow-ups.</p>
+                        <button class="add-btn" style="margin-top:12px;padding:8px 24px;" onclick="openAddFollowupModal()"><i class="fas fa-plus"></i> Add First Visitor</button>
+                    </div>
+                </td></tr>
+            `;
+            return;
+        }
+        let html = '';
+        data.forEach(f => {
+            const initials = f.name.split(' ').map(n=>n[0]).join('').toUpperCase().slice(0,2);
+            const statusClass = f.status || 'pending';
+            const statusLabels = { pending:'Pending', confirmed:'Confirmed', 'not-coming':'Not Coming', 'followed-up':'Followed Up' };
+            const isChecked = selectedIds.has(f.id) ? 'checked' : '';
+            html += `
+                <tr>
+                    <td><input type="checkbox" class="row-checkbox" data-id="${f.id}" ${isChecked} onchange="toggleRowSelect('${f.id}')"></td>
+                    <td><div style="display:flex;align-items:center;gap:10px;"><div style="width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,var(--cbwci-purple),var(--cbwci-purple-dark));display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:12px;flex-shrink:0;">${initials}</div><div><div style="font-weight:600;color:var(--cbwci-text);font-size:13px;">${f.name}</div></div></div></td>
+                    <td style="font-size:13px;">${f.phone}</td>
+                    <td style="font-size:13px;">${f.invitedBy || 'Admin'}</td>
+                    <td style="font-size:13px;">${f.serviceDate || 'N/A'}</td>
+                    <td><span class="status-badge ${statusClass}">${statusLabels[statusClass]||statusClass}</span></td>
+                    <td style="text-align:center;"><div class="action-btns">
+                        <button class="btn-action whatsapp" onclick="sendWhatsAppTo('${f.phone}')" title="WhatsApp"><i class="fab fa-whatsapp"></i></button>
+                        <button class="btn-action view" onclick="viewFollowup('${f.id}')" title="View"><i class="fas fa-eye"></i></button>
+                        ${f.status === 'pending' ? `
+                            <button class="btn-action confirm" onclick="updateFollowupStatusAction('${f.id}','confirmed')" title="Confirm"><i class="fas fa-check"></i></button>
+                            <button class="btn-action cancel" onclick="updateFollowupStatusAction('${f.id}','not-coming')" title="Not Coming"><i class="fas fa-times"></i></button>
+                        ` : ''}
+                        <button class="btn-action delete" onclick="deleteFollowup('${f.id}')" title="Delete"><i class="fas fa-trash"></i></button>
+                    </div></td>
+                </tr>
+            `;
+        });
+        tbody.innerHTML = html;
+        document.getElementById('paginationInfo').textContent = `Showing ${data.length} of ${allFollowups.length} follow-ups`;
+        updateSelectAllState();
+    }
+
+    // ===== APPLY FILTERS =====
+    function applyFiltersAndRender() {
+        let data = [...allFollowups];
+        if (currentFilter !== 'all') {
+            data = data.filter(f => f.status === currentFilter);
+        }
+        if (currentSearch.trim()) {
+            const q = currentSearch.trim().toLowerCase();
+            data = data.filter(f =>
+                f.name.toLowerCase().includes(q) ||
+                f.phone.includes(q) ||
+                (f.invitedBy && f.invitedBy.toLowerCase().includes(q))
+            );
+        }
+        filteredFollowups = data;
+        renderFollowupsTable(data);
+    }
+
+    function filterFollowups(filter, btn) {
+        if (btn) {
+            document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            currentFilter = filter;
+        } else {
+            currentSearch = document.getElementById('searchInput').value;
+        }
+        applyFiltersAndRender();
+    }
+    window.filterFollowups = filterFollowups;
+
+    document.getElementById('searchInput').addEventListener('input', function() {
+        currentSearch = this.value;
+        applyFiltersAndRender();
+    });
+
+    // ===== OPEN ADD MODAL =====
+    function openAddFollowupModal() {
+        document.getElementById('addFollowupForm').reset();
+        const modal = new bootstrap.Modal(document.getElementById('addFollowupModal'));
+        modal.show();
+    }
+    window.openAddFollowupModal = openAddFollowupModal;
+
+    // ===== ADD FOLLOW-UP TO FIREBASE =====
+    async function addFollowupToFirebase() {
+        const name = document.getElementById('visitorName').value.trim();
+        const phone = document.getElementById('visitorPhone').value.trim();
+        const invitedBy = document.getElementById('invitedBy').value.trim() || 'Admin';
+        const serviceDate = document.getElementById('serviceDate').value;
+        const status = document.getElementById('visitorStatus').value;
+
+        if (!name || !phone) {
+            showToast('Error', 'Please fill in all required fields.', 'danger');
+            return;
+        }
+
+        const newFollowup = {
+            name,
+            phone,
+            invitedBy,
+            serviceDate,
+            status,
+            notes: '',
+            dateAdded: new Date().toLocaleDateString('en-ZA'),
+            createdAt: Date.now()
+        };
+
+        try {
+            const ref = firebase.database().ref('cbwci/followups').push();
+            await ref.set(newFollowup);
+            bootstrap.Modal.getInstance(document.getElementById('addFollowupModal')).hide();
+            showToast('Visitor Added', `${name} has been added to follow-up list!`, 'success');
+            await fetchFollowupsFromFirebase();
+        } catch (err) {
+            console.error(err);
+            showToast('Error', 'Failed to add visitor.', 'danger');
+        }
+    }
+    window.addFollowupToFirebase = addFollowupToFirebase;
+
+    // ===== VIEW FOLLOW-UP =====
+    function viewFollowup(id) {
+        const f = allFollowups.find(item => item.id === id);
+        if (!f) { showToast('Error', 'Follow-up not found.', 'danger'); return; }
+        currentViewId = id;
+        const initials = f.name.split(' ').map(n=>n[0]).join('').toUpperCase().slice(0,2);
+        document.getElementById('viewVisitorName').textContent = f.name;
+        document.getElementById('viewVisitorPhone').textContent = f.phone;
+        document.getElementById('viewInvitedBy').textContent = f.invitedBy || 'Admin';
+        document.getElementById('viewServiceDate').textContent = f.serviceDate || 'N/A';
+        document.getElementById('viewStatusDetail').textContent = f.status.charAt(0).toUpperCase()+f.status.slice(1);
+        document.getElementById('viewNotes').value = f.notes || '';
+        document.getElementById('viewFollowupId').textContent = f.id;
+        const statusEl = document.getElementById('viewVisitorStatus');
+        statusEl.textContent = f.status.charAt(0).toUpperCase()+f.status.slice(1);
+        statusEl.className = `status-badge ${f.status}`;
+        document.querySelector('#viewFollowupBody .text-center div').textContent = initials;
+        const modal = new bootstrap.Modal(document.getElementById('viewFollowupModal'));
+        modal.show();
+    }
+    window.viewFollowup = viewFollowup;
+
+    // ===== UPDATE FOLLOW-UP STATUS =====
+    async function updateFollowupStatus() {
+        if (!currentViewId) return;
+        const notes = document.getElementById('viewNotes').value.trim();
+        try {
+            await firebase.database().ref(`cbwci/followups/${currentViewId}`).update({ notes });
+            bootstrap.Modal.getInstance(document.getElementById('viewFollowupModal')).hide();
+            showToast('Updated', 'Notes saved successfully.', 'success');
+            await fetchFollowupsFromFirebase();
+        } catch (err) {
+            showToast('Error', 'Failed to save notes.', 'danger');
+        }
+    }
+    window.updateFollowupStatus = updateFollowupStatus;
+
+    // ===== UPDATE FOLLOW-UP STATUS ACTION =====
+    async function updateFollowupStatusAction(id, newStatus) {
+        const f = allFollowups.find(item => item.id === id);
+        if (!f) return;
+        try {
+            await firebase.database().ref(`cbwci/followups/${id}`).update({ status: newStatus });
+            const statusLabels = { pending:'Pending', confirmed:'Confirmed', 'not-coming':'Not Coming', 'followed-up':'Followed Up' };
+            showToast('Status Updated', `${f.name} is now ${statusLabels[newStatus]}.`, 'success');
+            await fetchFollowupsFromFirebase();
+        } catch (err) {
+            showToast('Error', 'Failed to update status.', 'danger');
+        }
+    }
+    window.updateFollowupStatusAction = updateFollowupStatusAction;
+
+    // ===== DELETE FOLLOW-UP =====
+    async function deleteFollowup(id) {
+        const f = allFollowups.find(item => item.id === id);
+        if (!f) return;
+        if (!confirm(`Delete follow-up for ${f.name}? This cannot be undone.`)) return;
+        try {
+            await firebase.database().ref(`cbwci/followups/${id}`).remove();
+            selectedIds.delete(id);
+            showToast('Deleted', `Follow-up for ${f.name} has been removed.`, 'danger');
+            await fetchFollowupsFromFirebase();
+        } catch (err) {
+            showToast('Error', 'Failed to delete.', 'danger');
+        }
+    }
+    window.deleteFollowup = deleteFollowup;
+
+    // ===== SEND WHATSAPP =====
+    function sendWhatsAppFromView() {
+        if (!currentViewId) return;
+        const f = allFollowups.find(item => item.id === currentViewId);
+        if (f) sendWhatsAppTo(f.phone);
+    }
+    window.sendWhatsAppFromView = sendWhatsAppFromView;
+
+    function sendWhatsAppTo(phone) {
+        let cleanPhone = phone.replace(/[^0-9+]/g, '');
+        if (cleanPhone.startsWith('+')) cleanPhone = cleanPhone.substring(1);
+        const message = document.getElementById('bulkMessage').value || '🙏 CBWCI Church Invitation\n\nHello! This is a friendly reminder from Changed By The Word Church International.\n\nWe would love to have you join us for our upcoming service.\n\n📅 This Sunday\n🕙 10:00 AM\n📍 CBWCI Headquarters\n\nCome as you are and experience the presence of God!\n\nGod bless you! 🙏';
+        const encodedMsg = encodeURIComponent(message);
+        window.open(`https://wa.me/${cleanPhone}?text=${encodedMsg}`, '_blank');
+        showToast('WhatsApp', 'Opening WhatsApp to send message...', 'info');
+    }
+    window.sendWhatsAppTo = sendWhatsAppTo;
+
+    // ===== SEND BULK WHATSAPP =====
+    function sendBulkWhatsApp() {
+        if (selectedIds.size === 0) {
+            showToast('Error', 'Please select at least one contact.', 'danger');
+            return;
+        }
+        const selected = allFollowups.filter(f => selectedIds.has(f.id));
+        const message = document.getElementById('bulkMessage').value;
+        if (!message.trim()) {
+            showToast('Error', 'Please enter a message to send.', 'danger');
+            return;
+        }
+        const progressDiv = document.getElementById('sendProgress');
+        const progressFill = document.getElementById('progressFill');
+        const progressText = document.getElementById('progressText');
+        progressDiv.classList.add('show');
+        let sent = 0;
+        const total = selected.length;
+        selected.forEach((f, index) => {
+            setTimeout(() => {
+                let cleanPhone = f.phone.replace(/[^0-9+]/g, '');
+                if (cleanPhone.startsWith('+')) cleanPhone = cleanPhone.substring(1);
+                const encodedMsg = encodeURIComponent(message);
+                window.open(`https://wa.me/${cleanPhone}?text=${encodedMsg}`, '_blank');
+                sent++;
+                const progress = (sent / total) * 100;
+                progressFill.style.width = progress + '%';
+                progressText.textContent = `Opening ${sent} of ${total}...`;
+                if (sent === total) {
+                    setTimeout(() => {
+                        progressText.textContent = `✅ ${total} messages opened!`;
+                        setTimeout(() => { progressDiv.classList.remove('show'); progressFill.style.width = '0%'; }, 3000);
+                    }, 1000);
+                    selected.forEach(f2 => {
+                        if (f2.status === 'pending') {
+                            firebase.database().ref(`cbwci/followups/${f2.id}`).update({ status: 'followed-up' });
+                        }
+                    });
+                    setTimeout(fetchFollowupsFromFirebase, 2000);
+                    showToast('Bulk WhatsApp', `${total} WhatsApp messages opened!`, 'success');
+                }
+            }, index * 1500);
+        });
+    }
+    window.sendBulkWhatsApp = sendBulkWhatsApp;
+
+    // ===== SEND BULK SMS =====
+    function sendBulkSMS() {
+        if (selectedIds.size === 0) {
+            showToast('Error', 'Please select at least one contact.', 'danger');
+            return;
+        }
+        const selected = allFollowups.filter(f => selectedIds.has(f.id));
+        const message = document.getElementById('bulkMessage').value;
+        if (!message.trim()) {
+            showToast('Error', 'Please enter a message to send.', 'danger');
+            return;
+        }
+        const progressDiv = document.getElementById('sendProgress');
+        const progressFill = document.getElementById('progressFill');
+        const progressText = document.getElementById('progressText');
+        progressDiv.classList.add('show');
+        let sent = 0;
+        const total = selected.length;
+        selected.forEach((f, index) => {
+            setTimeout(() => {
+                let cleanPhone = f.phone.replace(/[^0-9+]/g, '');
+                if (cleanPhone.startsWith('+')) cleanPhone = cleanPhone.substring(1);
+                const encodedMsg = encodeURIComponent(message);
+                window.location.href = `sms:${cleanPhone}?body=${encodedMsg}`;
+                sent++;
+                const progress = (sent / total) * 100;
+                progressFill.style.width = progress + '%';
+                progressText.textContent = `Opening SMS ${sent} of ${total}...`;
+                if (sent === total) {
+                    setTimeout(() => {
+                        progressText.textContent = `✅ ${total} SMS opened!`;
+                        setTimeout(() => { progressDiv.classList.remove('show'); progressFill.style.width = '0%'; }, 3000);
+                    }, 1000);
+                    selected.forEach(f2 => {
+                        if (f2.status === 'pending') {
+                            firebase.database().ref(`cbwci/followups/${f2.id}`).update({ status: 'followed-up' });
+                        }
+                    });
+                    setTimeout(fetchFollowupsFromFirebase, 2000);
+                    showToast('Bulk SMS', `${total} SMS messages opened!`, 'success');
+                }
+            }, index * 1000);
+        });
+    }
+    window.sendBulkSMS = sendBulkSMS;
+
+    // ===== AUTH =====
+    firebase.auth().onAuthStateChanged(async user => {
+        if (user) {
+            console.log('✅ Admin logged in:', user.uid);
+            document.getElementById('adminName').textContent = user.displayName || 'Admin';
+            await fetchFollowupsFromFirebase();
+        } else {
+            showToast('Not Logged In', 'Please log in to access follow-ups.', 'warning');
+            setTimeout(() => window.location.href='login.html', 2000);
+        }
+    });
+
+    console.log('%c✝ CBWCI - Follow-Up Management ✝', 'font-size:18px;color:#C9A84C;font-weight:bold;');
+    console.log('📱 Live follow-ups from Firebase Realtime Database');
+</script>
+</body>
+</html>

@@ -1,0 +1,1543 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Security Settings - CBWCI</title>
+    
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <!-- Font Awesome Icons -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- AOS Animation -->
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+    
+    <style>
+        /* ===== CBWCI BRAND COLORS ===== */
+        :root {
+            --cbwci-purple: #4A1942;
+            --cbwci-purple-light: #6B2D5F;
+            --cbwci-purple-dark: #2E0F28;
+            --cbwci-gold: #C9A84C;
+            --cbwci-gold-light: #E8CD7A;
+            --cbwci-gold-dark: #A8893A;
+            --cbwci-cream: #FDF8F0;
+            --cbwci-dark: #1A0F16;
+            --cbwci-text: #2C1A24;
+            --cbwci-muted: #7A6A72;
+            --shadow: 0 10px 40px rgba(74, 25, 66, 0.12);
+            --shadow-hover: 0 15px 50px rgba(74, 25, 66, 0.2);
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            --success: #2D8F5C;
+            --danger: #C0392B;
+            --warning: #E67E22;
+            --info: #2980B9;
+        }
+
+        /* ===== GLOBAL ===== */
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--cbwci-cream);
+            color: var(--cbwci-text);
+            padding-top: 80px;
+            min-height: 100vh;
+        }
+
+        /* ===== NAVBAR ===== */
+        .navbar {
+            background: rgba(74, 25, 66, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 12px 0;
+            box-shadow: 0 4px 30px rgba(0,0,0,0.2);
+            border-bottom: 3px solid var(--cbwci-gold);
+        }
+
+        .navbar-brand {
+            font-family: 'Playfair Display', serif;
+            font-weight: 900;
+            font-size: 20px;
+            color: white !important;
+            letter-spacing: 2px;
+        }
+
+        .navbar-brand .gold {
+            color: var(--cbwci-gold);
+            display: block;
+            font-size: 14px;
+            letter-spacing: 4px;
+        }
+
+        .navbar-brand i {
+            color: var(--cbwci-gold);
+            margin-right: 10px;
+        }
+
+        .nav-link {
+            color: rgba(255,255,255,0.8) !important;
+            font-weight: 500;
+            font-size: 14px;
+            letter-spacing: 1px;
+            transition: var(--transition);
+            padding: 8px 18px !important;
+            border-radius: 8px;
+        }
+
+        .nav-link:hover {
+            color: var(--cbwci-gold) !important;
+            background: rgba(201, 168, 76, 0.1);
+        }
+
+        .nav-link.active {
+            color: var(--cbwci-gold) !important;
+        }
+
+        .navbar .btn-back {
+            background: transparent;
+            border: 2px solid rgba(255,255,255,0.2);
+            color: white;
+            padding: 6px 20px;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 13px;
+            transition: var(--transition);
+            text-decoration: none;
+        }
+
+        .navbar .btn-back:hover {
+            background: rgba(255,255,255,0.1);
+            border-color: white;
+            transform: translateY(-2px);
+            color: white;
+        }
+
+        .navbar .btn-logout {
+            background: transparent;
+            border: 2px solid rgba(255,255,255,0.2);
+            color: white;
+            padding: 6px 20px;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 13px;
+            transition: var(--transition);
+            text-decoration: none;
+            cursor: pointer;
+        }
+
+        .navbar .btn-logout:hover {
+            background: var(--danger);
+            border-color: var(--danger);
+            transform: translateY(-2px);
+            color: white;
+        }
+
+        /* ===== PAGE HEADER ===== */
+        .page-header-section {
+            padding: 20px 0 30px;
+        }
+
+        .page-header-section h2 {
+            font-family: 'Playfair Display', serif;
+            font-weight: 700;
+            color: var(--cbwci-purple);
+            font-size: 32px;
+        }
+
+        .page-header-section .breadcrumb-custom {
+            color: var(--cbwci-muted);
+            font-size: 14px;
+        }
+
+        .page-header-section .breadcrumb-custom a {
+            color: var(--cbwci-purple);
+            text-decoration: none;
+            transition: var(--transition);
+        }
+
+        .page-header-section .breadcrumb-custom a:hover {
+            color: var(--cbwci-gold);
+        }
+
+        .page-header-section .breadcrumb-custom .separator {
+            margin: 0 8px;
+            color: var(--cbwci-gold);
+        }
+
+        .page-header-section .security-badge {
+            display: inline-block;
+            background: var(--success);
+            color: white;
+            padding: 2px 16px;
+            border-radius: 50px;
+            font-size: 14px;
+            font-weight: 600;
+            margin-left: 12px;
+        }
+
+        /* ===== SECURITY WRAPPER ===== */
+        .security-wrapper {
+            padding-bottom: 60px;
+        }
+
+        /* ===== SECURITY CARDS ===== */
+        .security-card {
+            background: white;
+            border-radius: 16px;
+            padding: 28px 30px;
+            box-shadow: var(--shadow);
+            border: 1px solid rgba(201, 168, 76, 0.1);
+            margin-bottom: 25px;
+            transition: var(--transition);
+        }
+
+        .security-card:hover {
+            box-shadow: var(--shadow-hover);
+        }
+
+        .security-card .card-header-custom {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #f0ebe4;
+        }
+
+        .security-card .card-header-custom h5 {
+            font-weight: 700;
+            color: var(--cbwci-purple);
+            margin: 0;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .security-card .card-header-custom h5 i {
+            color: var(--cbwci-gold);
+            font-size: 20px;
+        }
+
+        .security-card .card-header-custom .status-badge {
+            padding: 4px 16px;
+            border-radius: 50px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .status-badge.secure {
+            background: rgba(45, 143, 92, 0.12);
+            color: var(--success);
+        }
+
+        .status-badge.insecure {
+            background: rgba(192, 57, 43, 0.12);
+            color: var(--danger);
+        }
+
+        .status-badge.partial {
+            background: rgba(230, 126, 34, 0.12);
+            color: var(--warning);
+        }
+
+        /* ===== FORM STYLES ===== */
+        .form-label {
+            font-weight: 600;
+            font-size: 13px;
+            color: var(--cbwci-text);
+            margin-bottom: 4px;
+        }
+
+        .form-label i {
+            color: var(--cbwci-gold-dark);
+            margin-right: 6px;
+        }
+
+        .form-control {
+            border: 2px solid #E8DCC8;
+            border-radius: 10px;
+            padding: 11px 16px;
+            font-size: 14px;
+            transition: var(--transition);
+            background: #FDFAF5;
+            color: var(--cbwci-text);
+        }
+
+        .form-control:focus {
+            border-color: var(--cbwci-gold);
+            box-shadow: 0 0 0 4px rgba(201, 168, 76, 0.12);
+            background: white;
+        }
+
+        .form-control.is-valid {
+            border-color: var(--success);
+        }
+
+        .form-control.is-invalid {
+            border-color: var(--danger);
+        }
+
+        .input-group .btn-outline-secondary {
+            border: 2px solid #E8DCC8;
+            border-left: none;
+            background: #FDFAF5;
+            color: var(--cbwci-muted);
+        }
+
+        .input-group .btn-outline-secondary:hover {
+            background: var(--cbwci-cream);
+            color: var(--cbwci-purple);
+        }
+
+        /* ===== PASSWORD STRENGTH ===== */
+        .password-strength {
+            margin-top: 8px;
+        }
+
+        .strength-bar {
+            height: 4px;
+            background: #E8DCC8;
+            border-radius: 4px;
+            overflow: hidden;
+            margin-bottom: 4px;
+        }
+
+        .strength-bar .fill {
+            height: 100%;
+            width: 0%;
+            transition: var(--transition);
+            border-radius: 4px;
+        }
+
+        .strength-text {
+            font-size: 12px;
+            color: var(--cbwci-muted);
+        }
+
+        /* ===== BUTTONS ===== */
+        .btn-primary-custom {
+            background: linear-gradient(135deg, var(--cbwci-purple), var(--cbwci-purple-dark));
+            border: none;
+            border-radius: 10px;
+            padding: 12px 30px;
+            font-weight: 600;
+            font-size: 15px;
+            color: white;
+            transition: var(--transition);
+        }
+
+        .btn-primary-custom:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(74, 25, 66, 0.35);
+            color: white;
+        }
+
+        .btn-gold-custom {
+            background: linear-gradient(135deg, var(--cbwci-gold), var(--cbwci-gold-dark));
+            border: none;
+            border-radius: 10px;
+            padding: 12px 30px;
+            font-weight: 600;
+            font-size: 15px;
+            color: var(--cbwci-purple-dark);
+            transition: var(--transition);
+        }
+
+        .btn-gold-custom:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(201, 168, 76, 0.35);
+            color: var(--cbwci-purple-dark);
+        }
+
+        .btn-outline-custom {
+            background: transparent;
+            border: 2px solid #E8DCC8;
+            border-radius: 10px;
+            padding: 12px 30px;
+            font-weight: 600;
+            font-size: 15px;
+            color: var(--cbwci-muted);
+            transition: var(--transition);
+        }
+
+        .btn-outline-custom:hover {
+            border-color: var(--cbwci-purple);
+            color: var(--cbwci-purple);
+        }
+
+        .btn-danger-custom {
+            background: var(--danger);
+            border: none;
+            border-radius: 10px;
+            padding: 12px 30px;
+            font-weight: 600;
+            font-size: 15px;
+            color: white;
+            transition: var(--transition);
+        }
+
+        .btn-danger-custom:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(192, 57, 43, 0.35);
+            color: white;
+        }
+
+        .btn-success-custom {
+            background: var(--success);
+            border: none;
+            border-radius: 10px;
+            padding: 12px 30px;
+            font-weight: 600;
+            font-size: 15px;
+            color: white;
+            transition: var(--transition);
+        }
+
+        .btn-success-custom:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(45, 143, 92, 0.35);
+            color: white;
+        }
+
+        /* ===== SESSION ITEMS ===== */
+        .session-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 14px 18px;
+            background: var(--cbwci-cream);
+            border-radius: 10px;
+            border: 1px solid rgba(201, 168, 76, 0.08);
+            margin-bottom: 10px;
+            transition: var(--transition);
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .session-item:hover {
+            border-color: var(--cbwci-gold);
+        }
+
+        .session-item .session-info {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+
+        .session-item .session-info .device-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            background: rgba(74, 25, 66, 0.08);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--cbwci-purple);
+            font-size: 18px;
+        }
+
+        .session-item .session-info .details h6 {
+            margin: 0;
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .session-item .session-info .details small {
+            color: var(--cbwci-muted);
+            font-size: 12px;
+        }
+
+        .session-item .session-status {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .session-item .session-status .status-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            display: inline-block;
+        }
+
+        .status-dot.active {
+            background: var(--success);
+            animation: pulse-dot 2s infinite;
+        }
+
+        .status-dot.inactive {
+            background: var(--cbwci-muted);
+        }
+
+        @keyframes pulse-dot {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.5; transform: scale(0.8); }
+        }
+
+        .session-item .session-status .status-text {
+            font-size: 13px;
+            font-weight: 600;
+        }
+
+        .session-item .session-status .status-text.active-text {
+            color: var(--success);
+        }
+
+        .session-item .session-status .status-text.inactive-text {
+            color: var(--cbwci-muted);
+        }
+
+        /* ===== TOGGLE SWITCH ===== */
+        .toggle-switch {
+            position: relative;
+            width: 52px;
+            height: 28px;
+            flex-shrink: 0;
+        }
+
+        .toggle-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .toggle-switch .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: #ccc;
+            transition: var(--transition);
+            border-radius: 34px;
+        }
+
+        .toggle-switch .slider::before {
+            content: "";
+            position: absolute;
+            height: 20px;
+            width: 20px;
+            left: 4px;
+            bottom: 4px;
+            background: white;
+            transition: var(--transition);
+            border-radius: 50%;
+        }
+
+        .toggle-switch input:checked + .slider {
+            background: var(--success);
+        }
+
+        .toggle-switch input:checked + .slider::before {
+            transform: translateX(24px);
+        }
+
+        .toggle-switch input:disabled + .slider {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        /* ===== ACTIVITY LOG ===== */
+        .activity-item {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            padding: 10px 0;
+            border-bottom: 1px solid #f0ebe4;
+        }
+
+        .activity-item:last-child {
+            border-bottom: none;
+        }
+
+        .activity-item .activity-icon {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: rgba(74, 25, 66, 0.06);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--cbwci-purple);
+            flex-shrink: 0;
+        }
+
+        .activity-item .activity-content {
+            flex: 1;
+        }
+
+        .activity-item .activity-content .action {
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .activity-item .activity-content .time {
+            font-size: 12px;
+            color: var(--cbwci-muted);
+        }
+
+        .activity-item .activity-content .ip {
+            font-size: 12px;
+            color: var(--cbwci-muted);
+            opacity: 0.7;
+        }
+
+        /* ===== 2FA SETUP ===== */
+        .twofa-setup {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            flex-wrap: wrap;
+            padding: 16px 20px;
+            background: var(--cbwci-cream);
+            border-radius: 12px;
+            border: 1px solid rgba(201, 168, 76, 0.1);
+        }
+
+        .twofa-setup .info h6 {
+            font-weight: 600;
+            margin: 0;
+            color: var(--cbwci-text);
+        }
+
+        .twofa-setup .info small {
+            color: var(--cbwci-muted);
+        }
+
+        .twofa-setup .qr-placeholder {
+            width: 100px;
+            height: 100px;
+            background: white;
+            border-radius: 10px;
+            border: 2px dashed #E8DCC8;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--cbwci-muted);
+            font-size: 12px;
+            text-align: center;
+            padding: 10px;
+        }
+
+        .twofa-setup .qr-placeholder i {
+            font-size: 28px;
+            display: block;
+            margin-bottom: 4px;
+            color: var(--cbwci-gold);
+        }
+
+        /* ===== TOAST ===== */
+        .toast-container {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            z-index: 9999;
+        }
+
+        .toast-custom {
+            background: white;
+            border-radius: 12px;
+            padding: 16px 24px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.15);
+            border-left: 4px solid var(--success);
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            animation: slideUp 0.4s ease;
+            margin-top: 10px;
+        }
+
+        .toast-custom i {
+            font-size: 24px;
+            color: var(--success);
+        }
+
+        .toast-custom .msg h6 {
+            margin: 0;
+            font-weight: 600;
+        }
+
+        .toast-custom .msg small {
+            color: var(--cbwci-muted);
+        }
+
+        .toast-custom.toast-danger {
+            border-left-color: var(--danger);
+        }
+
+        .toast-custom.toast-danger i {
+            color: var(--danger);
+        }
+
+        .toast-custom.toast-warning {
+            border-left-color: var(--warning);
+        }
+
+        .toast-custom.toast-warning i {
+            color: var(--warning);
+        }
+
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* ===== RESPONSIVE ===== */
+        @media (max-width: 768px) {
+            body {
+                padding-top: 70px;
+            }
+            .page-header-section h2 {
+                font-size: 24px;
+            }
+            .security-card {
+                padding: 20px 18px;
+            }
+            .security-card .card-header-custom {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 10px;
+            }
+            .session-item {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            .session-item .session-status {
+                align-self: flex-start;
+            }
+            .twofa-setup {
+                flex-direction: column;
+                align-items: center;
+                text-align: center;
+            }
+            .navbar-brand {
+                font-size: 16px;
+            }
+            .navbar-brand .gold {
+                font-size: 11px;
+            }
+            .navbar .btn-back,
+            .navbar .btn-logout {
+                font-size: 12px;
+                padding: 4px 12px;
+            }
+            .form-actions {
+                flex-direction: column;
+            }
+            .form-actions .btn {
+                width: 100%;
+            }
+        }
+
+        @media (max-width: 576px) {
+            .page-header-section h2 {
+                font-size: 20px;
+            }
+            .security-card {
+                padding: 16px 14px;
+            }
+            .security-card .card-header-custom h5 {
+                font-size: 16px;
+            }
+            .session-item .session-info {
+                flex-wrap: wrap;
+            }
+            .twofa-setup .qr-placeholder {
+                width: 80px;
+                height: 80px;
+            }
+        }
+
+        /* ===== SCROLLBAR ===== */
+        ::-webkit-scrollbar {
+            width: 10px;
+        }
+        ::-webkit-scrollbar-track {
+            background: var(--cbwci-cream);
+        }
+        ::-webkit-scrollbar-thumb {
+            background: var(--cbwci-purple);
+            border-radius: 10px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--cbwci-gold);
+        }
+    </style>
+</head>
+<body>
+
+    <!-- ======================================== -->
+    <!-- NAVBAR -->
+    <!-- ======================================== -->
+    <nav class="navbar navbar-expand-lg fixed-top">
+        <div class="container">
+            <a class="navbar-brand" href="index.html">
+                <i class="fas fa-church"></i>
+                CBWCI
+                <span class="gold">Changed By The Word</span>
+            </a>
+            <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon" style="filter: invert(1);"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto align-items-lg-center">
+                    <li class="nav-item">
+                        <a class="nav-link" href="profile.html"><i class="fas fa-chart-pie"></i> Overview</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="edit_profile.html"><i class="fas fa-user-edit"></i> Edit Profile</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="taxi.html"><i class="fas fa-taxi"></i> Book a Ride</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="profile.html#tab-zoom"><i class="fas fa-video"></i> CBWCI Virtual Meeting</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="followup.html"><i class="fas fa-users"></i> Follow-Ups</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="notification.html"><i class="fas fa-bell"></i> Notifications</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active" href="security.html"><i class="fas fa-shield-alt"></i> Security</a>
+                    </li>
+                    <li class="nav-item ms-lg-2">
+                        <a href="profile.html" class="btn btn-back me-2">
+                            <i class="fas fa-arrow-left"></i> Back
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="#" class="btn btn-logout" onclick="logoutUser(event)">
+                            <i class="fas fa-sign-out-alt"></i> Logout
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- ======================================== -->
+    <!-- PAGE HEADER -->
+    <!-- ======================================== -->
+    <section class="page-header-section">
+        <div class="container">
+            <div data-aos="fade-up">
+                <div class="breadcrumb-custom">
+                    <a href="index.html"><i class="fas fa-home"></i> Home</a>
+                    <span class="separator">/</span>
+                    <a href="profile.html">Profile</a>
+                    <span class="separator">/</span>
+                    <span style="color: var(--cbwci-gold-dark); font-weight: 500;">Security</span>
+                </div>
+                <h2>
+                    <i class="fas fa-shield-alt" style="color: var(--cbwci-gold);"></i> 
+                    Security Settings
+                    <span class="security-badge"><i class="fas fa-check-circle"></i> Secure</span>
+                </h2>
+                <p style="color: var(--cbwci-muted); font-size: 16px; max-width: 500px;">
+                    Manage your password, two-factor authentication, active sessions, and privacy settings.
+                </p>
+            </div>
+        </div>
+    </section>
+
+    <!-- ======================================== -->
+    <!-- SECURITY CONTENT -->
+    <!-- ======================================== -->
+    <section class="security-wrapper">
+        <div class="container">
+
+            <!-- ======================================== -->
+            <!-- SECTION 1: CHANGE PASSWORD -->
+            <!-- ======================================== -->
+            <div class="security-card" data-aos="fade-up">
+                <div class="card-header-custom">
+                    <h5><i class="fas fa-key"></i> Change Password</h5>
+                    <span class="status-badge secure"><i class="fas fa-check-circle"></i> Last changed: 30 days ago</span>
+                </div>
+
+                <form id="passwordForm">
+                    <div class="row g-3">
+                        <div class="col-md-12">
+                            <label class="form-label"><i class="fas fa-lock"></i> Current Password</label>
+                            <div class="input-group">
+                                <input type="password" 
+                                       class="form-control" 
+                                       placeholder="Enter your current password" 
+                                       id="currentPassword"
+                                       required>
+                                <button class="btn btn-outline-secondary" type="button" onclick="togglePassword('currentPassword')">
+                                    <i class="fas fa-eye"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label"><i class="fas fa-key"></i> New Password</label>
+                            <div class="input-group">
+                                <input type="password" 
+                                       class="form-control" 
+                                       placeholder="Min 8 characters" 
+                                       id="newPassword"
+                                       minlength="8"
+                                       required>
+                                <button class="btn btn-outline-secondary" type="button" onclick="togglePassword('newPassword')">
+                                    <i class="fas fa-eye"></i>
+                                </button>
+                            </div>
+                            <!-- Password Strength -->
+                            <div class="password-strength">
+                                <div class="strength-bar">
+                                    <div class="fill" id="strengthFill"></div>
+                                </div>
+                                <span class="strength-text" id="strengthText">Enter a strong password</span>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label"><i class="fas fa-check-circle"></i> Confirm New Password</label>
+                            <div class="input-group">
+                                <input type="password" 
+                                       class="form-control" 
+                                       placeholder="Confirm your new password" 
+                                       id="confirmPassword"
+                                       required>
+                                <button class="btn btn-outline-secondary" type="button" onclick="togglePassword('confirmPassword')">
+                                    <i class="fas fa-eye"></i>
+                                </button>
+                            </div>
+                            <div class="invalid-feedback" id="passwordMatchError" style="display: none; font-size: 12px; color: var(--danger); margin-top: 4px;">
+                                Passwords do not match
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-actions" style="margin-top: 20px; display: flex; gap: 12px; flex-wrap: wrap;">
+                        <button type="submit" class="btn btn-primary-custom" onclick="changePassword(event)">
+                            <i class="fas fa-save"></i> Update Password
+                        </button>
+                        <button type="reset" class="btn btn-outline-custom">
+                            <i class="fas fa-undo"></i> Reset
+                        </button>
+                    </div>
+                </form>
+            </div>
+
+            <!-- ======================================== -->
+            <!-- SECTION 2: TWO-FACTOR AUTHENTICATION -->
+            <!-- ======================================== -->
+            <div class="security-card" data-aos="fade-up" data-aos-delay="100">
+                <div class="card-header-custom">
+                    <h5><i class="fas fa-mobile-alt"></i> Two-Factor Authentication (2FA)</h5>
+                    <span class="status-badge insecure" id="twofaStatus"><i class="fas fa-times-circle"></i> Disabled</span>
+                </div>
+
+                <div class="twofa-setup">
+                    <div class="qr-placeholder" id="qrCodeContainer">
+                        <div>
+                            <i class="fas fa-qrcode"></i>
+                            <span>Scan to Enable</span>
+                        </div>
+                    </div>
+                    <div class="info" style="flex:1;">
+                        <h6><i class="fas fa-shield-alt" style="color: var(--cbwci-gold);"></i> Add an extra layer of security</h6>
+                        <small>Two-factor authentication adds an additional layer of security to your account. You'll need to enter a verification code from your authenticator app when logging in.</small>
+                        <div style="margin-top: 12px; display: flex; gap: 10px; flex-wrap: wrap;">
+                            <button class="btn btn-gold-custom" onclick="enable2FA()" id="enable2faBtn">
+                                <i class="fas fa-shield-alt"></i> Enable 2FA
+                            </button>
+                            <button class="btn btn-outline-custom" onclick="showToast('Setup Guide', 'Download Google Authenticator or Authy from your app store.', 'info')">
+                                <i class="fas fa-info-circle"></i> How to Set Up
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Recovery Codes (Hidden initially) -->
+                <div id="recoveryCodes" style="display: none; margin-top: 15px; padding: 16px; background: var(--cbwci-cream); border-radius: 10px; border: 1px solid rgba(201,168,76,0.15);">
+                    <h6 style="font-weight: 600; color: var(--cbwci-purple);">
+                        <i class="fas fa-save" style="color: var(--cbwci-gold);"></i> Recovery Codes
+                    </h6>
+                    <p style="font-size: 13px; color: var(--cbwci-muted);">
+                        Save these recovery codes in a safe place. You can use them to access your account if you lose your 2FA device.
+                    </p>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; font-family: monospace; font-size: 14px; background: white; padding: 12px; border-radius: 8px;">
+                        <span>CBWCI-XXXX-XXXX-0001</span>
+                        <span>CBWCI-XXXX-XXXX-0002</span>
+                        <span>CBWCI-XXXX-XXXX-0003</span>
+                        <span>CBWCI-XXXX-XXXX-0004</span>
+                        <span>CBWCI-XXXX-XXXX-0005</span>
+                        <span>CBWCI-XXXX-XXXX-0006</span>
+                    </div>
+                    <button class="btn btn-outline-custom" style="margin-top: 10px; padding: 6px 18px; font-size: 13px;" onclick="showToast('Copied!', 'Recovery codes copied to clipboard.', 'success')">
+                        <i class="fas fa-copy"></i> Copy Codes
+                    </button>
+                </div>
+            </div>
+
+            <!-- ======================================== -->
+            <!-- SECTION 3: ACTIVE SESSIONS -->
+            <!-- ======================================== -->
+            <div class="security-card" data-aos="fade-up" data-aos-delay="200">
+                <div class="card-header-custom">
+                    <h5><i class="fas fa-laptop"></i> Active Sessions</h5>
+                    <span class="status-badge secure"><i class="fas fa-check-circle"></i> 2 active sessions</span>
+                </div>
+
+                <p style="color: var(--cbwci-muted); font-size: 14px; margin-bottom: 15px;">
+                    These are the devices currently logged into your account. You can logout from any device.
+                </p>
+
+                <!-- Session 1 - Current Device -->
+                <div class="session-item">
+                    <div class="session-info">
+                        <div class="device-icon"><i class="fas fa-desktop"></i></div>
+                        <div class="details">
+                            <h6>Chrome • Windows <span style="font-size: 11px; font-weight: 400; color: var(--cbwci-muted);">(Current)</span></h6>
+                            <small><i class="fas fa-map-marker-alt"></i> Nelspruit, South Africa</small>
+                        </div>
+                    </div>
+                    <div class="session-status">
+                        <span class="status-dot active"></span>
+                        <span class="status-text active-text">Active now</span>
+                        <button class="btn btn-outline-custom btn-sm" style="padding: 4px 14px; font-size: 12px;" disabled>
+                            Current
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Session 2 - Other Device -->
+                <div class="session-item">
+                    <div class="session-info">
+                        <div class="device-icon"><i class="fas fa-mobile-alt"></i></div>
+                        <div class="details">
+                            <h6>Safari • iPhone 15</h6>
+                            <small><i class="fas fa-map-marker-alt"></i> Cape Town, South Africa</small>
+                            <br>
+                            <small><i class="fas fa-clock"></i> Last active: 2 days ago</small>
+                        </div>
+                    </div>
+                    <div class="session-status">
+                        <span class="status-dot inactive"></span>
+                        <span class="status-text inactive-text">Inactive</span>
+                        <button class="btn btn-danger-custom btn-sm" style="padding: 4px 14px; font-size: 12px;" onclick="logoutSession(event)">
+                            <i class="fas fa-sign-out-alt"></i> Logout
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Session 3 - Other Device -->
+                <div class="session-item">
+                    <div class="session-info">
+                        <div class="device-icon"><i class="fas fa-tablet-alt"></i></div>
+                        <div class="details">
+                            <h6>Firefox • iPad</h6>
+                            <small><i class="fas fa-map-marker-alt"></i> Johannesburg, South Africa</small>
+                            <br>
+                            <small><i class="fas fa-clock"></i> Last active: 5 days ago</small>
+                        </div>
+                    </div>
+                    <div class="session-status">
+                        <span class="status-dot inactive"></span>
+                        <span class="status-text inactive-text">Inactive</span>
+                        <button class="btn btn-danger-custom btn-sm" style="padding: 4px 14px; font-size: 12px;" onclick="logoutSession(event)">
+                            <i class="fas fa-sign-out-alt"></i> Logout
+                        </button>
+                    </div>
+                </div>
+
+                <div style="margin-top: 15px;">
+                    <button class="btn btn-danger-custom" onclick="logoutAllSessions(event)">
+                        <i class="fas fa-sign-out-alt"></i> Logout All Other Sessions
+                    </button>
+                    <span style="font-size: 12px; color: var(--cbwci-muted); margin-left: 12px;">
+                        <i class="fas fa-info-circle"></i> This will logout all devices except this one
+                    </span>
+                </div>
+            </div>
+
+            <!-- ======================================== -->
+            <!-- SECTION 4: ACTIVITY LOG -->
+            <!-- ======================================== -->
+            <div class="security-card" data-aos="fade-up" data-aos-delay="300">
+                <div class="card-header-custom">
+                    <h5><i class="fas fa-history"></i> Recent Activity</h5>
+                    <span class="status-badge secure"><i class="fas fa-check-circle"></i> All activities are secure</span>
+                </div>
+
+                <div class="activity-item">
+                    <div class="activity-icon"><i class="fas fa-sign-in-alt"></i></div>
+                    <div class="activity-content">
+                        <div class="action">Logged in from Chrome • Windows</div>
+                        <div class="time"><i class="far fa-clock"></i> Today, 9:30 AM</div>
+                        <div class="ip">IP: 192.168.1.1 • Nelspruit, South Africa</div>
+                    </div>
+                </div>
+
+                <div class="activity-item">
+                    <div class="activity-icon"><i class="fas fa-key"></i></div>
+                    <div class="activity-content">
+                        <div class="action">Password changed successfully</div>
+                        <div class="time"><i class="far fa-clock"></i> 2 days ago, 3:15 PM</div>
+                        <div class="ip">IP: 192.168.1.1 • Nelspruit, South Africa</div>
+                    </div>
+                </div>
+
+                <div class="activity-item">
+                    <div class="activity-icon"><i class="fas fa-shield-alt"></i></div>
+                    <div class="activity-content">
+                        <div class="action">Security settings updated</div>
+                        <div class="time"><i class="far fa-clock"></i> 5 days ago, 10:00 AM</div>
+                        <div class="ip">IP: 192.168.1.1 • Nelspruit, South Africa</div>
+                    </div>
+                </div>
+
+                <div class="activity-item">
+                    <div class="activity-icon"><i class="fas fa-sign-in-alt"></i></div>
+                    <div class="activity-content">
+                        <div class="action">Logged in from Safari • iPhone</div>
+                        <div class="time"><i class="far fa-clock"></i> 1 week ago, 8:45 PM</div>
+                        <div class="ip">IP: 10.0.0.1 • Cape Town, South Africa</div>
+                    </div>
+                </div>
+
+                <div style="margin-top: 12px;">
+                    <button class="btn btn-outline-custom" onclick="showToast('Activity Log', 'Full activity log exported successfully.', 'success')">
+                        <i class="fas fa-file-export"></i> Export Activity Log
+                    </button>
+                </div>
+            </div>
+
+            <!-- ======================================== -->
+            <!-- SECTION 5: PRIVACY & DATA -->
+            <!-- ======================================== -->
+            <div class="security-card" data-aos="fade-up" data-aos-delay="400">
+                <div class="card-header-custom">
+                    <h5><i class="fas fa-user-shield"></i> Privacy & Data</h5>
+                    <span class="status-badge secure"><i class="fas fa-check-circle"></i> GDPR Compliant</span>
+                </div>
+
+                <div style="display: flex; flex-direction: column; gap: 15px;">
+                    <!-- Data Sharing -->
+                    <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; padding: 12px 16px; background: var(--cbwci-cream); border-radius: 10px; border: 1px solid rgba(201,168,76,0.08);">
+                        <div>
+                            <h6 style="margin: 0; font-weight: 600; font-size: 14px;">Data Sharing</h6>
+                            <small style="color: var(--cbwci-muted);">Allow CBWCI to use your data for church community features</small>
+                        </div>
+                        <label class="toggle-switch">
+                            <input type="checkbox" checked id="dataSharing">
+                            <span class="slider"></span>
+                        </label>
+                    </div>
+
+                    <!-- Profile Visibility -->
+                    <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; padding: 12px 16px; background: var(--cbwci-cream); border-radius: 10px; border: 1px solid rgba(201,168,76,0.08);">
+                        <div>
+                            <h6 style="margin: 0; font-weight: 600; font-size: 14px;">Profile Visibility</h6>
+                            <small style="color: var(--cbwci-muted);">Let other church members see your profile information</small>
+                        </div>
+                        <label class="toggle-switch">
+                            <input type="checkbox" checked id="profileVisibility">
+                            <span class="slider"></span>
+                        </label>
+                    </div>
+
+                    <!-- Email Notifications -->
+                    <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; padding: 12px 16px; background: var(--cbwci-cream); border-radius: 10px; border: 1px solid rgba(201,168,76,0.08);">
+                        <div>
+                            <h6 style="margin: 0; font-weight: 600; font-size: 14px;">Email Notifications</h6>
+                            <small style="color: var(--cbwci-muted);">Receive church announcements and updates via email</small>
+                        </div>
+                        <label class="toggle-switch">
+                            <input type="checkbox" checked id="emailNotifications">
+                            <span class="slider"></span>
+                        </label>
+                    </div>
+
+                    <!-- SMS Notifications -->
+                    <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; padding: 12px 16px; background: var(--cbwci-cream); border-radius: 10px; border: 1px solid rgba(201,168,76,0.08);">
+                        <div>
+                            <h6 style="margin: 0; font-weight: 600; font-size: 14px;">SMS Notifications</h6>
+                            <small style="color: var(--cbwci-muted);">Receive important updates via SMS text message</small>
+                        </div>
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="smsNotifications">
+                            <span class="slider"></span>
+                        </label>
+                    </div>
+                </div>
+
+                <div style="margin-top: 20px; display: flex; gap: 12px; flex-wrap: wrap;">
+                    <button class="btn btn-primary-custom" onclick="savePrivacySettings()">
+                        <i class="fas fa-save"></i> Save Privacy Settings
+                    </button>
+                    <button class="btn btn-outline-custom" onclick="showToast('Data Downloaded', 'Your data has been downloaded successfully.', 'success')">
+                        <i class="fas fa-download"></i> Download My Data
+                    </button>
+                </div>
+            </div>
+
+            <!-- ======================================== -->
+            <!-- SECTION 6: DANGER ZONE -->
+            <!-- ======================================== -->
+            <div class="security-card" data-aos="fade-up" data-aos-delay="500" style="border-left: 4px solid var(--danger);">
+                <div class="card-header-custom">
+                    <h5 style="color: var(--danger);"><i class="fas fa-exclamation-triangle"></i> Danger Zone</h5>
+                    <span class="status-badge insecure"><i class="fas fa-exclamation-circle"></i> Proceed with caution</span>
+                </div>
+
+                <p style="color: var(--cbwci-muted); font-size: 14px; margin-bottom: 15px;">
+                    These actions are irreversible and can permanently affect your account. Please proceed with caution.
+                </p>
+
+                <div style="display: flex; gap: 12px; flex-wrap: wrap;">
+                    <button class="btn btn-danger-custom" onclick="confirmDeactivate()">
+                        <i class="fas fa-user-slash"></i> Deactivate Account
+                    </button>
+                    <button class="btn btn-danger-custom" onclick="confirmDelete()" style="background: #922B21;">
+                        <i class="fas fa-trash-alt"></i> Delete Account
+                    </button>
+                    <button class="btn btn-outline-custom" onclick="showToast('Support', 'Please contact admin for account assistance.', 'info')">
+                        <i class="fas fa-headset"></i> Contact Support
+                    </button>
+                </div>
+
+                <div style="margin-top: 12px; font-size: 12px; color: var(--cbwci-muted);">
+                    <i class="fas fa-info-circle" style="color: var(--cbwci-gold);"></i>
+                    Deactivating your account will hide your profile. Deleting your account will permanently remove all your data.
+                    You can reactivate anytime by contacting admin.
+                </div>
+            </div>
+
+        </div>
+    </section>
+
+    <!-- ======================================== -->
+    <!-- TOAST CONTAINER -->
+    <!-- ======================================== -->
+    <div class="toast-container" id="toastContainer"></div>
+
+    <!-- ======================================== -->
+    <!-- SCRIPTS -->
+    <!-- ======================================== -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js">
+    </script>
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js">
+    </script>
+
+    <script>
+        // ========================================
+        // INITIALIZE AOS
+        // ========================================
+        AOS.init({
+            duration: 800,
+            once: true
+        });
+
+        // ========================================
+        // TOGGLE PASSWORD VISIBILITY
+        // ========================================
+        function togglePassword(fieldId) {
+            const field = document.getElementById(fieldId);
+            const type = field.getAttribute('type') === 'password' ? 'text' : 'password';
+            field.setAttribute('type', type);
+            
+            const btn = field.parentElement.querySelector('button');
+            const icon = btn.querySelector('i');
+            icon.classList.toggle('fa-eye');
+            icon.classList.toggle('fa-eye-slash');
+        }
+
+        // ========================================
+        // PASSWORD STRENGTH CHECKER
+        // ========================================
+        document.getElementById('newPassword').addEventListener('input', function() {
+            const password = this.value;
+            const fill = document.getElementById('strengthFill');
+            const text = document.getElementById('strengthText');
+
+            let strength = 0;
+            let color = '#E8DCC8';
+            let message = 'Enter a strong password';
+
+            if (password.length >= 8) strength += 25;
+            if (password.match(/[a-z]/)) strength += 25;
+            if (password.match(/[A-Z]/)) strength += 25;
+            if (password.match(/[0-9!@#$%^&*]/)) strength += 25;
+
+            if (strength <= 25) {
+                color = '#C0392B';
+                message = 'Weak - Add more characters, numbers, and symbols';
+            } else if (strength <= 50) {
+                color = '#E67E22';
+                message = 'Fair - Add uppercase letters and symbols';
+            } else if (strength <= 75) {
+                color = '#F1C40F';
+                message = 'Good - Almost there!';
+            } else {
+                color = '#2D8F5C';
+                message = 'Strong - Great password!';
+            }
+
+            fill.style.width = strength + '%';
+            fill.style.background = color;
+            text.textContent = message;
+            text.style.color = color;
+        });
+
+        // ========================================
+        // PASSWORD MATCH CHECK
+        // ========================================
+        document.getElementById('confirmPassword').addEventListener('input', function() {
+            const password = document.getElementById('newPassword').value;
+            const matchError = document.getElementById('passwordMatchError');
+            
+            if (this.value && this.value !== password) {
+                this.classList.add('is-invalid');
+                matchError.style.display = 'block';
+            } else {
+                this.classList.remove('is-invalid');
+                matchError.style.display = 'none';
+            }
+        });
+
+        // ========================================
+        // CHANGE PASSWORD
+        // ========================================
+        function changePassword(e) {
+            e.preventDefault();
+            
+            const current = document.getElementById('currentPassword').value;
+            const newPass = document.getElementById('newPassword').value;
+            const confirm = document.getElementById('confirmPassword').value;
+            
+            if (!current) {
+                showToast('Error', 'Please enter your current password.', 'danger');
+                return;
+            }
+            
+            if (newPass !== confirm) {
+                showToast('Password Error', 'New passwords do not match!', 'danger');
+                return;
+            }
+            
+            if (newPass.length < 8) {
+                showToast('Password Error', 'Password must be at least 8 characters!', 'danger');
+                return;
+            }
+            
+            showToast('Password Updated', 'Your password has been changed successfully!', 'success');
+            
+            // Clear fields
+            document.getElementById('currentPassword').value = '';
+            document.getElementById('newPassword').value = '';
+            document.getElementById('confirmPassword').value = '';
+            document.getElementById('strengthFill').style.width = '0%';
+            document.getElementById('strengthText').textContent = 'Enter a strong password';
+        }
+
+        // ========================================
+        // TWO-FACTOR AUTHENTICATION
+        // ========================================
+        let twofaEnabled = false;
+
+        function enable2FA() {
+            const btn = document.getElementById('enable2faBtn');
+            
+            if (!twofaEnabled) {
+                // Show QR code
+                document.getElementById('qrCodeContainer').innerHTML = `
+                    <div style="background: white; padding: 10px; border-radius: 8px; border: 2px solid var(--cbwci-gold);">
+                        <i class="fas fa-qrcode" style="font-size: 48px; color: var(--cbwci-purple); display: block; margin-bottom: 4px;"></i>
+                        <span style="font-size: 10px;">Scan with Authenticator</span>
+                    </div>
+                `;
+                
+                // Show recovery codes
+                document.getElementById('recoveryCodes').style.display = 'block';
+                
+                // Update status
+                document.getElementById('twofaStatus').innerHTML = '<i class="fas fa-check-circle"></i> Setup in Progress';
+                document.getElementById('twofaStatus').className = 'status-badge partial';
+                
+                btn.innerHTML = '<i class="fas fa-check"></i> Verify & Enable';
+                twofaEnabled = true;
+                
+                showToast('2FA Setup', 'Scan the QR code with your authenticator app, then click Verify.', 'info');
+            } else {
+                // Complete setup
+                document.getElementById('twofaStatus').innerHTML = '<i class="fas fa-check-circle"></i> Enabled';
+                document.getElementById('twofaStatus').className = 'status-badge secure';
+                btn.innerHTML = '<i class="fas fa-shield-alt"></i> Disable 2FA';
+                btn.className = 'btn btn-outline-custom';
+                
+                showToast('2FA Enabled', 'Two-factor authentication has been enabled successfully!', 'success');
+            }
+        }
+
+        // ========================================
+        // SESSIONS MANAGEMENT
+        // ========================================
+        function logoutSession(e) {
+            const btn = e.target.closest('button');
+            const parent = btn.closest('.session-item');
+            
+            if (confirm('Are you sure you want to logout this session?')) {
+                parent.style.opacity = '0.5';
+                parent.style.transition = 'opacity 0.3s';
+                setTimeout(() => {
+                    parent.style.display = 'none';
+                    showToast('Session Logged Out', 'This session has been logged out successfully.', 'success');
+                }, 300);
+            }
+        }
+
+        function logoutAllSessions(e) {
+            if (confirm('Are you sure you want to logout all other devices? You will stay logged in on this device.')) {
+                const sessions = document.querySelectorAll('.session-item');
+                let count = 0;
+                
+                sessions.forEach(session => {
+                    const btn = session.querySelector('.btn-danger-custom');
+                    if (btn && !btn.disabled) {
+                        session.style.opacity = '0.5';
+                        session.style.transition = 'opacity 0.3s';
+                        setTimeout(() => {
+                            session.style.display = 'none';
+                            count++;
+                        }, 300);
+                    }
+                });
+                
+                setTimeout(() => {
+                    showToast('Sessions Logged Out', `${count} sessions have been logged out.`, 'success');
+                }, 500);
+            }
+        }
+
+        // ========================================
+        // PRIVACY SETTINGS
+        // ========================================
+        function savePrivacySettings() {
+            const dataSharing = document.getElementById('dataSharing').checked;
+            const profileVisibility = document.getElementById('profileVisibility').checked;
+            const emailNotifications = document.getElementById('emailNotifications').checked;
+            const smsNotifications = document.getElementById('smsNotifications').checked;
+            
+            showToast('Settings Saved', 'Your privacy settings have been updated successfully.', 'success');
+            
+            console.log('Privacy Settings:', {
+                dataSharing,
+                profileVisibility,
+                emailNotifications,
+                smsNotifications
+            });
+        }
+
+        // ========================================
+        // DANGER ZONE ACTIONS
+        // ========================================
+        function confirmDeactivate() {
+            if (confirm('⚠️ Are you sure you want to deactivate your account?\n\nYour profile will be hidden from other members. You can reactivate anytime by contacting admin.')) {
+                showToast('Account Deactivated', 'Your account has been deactivated.', 'warning');
+                setTimeout(() => {
+                    window.location.href = 'index.html';
+                }, 2000);
+            }
+        }
+
+        function confirmDelete() {
+            if (confirm('⚠️ WARNING: This will permanently delete your account!\n\nAll your data including profile, taxi history, and guest invites will be removed. This action cannot be undone.')) {
+                const confirmation = prompt('Type "DELETE" to confirm account deletion:');
+                if (confirmation === 'DELETE') {
+                    showToast('Account Deleted', 'Your account has been permanently deleted.', 'danger');
+                    setTimeout(() => {
+                        window.location.href = 'index.html';
+                    }, 2500);
+                } else if (confirmation !== null) {
+                    showToast('Cancelled', 'Account deletion was cancelled.', 'warning');
+                }
+            }
+        }
+
+        // ========================================
+        // LOGOUT
+        // ========================================
+        function logoutUser(event) {
+            event.preventDefault();
+            if (confirm('Are you sure you want to logout?')) {
+                sessionStorage.clear();
+                showToast('Logged Out', 'You have been successfully logged out.', 'info');
+                setTimeout(() => {
+                    window.location.href = 'login.html';
+                }, 1500);
+            }
+        }
+
+        // ========================================
+        // TOAST NOTIFICATIONS
+        // ========================================
+        function showToast(title, message, type = 'success') {
+            const container = document.getElementById('toastContainer');
+            const iconMap = {
+                'success': 'fa-check-circle',
+                'danger': 'fa-exclamation-circle',
+                'warning': 'fa-exclamation-triangle',
+                'info': 'fa-info-circle'
+            };
+            const colorMap = {
+                'success': 'var(--success)',
+                'danger': 'var(--danger)',
+                'warning': 'var(--warning)',
+                'info': 'var(--info)'
+            };
+
+            const toast = document.createElement('div');
+            toast.className = `toast-custom ${type === 'danger' ? 'toast-danger' : ''} ${type === 'warning' ? 'toast-warning' : ''}`;
+            toast.innerHTML = `
+                <i class="fas ${iconMap[type] || 'fa-check-circle'}" style="color: ${colorMap[type] || 'var(--success)'};"></i>
+                <div class="msg">
+                    <h6>${title}</h6>
+                    <small>${message}</small>
+                </div>
+            `;
+            
+            container.appendChild(toast);
+            
+            setTimeout(() => {
+                toast.style.opacity = '0';
+                toast.style.transform = 'translateX(50px)';
+                setTimeout(() => toast.remove(), 400);
+            }, 4000);
+        }
+
+        // ========================================
+        // KEYBOARD SHORTCUTS
+        // ========================================
+        document.addEventListener('keydown', function(e) {
+            // Ctrl + S to save privacy settings
+            if (e.ctrlKey && e.key === 's') {
+                e.preventDefault();
+                savePrivacySettings();
+            }
+        });
+
+        // ========================================
+        // CONSOLE BRANDING
+        // ========================================
+        console.log('%c✝ CBWCI - Security Settings ✝', 'font-size: 18px; color: #C9A84C; font-weight: bold;');
+        console.log('%c"Change, Dominate and Walk in Glory"', 'font-size: 14px; color: #4A1942; font-style: italic;');
+        console.log('🔒 Your account security is our priority');
+
+        // ========================================
+        // AUTO-FOCUS FIRST FIELD
+        // ========================================
+        document.getElementById('currentPassword').focus();
+    </script>
+
+</body>
+</html>

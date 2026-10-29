@@ -1,0 +1,1250 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registered Users - CBWCI</title>
+    
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <!-- Font Awesome Icons -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- AOS Animation -->
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+    
+    <!-- DataTables CSS -->
+    <link href="https://cdn.datatables.net/1.13.4/css/dataTables.bootstrap5.min.css" rel="stylesheet">
+    
+    <style>
+        /* ===== CBWCI BRAND COLORS ===== */
+        :root {
+            --cbwci-purple: #4A1942;
+            --cbwci-purple-light: #6B2D5F;
+            --cbwci-purple-dark: #2E0F28;
+            --cbwci-gold: #C9A84C;
+            --cbwci-gold-light: #E8CD7A;
+            --cbwci-gold-dark: #A8893A;
+            --cbwci-cream: #FDF8F0;
+            --cbwci-dark: #1A0F16;
+            --cbwci-text: #2C1A24;
+            --cbwci-muted: #7A6A72;
+            --shadow: 0 10px 40px rgba(74, 25, 66, 0.12);
+            --shadow-hover: 0 15px 50px rgba(74, 25, 66, 0.2);
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            --success: #2D8F5C;
+            --danger: #C0392B;
+            --warning: #E67E22;
+            --info: #2980B9;
+        }
+
+        /* ===== GLOBAL ===== */
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--cbwci-cream);
+            color: var(--cbwci-text);
+            padding-top: 80px;
+            min-height: 100vh;
+        }
+
+        /* ===== NAVBAR ===== */
+        .navbar {
+            background: rgba(74, 25, 66, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 12px 0;
+            box-shadow: 0 4px 30px rgba(0,0,0,0.2);
+            border-bottom: 3px solid var(--cbwci-gold);
+        }
+
+        .navbar-brand {
+            font-family: 'Playfair Display', serif;
+            font-weight: 900;
+            font-size: 20px;
+            color: white !important;
+            letter-spacing: 2px;
+        }
+
+        .navbar-brand .gold {
+            color: var(--cbwci-gold);
+            display: block;
+            font-size: 14px;
+            letter-spacing: 4px;
+        }
+
+        .navbar-brand i {
+            color: var(--cbwci-gold);
+            margin-right: 10px;
+        }
+
+        .nav-link {
+            color: rgba(255,255,255,0.8) !important;
+            font-weight: 500;
+            font-size: 14px;
+            letter-spacing: 1px;
+            transition: var(--transition);
+            padding: 8px 18px !important;
+            border-radius: 8px;
+        }
+
+        .nav-link:hover {
+            color: var(--cbwci-gold) !important;
+            background: rgba(201, 168, 76, 0.1);
+        }
+
+        .nav-link.active {
+            color: var(--cbwci-gold) !important;
+        }
+
+        .navbar .btn-back {
+            background: transparent;
+            border: 2px solid rgba(255,255,255,0.2);
+            color: white;
+            padding: 6px 20px;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 13px;
+            transition: var(--transition);
+            text-decoration: none;
+        }
+
+        .navbar .btn-back:hover {
+            background: rgba(255,255,255,0.1);
+            border-color: white;
+            transform: translateY(-2px);
+            color: white;
+        }
+
+        .navbar .btn-logout {
+            background: transparent;
+            border: 2px solid rgba(255,255,255,0.2);
+            color: white;
+            padding: 6px 20px;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 13px;
+            transition: var(--transition);
+            text-decoration: none;
+            cursor: pointer;
+        }
+
+        .navbar .btn-logout:hover {
+            background: var(--danger);
+            border-color: var(--danger);
+            transform: translateY(-2px);
+            color: white;
+        }
+
+        /* ===== PAGE HEADER ===== */
+        .page-header-section {
+            padding: 20px 0 30px;
+        }
+
+        .page-header-section h2 {
+            font-family: 'Playfair Display', serif;
+            font-weight: 700;
+            color: var(--cbwci-purple);
+            font-size: 32px;
+        }
+
+        .page-header-section .breadcrumb-custom {
+            color: var(--cbwci-muted);
+            font-size: 14px;
+        }
+
+        .page-header-section .breadcrumb-custom a {
+            color: var(--cbwci-purple);
+            text-decoration: none;
+            transition: var(--transition);
+        }
+
+        .page-header-section .breadcrumb-custom a:hover {
+            color: var(--cbwci-gold);
+        }
+
+        .page-header-section .breadcrumb-custom .separator {
+            margin: 0 8px;
+            color: var(--cbwci-gold);
+        }
+
+        .page-header-section .total-badge {
+            display: inline-block;
+            background: var(--cbwci-gold);
+            color: var(--cbwci-purple-dark);
+            padding: 2px 18px;
+            border-radius: 50px;
+            font-size: 14px;
+            font-weight: 600;
+            margin-left: 12px;
+        }
+
+        /* ===== USERS WRAPPER ===== */
+        .users-wrapper {
+            padding-bottom: 60px;
+        }
+
+        /* ===== STATS CARDS ===== */
+        .stat-card {
+            background: white;
+            border-radius: 12px;
+            padding: 20px 24px;
+            box-shadow: var(--shadow);
+            border: 1px solid rgba(201, 168, 76, 0.1);
+            text-align: center;
+            transition: var(--transition);
+            height: 100%;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-3px);
+            box-shadow: var(--shadow-hover);
+        }
+
+        .stat-card .stat-icon {
+            font-size: 28px;
+            color: var(--cbwci-gold);
+            margin-bottom: 6px;
+        }
+
+        .stat-card .stat-number {
+            font-family: 'Playfair Display', serif;
+            font-weight: 900;
+            font-size: 32px;
+            color: var(--cbwci-purple);
+        }
+
+        .stat-card .stat-label {
+            font-size: 13px;
+            color: var(--cbwci-muted);
+        }
+
+        /* ===== USERS TABLE CARD ===== */
+        .users-card {
+            background: white;
+            border-radius: 16px;
+            padding: 24px 28px;
+            box-shadow: var(--shadow);
+            border: 1px solid rgba(201, 168, 76, 0.1);
+        }
+
+        .users-card .card-header-custom {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #f0ebe4;
+        }
+
+        .users-card .card-header-custom h5 {
+            font-weight: 700;
+            color: var(--cbwci-purple);
+            margin: 0;
+        }
+
+        .users-card .card-header-custom .header-actions {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        /* ===== TABLE STYLES ===== */
+        .table-wrapper {
+            overflow-x: auto;
+        }
+
+        #usersTable {
+            width: 100% !important;
+            font-size: 14px;
+        }
+
+        #usersTable thead th {
+            background: var(--cbwci-cream);
+            padding: 12px 16px;
+            font-weight: 600;
+            color: var(--cbwci-purple);
+            border-bottom: 2px solid var(--cbwci-gold);
+            white-space: nowrap;
+        }
+
+        #usersTable tbody td {
+            padding: 12px 16px;
+            vertical-align: middle;
+            border-bottom: 1px solid #f0ebe4;
+        }
+
+        #usersTable tbody tr:hover td {
+            background: rgba(74, 25, 66, 0.02);
+        }
+
+        #usersTable .user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--cbwci-purple), var(--cbwci-purple-dark));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 700;
+            font-size: 16px;
+            font-family: 'Playfair Display', serif;
+            flex-shrink: 0;
+        }
+
+        #usersTable .status-badge {
+            padding: 3px 12px;
+            border-radius: 50px;
+            font-size: 12px;
+            font-weight: 600;
+            white-space: nowrap;
+        }
+
+        #usersTable .status-badge.active {
+            background: rgba(45, 143, 92, 0.12);
+            color: var(--success);
+        }
+
+        #usersTable .status-badge.inactive {
+            background: rgba(192, 57, 43, 0.12);
+            color: var(--danger);
+        }
+
+        #usersTable .status-badge.pending {
+            background: rgba(230, 126, 34, 0.12);
+            color: var(--warning);
+        }
+
+        #usersTable .role-badge {
+            padding: 2px 12px;
+            border-radius: 50px;
+            font-size: 11px;
+            font-weight: 600;
+        }
+
+        #usersTable .role-badge.admin {
+            background: rgba(74, 25, 66, 0.12);
+            color: var(--cbwci-purple);
+        }
+
+        #usersTable .role-badge.member {
+            background: rgba(41, 128, 185, 0.12);
+            color: var(--info);
+        }
+
+        #usersTable .role-badge.followup {
+            background: rgba(45, 143, 92, 0.12);
+            color: var(--success);
+        }
+
+        #usersTable .role-badge.driver {
+            background: rgba(230, 126, 34, 0.12);
+            color: var(--warning);
+        }
+
+        #usersTable .action-btns {
+            display: flex;
+            gap: 4px;
+            flex-wrap: wrap;
+        }
+
+        #usersTable .action-btns .btn-sm {
+            padding: 2px 10px;
+            font-size: 11px;
+            border-radius: 6px;
+        }
+
+        /* ===== BUTTONS ===== */
+        .btn-primary-custom {
+            background: linear-gradient(135deg, var(--cbwci-purple), var(--cbwci-purple-dark));
+            border: none;
+            border-radius: 10px;
+            padding: 10px 24px;
+            font-weight: 600;
+            font-size: 14px;
+            color: white;
+            transition: var(--transition);
+        }
+
+        .btn-primary-custom:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(74, 25, 66, 0.35);
+            color: white;
+        }
+
+        .btn-outline-custom {
+            background: transparent;
+            border: 2px solid #E8DCC8;
+            border-radius: 10px;
+            padding: 10px 24px;
+            font-weight: 600;
+            font-size: 14px;
+            color: var(--cbwci-muted);
+            transition: var(--transition);
+        }
+
+        .btn-outline-custom:hover {
+            border-color: var(--cbwci-purple);
+            color: var(--cbwci-purple);
+        }
+
+        .btn-success-custom {
+            background: var(--success);
+            border: none;
+            border-radius: 8px;
+            padding: 6px 18px;
+            font-weight: 600;
+            font-size: 13px;
+            color: white;
+            transition: var(--transition);
+        }
+
+        .btn-success-custom:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(45, 143, 92, 0.3);
+            color: white;
+        }
+
+        .btn-danger-custom {
+            background: var(--danger);
+            border: none;
+            border-radius: 8px;
+            padding: 6px 18px;
+            font-weight: 600;
+            font-size: 13px;
+            color: white;
+            transition: var(--transition);
+        }
+
+        .btn-danger-custom:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(192, 57, 43, 0.3);
+            color: white;
+        }
+
+        .btn-gold-custom {
+            background: linear-gradient(135deg, var(--cbwci-gold), var(--cbwci-gold-dark));
+            border: none;
+            border-radius: 8px;
+            padding: 6px 18px;
+            font-weight: 600;
+            font-size: 13px;
+            color: var(--cbwci-purple-dark);
+            transition: var(--transition);
+        }
+
+        .btn-gold-custom:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(201, 168, 76, 0.3);
+            color: var(--cbwci-purple-dark);
+        }
+
+        /* ===== DATA TABLES CUSTOM ===== */
+        .dataTables_wrapper .dataTables_length,
+        .dataTables_wrapper .dataTables_filter {
+            margin-bottom: 15px;
+        }
+
+        .dataTables_wrapper .dataTables_length select,
+        .dataTables_wrapper .dataTables_filter input {
+            border: 2px solid #E8DCC8;
+            border-radius: 8px;
+            padding: 6px 12px;
+            font-size: 13px;
+            transition: var(--transition);
+        }
+
+        .dataTables_wrapper .dataTables_length select:focus,
+        .dataTables_wrapper .dataTables_filter input:focus {
+            border-color: var(--cbwci-gold);
+            box-shadow: 0 0 0 4px rgba(201, 168, 76, 0.12);
+            outline: none;
+        }
+
+        .dataTables_wrapper .dataTables_paginate .paginate_button {
+            padding: 6px 14px;
+            border-radius: 8px;
+            border: 2px solid #E8DCC8;
+            margin: 0 4px;
+            background: transparent;
+            color: var(--cbwci-muted);
+            font-weight: 600;
+            font-size: 13px;
+            transition: var(--transition);
+        }
+
+        .dataTables_wrapper .dataTables_paginate .paginate_button:hover {
+            border-color: var(--cbwci-purple);
+            color: var(--cbwci-purple);
+            background: transparent;
+        }
+
+        .dataTables_wrapper .dataTables_paginate .paginate_button.current {
+            background: var(--cbwci-purple);
+            border-color: var(--cbwci-purple);
+            color: white;
+        }
+
+        .dataTables_wrapper .dataTables_info {
+            font-size: 13px;
+            color: var(--cbwci-muted);
+        }
+
+        /* ===== LOADING OVERLAY ===== */
+        .loading-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.4);
+            backdrop-filter: blur(4px);
+            z-index: 9998;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .loading-overlay.show {
+            display: flex;
+        }
+
+        .loading-spinner {
+            background: white;
+            border-radius: 16px;
+            padding: 40px 50px;
+            text-align: center;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.2);
+        }
+
+        .loading-spinner .spinner {
+            width: 50px;
+            height: 50px;
+            border: 4px solid #f0ebe4;
+            border-top-color: var(--cbwci-gold);
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            margin: 0 auto 15px;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .loading-spinner h6 {
+            color: var(--cbwci-purple);
+            font-weight: 600;
+            margin: 0;
+        }
+
+        .loading-spinner small {
+            color: var(--cbwci-muted);
+        }
+
+        /* ===== TOAST ===== */
+        .toast-container {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            z-index: 9999;
+        }
+
+        .toast-custom {
+            background: white;
+            border-radius: 12px;
+            padding: 16px 24px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.15);
+            border-left: 4px solid var(--success);
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            animation: slideUp 0.4s ease;
+            margin-top: 10px;
+        }
+
+        .toast-custom i {
+            font-size: 24px;
+            color: var(--success);
+        }
+
+        .toast-custom .msg h6 {
+            margin: 0;
+            font-weight: 600;
+        }
+
+        .toast-custom .msg small {
+            color: var(--cbwci-muted);
+        }
+
+        .toast-custom.toast-danger {
+            border-left-color: var(--danger);
+        }
+
+        .toast-custom.toast-danger i {
+            color: var(--danger);
+        }
+
+        .toast-custom.toast-warning {
+            border-left-color: var(--warning);
+        }
+
+        .toast-custom.toast-warning i {
+            color: var(--warning);
+        }
+
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* ===== RESPONSIVE ===== */
+        @media (max-width: 768px) {
+            body {
+                padding-top: 70px;
+            }
+            .page-header-section h2 {
+                font-size: 24px;
+            }
+            .users-card {
+                padding: 18px 16px;
+            }
+            .users-card .card-header-custom {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 10px;
+            }
+            .navbar-brand {
+                font-size: 16px;
+            }
+            .navbar-brand .gold {
+                font-size: 11px;
+            }
+            #usersTable {
+                font-size: 12px;
+            }
+            #usersTable thead th,
+            #usersTable tbody td {
+                padding: 8px 10px;
+            }
+            .stat-card .stat-number {
+                font-size: 24px;
+            }
+        }
+
+        @media (max-width: 576px) {
+            .page-header-section h2 {
+                font-size: 20px;
+            }
+            .users-card {
+                padding: 14px 12px;
+            }
+            #usersTable thead th,
+            #usersTable tbody td {
+                padding: 6px 8px;
+                font-size: 11px;
+            }
+            #usersTable .user-avatar {
+                width: 30px;
+                height: 30px;
+                font-size: 12px;
+            }
+            #usersTable .action-btns .btn-sm {
+                padding: 1px 6px;
+                font-size: 9px;
+            }
+        }
+
+        /* ===== SCROLLBAR ===== */
+        ::-webkit-scrollbar {
+            width: 10px;
+        }
+        ::-webkit-scrollbar-track {
+            background: var(--cbwci-cream);
+        }
+        ::-webkit-scrollbar-thumb {
+            background: var(--cbwci-purple);
+            border-radius: 10px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--cbwci-gold);
+        }
+
+        /* ===== ANIMATIONS ===== */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .fade-in {
+            animation: fadeIn 0.4s ease;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- ======================================== -->
+    <!-- LOADING OVERLAY -->
+    <!-- ======================================== -->
+    <div class="loading-overlay" id="loadingOverlay">
+        <div class="loading-spinner">
+            <div class="spinner"></div>
+            <h6>Loading Users...</h6>
+            <small>Please wait while we fetch data from the database</small>
+        </div>
+    </div>
+
+    <!-- ======================================== -->
+    <!-- NAVBAR -->
+    <!-- ======================================== -->
+    <nav class="navbar navbar-expand-lg fixed-top">
+        <div class="container">
+            <a class="navbar-brand" href="index.html">
+                <i class="fas fa-church"></i>
+                CBWCI
+                <span class="gold">Changed By The Word</span>
+            </a>
+            <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon" style="filter: invert(1);"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto align-items-lg-center">
+                    <li class="nav-item">
+                        <a class="nav-link" href="profile.html"><i class="fas fa-chart-pie"></i> Overview</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="edit_profile.html"><i class="fas fa-user-edit"></i> Edit Profile</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="taxi.html"><i class="fas fa-taxi"></i> Book a Ride</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="profile.html#tab-zoom"><i class="fas fa-video"></i> CBWCI Virtual Meeting</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="followup.html"><i class="fas fa-users"></i> Follow-Ups</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="notification.html"><i class="fas fa-bell"></i> Notifications</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="security.html"><i class="fas fa-shield-alt"></i> Security</a>
+                    </li>
+                    <li class="nav-item ms-lg-2">
+                        <a href="profile.html" class="btn btn-back me-2">
+                            <i class="fas fa-arrow-left"></i> Back
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="#" class="btn btn-logout" onclick="logoutUser(event)">
+                            <i class="fas fa-sign-out-alt"></i> Logout
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- ======================================== -->
+    <!-- PAGE HEADER -->
+    <!-- ======================================== -->
+    <section class="page-header-section">
+        <div class="container">
+            <div data-aos="fade-up">
+                <div class="breadcrumb-custom">
+                    <a href="index.html"><i class="fas fa-home"></i> Home</a>
+                    <span class="separator">/</span>
+                    <a href="profile.html">Profile</a>
+                    <span class="separator">/</span>
+                    <span style="color: var(--cbwci-gold-dark); font-weight: 500;">Registered Users</span>
+                </div>
+                <h2>
+                    <i class="fas fa-users" style="color: var(--cbwci-gold);"></i> 
+                    Registered Users
+                    <span class="total-badge" id="totalUsersBadge">0</span>
+                </h2>
+                <p style="color: var(--cbwci-muted); font-size: 16px; max-width: 500px;">
+                    View and manage all registered members of Changed By The Word Church International.
+                </p>
+            </div>
+        </div>
+    </section>
+
+    <!-- ======================================== -->
+    <!-- USERS CONTENT -->
+    <!-- ======================================== -->
+    <section class="users-wrapper">
+        <div class="container">
+
+            <!-- ===== STATS ROW ===== -->
+            <div class="row g-3 mb-4" data-aos="fade-up">
+                <div class="col-md-3 col-6">
+                    <div class="stat-card">
+                        <div class="stat-icon"><i class="fas fa-users"></i></div>
+                        <div class="stat-number" id="statTotal">0</div>
+                        <div class="stat-label">Total Users</div>
+                    </div>
+                </div>
+                <div class="col-md-3 col-6">
+                    <div class="stat-card">
+                        <div class="stat-icon"><i class="fas fa-check-circle" style="color: var(--success);"></i></div>
+                        <div class="stat-number" id="statActive">0</div>
+                        <div class="stat-label">Active</div>
+                    </div>
+                </div>
+                <div class="col-md-3 col-6">
+                    <div class="stat-card">
+                        <div class="stat-icon"><i class="fas fa-clock" style="color: var(--warning);"></i></div>
+                        <div class="stat-number" id="statPending">0</div>
+                        <div class="stat-label">Pending</div>
+                    </div>
+                </div>
+                <div class="col-md-3 col-6">
+                    <div class="stat-card">
+                        <div class="stat-icon"><i class="fas fa-user-shield" style="color: var(--info);"></i></div>
+                        <div class="stat-number" id="statAdmins">0</div>
+                        <div class="stat-label">Admins</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ===== USERS TABLE ===== -->
+            <div class="users-card" data-aos="fade-up" data-aos-delay="100">
+                <div class="card-header-custom">
+                    <h5><i class="fas fa-list" style="color: var(--cbwci-gold);"></i> All Registered Users</h5>
+                    <div class="header-actions">
+                        <button class="btn btn-primary-custom" onclick="refreshUsers()">
+                            <i class="fas fa-sync-alt"></i> Refresh
+                        </button>
+                        <button class="btn btn-outline-custom" onclick="exportUsers()">
+                            <i class="fas fa-file-export"></i> Export CSV
+                        </button>
+                    </div>
+                </div>
+
+                <div class="table-wrapper">
+                    <table id="usersTable" class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th>User</th>
+                                <th>Email</th>
+                                <th>Phone</th>
+                                <th>Location</th>
+                                <th>Role</th>
+                                <th>Status</th>
+                                <th>Joined</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="usersTableBody">
+                            <!-- Data will be populated by JavaScript -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+        </div>
+    </section>
+
+    <!-- ======================================== -->
+    <!-- TOAST CONTAINER -->
+    <!-- ======================================== -->
+    <div class="toast-container" id="toastContainer"></div>
+
+    <!-- ======================================== -->
+    <!-- SCRIPTS -->
+    <!-- ======================================== -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js">
+    </script>
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js">
+    </script>
+    <script src="https://code.jquery.com/jquery-3.7.0.min.js">
+    </script>
+    <script src="https://cdn.datatables.net/1.13.4/js/jquery.dataTables.min.js">
+    </script>
+    <script src="https://cdn.datatables.net/1.13.4/js/dataTables.bootstrap5.min.js">
+    </script>
+
+    <script>
+        // ========================================
+        // INITIALIZE AOS
+        // ========================================
+        AOS.init({
+            duration: 800,
+            once: true
+        });
+
+        // ========================================
+        // SAMPLE USER DATA (Simulating Database)
+        // ========================================
+        let usersData = [
+            { id: 1, name: 'John M. Doe', email: 'john.doe@email.com', phone: '+27 82 123 4567', location: 'Nelspruit Town CBD', role: 'admin', status: 'active', joined: '2024-01-15' },
+            { id: 2, name: 'Sarah K. Smith', email: 'sarah.smith@email.com', phone: '+27 72 345 6789', location: 'Sonheuwel', role: 'member', status: 'active', joined: '2024-02-01' },
+            { id: 3, name: 'David M. Williams', email: 'david.williams@email.com', phone: '+27 64 567 8901', location: 'West Acres', role: 'driver', status: 'active', joined: '2024-02-15' },
+            { id: 4, name: 'Mary S. Johnson', email: 'mary.johnson@email.com', phone: '+27 73 456 7890', location: 'Belladonna', role: 'followup', status: 'active', joined: '2024-03-01' },
+            { id: 5, name: 'Peter K. Brown', email: 'peter.brown@email.com', phone: '+27 82 987 6543', location: 'Mataffin', role: 'member', status: 'pending', joined: '2024-03-15' },
+            { id: 6, name: 'Grace N. Davis', email: 'grace.davis@email.com', phone: '+27 71 234 5678', location: 'Stonehenge', role: 'member', status: 'active', joined: '2024-04-01' },
+            { id: 7, name: 'Samuel R. Wilson', email: 'samuel.wilson@email.com', phone: '+27 65 432 1098', location: 'Msholozi', role: 'admin', status: 'active', joined: '2024-04-15' },
+            { id: 8, name: 'Joyce M. Taylor', email: 'joyce.taylor@email.com', phone: '+27 74 321 9876', location: 'WhiteRiver', role: 'member', status: 'inactive', joined: '2024-05-01' },
+            { id: 9, name: 'Thomas W. Anderson', email: 'thomas.anderson@email.com', phone: '+27 63 789 0123', location: 'Ngodini', role: 'driver', status: 'active', joined: '2024-05-15' },
+            { id: 10, name: 'Anna K. Thomas', email: 'anna.thomas@email.com', phone: '+27 72 890 1234', location: 'HazyView', role: 'followup', status: 'active', joined: '2024-06-01' },
+            { id: 11, name: 'Paul M. Jackson', email: 'paul.jackson@email.com', phone: '+27 61 456 7890', location: 'Nelspruit Town CBD', role: 'member', status: 'pending', joined: '2024-06-15' },
+            { id: 12, name: 'Ruth N. White', email: 'ruth.white@email.com', phone: '+27 73 567 8901', location: 'Sonheuwel', role: 'member', status: 'active', joined: '2024-07-01' },
+            { id: 13, name: 'James T. Harris', email: 'james.harris@email.com', phone: '+27 82 123 4567', location: 'West Acres', role: 'admin', status: 'active', joined: '2024-07-15' },
+            { id: 14, name: 'Elizabeth M. Martin', email: 'elizabeth.martin@email.com', phone: '+27 64 890 1234', location: 'Belladonna', role: 'member', status: 'inactive', joined: '2024-08-01' },
+            { id: 15, name: 'Daniel K. Thompson', email: 'daniel.thompson@email.com', phone: '+27 71 678 9012', location: 'Mataffin', role: 'driver', status: 'active', joined: '2024-08-15' },
+            { id: 16, name: 'Susan W. Garcia', email: 'susan.garcia@email.com', phone: '+27 74 234 5678', location: 'Stonehenge', role: 'member', status: 'pending', joined: '2024-09-01' },
+            { id: 17, name: 'Joseph M. Martinez', email: 'joseph.martinez@email.com', phone: '+27 63 901 2345', location: 'Msholozi', role: 'followup', status: 'active', joined: '2024-09-15' },
+            { id: 18, name: 'Margaret L. Robinson', email: 'margaret.robinson@email.com', phone: '+27 72 678 9012', location: 'WhiteRiver', role: 'member', status: 'active', joined: '2024-10-01' },
+            { id: 19, name: 'Simon P. Clark', email: 'simon.clark@email.com', phone: '+27 61 234 5678', location: 'Ngodini', role: 'member', status: 'active', joined: '2024-10-15' },
+            { id: 20, name: 'Esther N. Rodriguez', email: 'esther.rodriguez@email.com', phone: '+27 73 890 1234', location: 'HazyView', role: 'admin', status: 'active', joined: '2024-11-01' },
+            { id: 21, name: 'Mark T. Lewis', email: 'mark.lewis@email.com', phone: '+27 82 567 8901', location: 'Nelspruit Town CBD', role: 'member', status: 'inactive', joined: '2024-11-15' },
+            { id: 22, name: 'Deborah M. Lee', email: 'deborah.lee@email.com', phone: '+27 64 123 4567', location: 'Sonheuwel', role: 'driver', status: 'active', joined: '2024-12-01' },
+            { id: 23, name: 'Stephen K. Walker', email: 'stephen.walker@email.com', phone: '+27 71 789 0123', location: 'West Acres', role: 'member', status: 'pending', joined: '2024-12-15' },
+            { id: 24, name: 'Hannah W. Hall', email: 'hannah.hall@email.com', phone: '+27 74 345 6789', location: 'Belladonna', role: 'followup', status: 'active', joined: '2025-01-01' },
+            { id: 25, name: 'Andrew M. Allen', email: 'andrew.allen@email.com', phone: '+27 63 456 7890', location: 'Mataffin', role: 'member', status: 'active', joined: '2025-01-15' },
+            { id: 26, name: 'Catherine N. Young', email: 'catherine.young@email.com', phone: '+27 72 901 2345', location: 'Stonehenge', role: 'admin', status: 'active', joined: '2025-02-01' },
+            { id: 27, name: 'Philip K. King', email: 'philip.king@email.com', phone: '+27 61 789 0123', location: 'Msholozi', role: 'member', status: 'active', joined: '2025-02-15' },
+            { id: 28, name: 'Sarah M. Wright', email: 'sarah.wright@email.com', phone: '+27 73 234 5678', location: 'WhiteRiver', role: 'driver', status: 'inactive', joined: '2025-03-01' },
+            { id: 29, name: 'David L. Scott', email: 'david.scott@email.com', phone: '+27 82 678 9012', location: 'Ngodini', role: 'member', status: 'active', joined: '2025-03-15' },
+            { id: 30, name: 'Mary T. Torres', email: 'mary.torres@email.com', phone: '+27 64 901 2345', location: 'HazyView', role: 'followup', status: 'pending', joined: '2025-04-01' }
+        ];
+
+        // ========================================
+        // DATA TABLE INSTANCE
+        // ========================================
+        let dataTable;
+
+        // ========================================
+        // LOAD USERS FROM DATABASE (SIMULATED)
+        // ========================================
+        function loadUsers() {
+            // Show loading overlay
+            document.getElementById('loadingOverlay').classList.add('show');
+
+            // Simulate API call delay
+            setTimeout(() => {
+                // In production, you would fetch from your backend:
+                // fetch('/api/users')
+                //     .then(response => response.json())
+                //     .then(data => {
+                //         usersData = data;
+                //         renderTable();
+                //         updateStats();
+                //     })
+                //     .catch(error => {
+                //         showToast('Error', 'Failed to load users from database.', 'danger');
+                //     });
+
+                renderTable();
+                updateStats();
+                document.getElementById('loadingOverlay').classList.remove('show');
+
+                showToast('Success', 'Users loaded successfully from database!', 'success');
+            }, 1500);
+        }
+
+        // ========================================
+        // RENDER TABLE
+        // ========================================
+        function renderTable() {
+            const tbody = document.getElementById('usersTableBody');
+
+            if (usersData.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="8" style="text-align: center; padding: 40px; color: var(--cbwci-muted);">
+                            <i class="fas fa-users" style="font-size: 32px; display: block; margin-bottom: 10px; opacity: 0.3;"></i>
+                            No registered users found.
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+
+            let html = '';
+            usersData.forEach(user => {
+                const initials = user.name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2);
+                const statusClass = user.status === 'active' ? 'active' : user.status === 'pending' ? 'pending' : 'inactive';
+                const statusIcon = user.status === 'active' ? 'fa-check-circle' : user.status === 'pending' ? 'fa-clock' : 'fa-times-circle';
+                const roleClass = user.role;
+                const joinedDate = new Date(user.joined).toLocaleDateString('en-ZA', {
+                    year: 'numeric',
+                    month: 'short',
+                    day: 'numeric'
+                });
+
+                html += `
+                    <tr>
+                        <td>
+                            <div style="display: flex; align-items: center; gap: 12px;">
+                                <div class="user-avatar">${initials}</div>
+                                <div>
+                                    <strong>${user.name}</strong>
+                                </div>
+                            </div>
+                        </td>
+                        <td>${user.email}</td>
+                        <td>${user.phone}</td>
+                        <td>${user.location}</td>
+                        <td><span class="role-badge ${roleClass}">${capitalize(user.role)}</span></td>
+                        <td>
+                            <span class="status-badge ${statusClass}">
+                                <i class="fas ${statusIcon}"></i> ${capitalize(user.status)}
+                            </span>
+                        </td>
+                        <td>${joinedDate}</td>
+                        <td>
+                            <div class="action-btns">
+                                <button class="btn btn-primary-custom btn-sm" onclick="viewUser(${user.id})">
+                                    <i class="fas fa-eye"></i>
+                                </button>
+                                <button class="btn btn-gold-custom btn-sm" onclick="editUser(${user.id})">
+                                    <i class="fas fa-edit"></i>
+                                </button>
+                                <button class="btn ${user.status === 'active' ? 'btn-warning-custom' : 'btn-success-custom'}" 
+                                        style="background: ${user.status === 'active' ? 'var(--warning)' : 'var(--success)'}; border: none; padding: 2px 10px; border-radius: 6px; font-weight: 600; font-size: 11px; color: white; transition: var(--transition);"
+                                        onclick="toggleStatus(${user.id})">
+                                    <i class="fas ${user.status === 'active' ? 'fa-pause' : 'fa-play'}"></i>
+                                </button>
+                                <button class="btn btn-danger-custom btn-sm" onclick="deleteUser(${user.id})">
+                                    <i class="fas fa-trash-alt"></i>
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+            });
+
+            tbody.innerHTML = html;
+
+            // Initialize or update DataTable
+            if (dataTable) {
+                dataTable.destroy();
+            }
+
+            dataTable = $('#usersTable').DataTable({
+                pageLength: 10,
+                responsive: true,
+                language: {
+                    search: "Search:",
+                    lengthMenu: "Show _MENU_ entries",
+                    info: "Showing _START_ to _END_ of _TOTAL_ users",
+                    infoEmpty: "No users available",
+                    infoFiltered: "(filtered from _MAX_ total users)",
+                    zeroRecords: "No matching users found"
+                },
+                columnDefs: [
+                    { orderable: false, targets: [7] }
+                ],
+                order: [
+                    [0, 'asc']
+                ],
+                drawCallback: function() {
+                    // Re-apply any custom styling after draw
+                    $('.dataTables_filter input').addClass('form-control form-control-sm');
+                    $('.dataTables_length select').addClass('form-select form-select-sm');
+                }
+            });
+        }
+
+        // ========================================
+        // UPDATE STATISTICS
+        // ========================================
+        function updateStats() {
+            const total = usersData.length;
+            const active = usersData.filter(u => u.status === 'active').length;
+            const pending = usersData.filter(u => u.status === 'pending').length;
+            const admins = usersData.filter(u => u.role === 'admin').length;
+
+            document.getElementById('statTotal').textContent = total;
+            document.getElementById('statActive').textContent = active;
+            document.getElementById('statPending').textContent = pending;
+            document.getElementById('statAdmins').textContent = admins;
+            document.getElementById('totalUsersBadge').textContent = total;
+        }
+
+        // ========================================
+        // HELPER FUNCTIONS
+        // ========================================
+        function capitalize(str) {
+            return str.charAt(0).toUpperCase() + str.slice(1);
+        }
+
+        function getInitials(name) {
+            return name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2);
+        }
+
+        // ========================================
+        // REFRESH USERS
+        // ========================================
+        function refreshUsers() {
+            loadUsers();
+        }
+
+        // ========================================
+        // VIEW USER
+        // ========================================
+        function viewUser(id) {
+            const user = usersData.find(u => u.id === id);
+            if (!user) return;
+
+            showToast(
+                `👤 ${user.name}`,
+                `Email: ${user.email}\nPhone: ${user.phone}\nLocation: ${user.location}\nRole: ${capitalize(user.role)}\nStatus: ${capitalize(user.status)}\nJoined: ${new Date(user.joined).toLocaleDateString('en-ZA')}`,
+                'info'
+            );
+        }
+
+        // ========================================
+        // EDIT USER
+        // ========================================
+        function editUser(id) {
+            const user = usersData.find(u => u.id === id);
+            if (!user) return;
+
+            // In production, this would open a modal or redirect to edit page
+            showToast(
+                'Edit User',
+                `Editing ${user.name}. In production, this would open the edit form.`,
+                'info'
+            );
+        }
+
+        // ========================================
+        // TOGGLE USER STATUS
+        // ========================================
+        function toggleStatus(id) {
+            const user = usersData.find(u => u.id === id);
+            if (!user) return;
+
+            const newStatus = user.status === 'active' ? 'inactive' : 'active';
+            const action = newStatus === 'active' ? 'activated' : 'deactivated';
+
+            if (confirm(`Are you sure you want to ${action} ${user.name}?`)) {
+                user.status = newStatus;
+                renderTable();
+                updateStats();
+                showToast(
+                    'Status Updated',
+                    `${user.name} has been ${action} successfully.`,
+                    newStatus === 'active' ? 'success' : 'warning'
+                );
+            }
+        }
+
+        // ========================================
+        // DELETE USER
+        // ========================================
+        function deleteUser(id) {
+            const user = usersData.find(u => u.id === id);
+            if (!user) return;
+
+            if (confirm(`⚠️ Are you sure you want to delete ${user.name}?\n\nThis action cannot be undone!`)) {
+                if (confirm(`Type "DELETE" to confirm:`, 'DELETE')) {
+                    usersData = usersData.filter(u => u.id !== id);
+                    renderTable();
+                    updateStats();
+                    showToast('User Deleted', `${user.name} has been deleted successfully.`, 'danger');
+                }
+            }
+        }
+
+        // ========================================
+        // EXPORT USERS
+        // ========================================
+        function exportUsers() {
+            if (usersData.length === 0) {
+                showToast('Error', 'No users to export.', 'danger');
+                return;
+            }
+
+            // Create CSV
+            let csv = 'Name,Email,Phone,Location,Role,Status,Joined\n';
+            usersData.forEach(u => {
+                csv += `${u.name},${u.email},${u.phone},${u.location},${u.role},${u.status},${u.joined}\n`;
+            });
+
+            // Download
+            const blob = new Blob([csv], { type: 'text/csv' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `cbwci-users-${new Date().toISOString().split('T')[0]}.csv`;
+            a.click();
+            window.URL.revokeObjectURL(url);
+
+            showToast('Exported', `${usersData.length} users exported successfully.`, 'success');
+        }
+
+        // ========================================
+        // LOGOUT
+        // ========================================
+        function logoutUser(event) {
+            event.preventDefault();
+            if (confirm('Are you sure you want to logout?')) {
+                sessionStorage.clear();
+                showToast('Logged Out', 'You have been successfully logged out.', 'info');
+                setTimeout(() => {
+                    window.location.href = 'login.html';
+                }, 1500);
+            }
+        }
+
+        // ========================================
+        // TOAST NOTIFICATIONS
+        // ========================================
+        function showToast(title, message, type = 'success') {
+            const container = document.getElementById('toastContainer');
+            const iconMap = {
+                'success': 'fa-check-circle',
+                'danger': 'fa-exclamation-circle',
+                'warning': 'fa-exclamation-triangle',
+                'info': 'fa-info-circle'
+            };
+            const colorMap = {
+                'success': 'var(--success)',
+                'danger': 'var(--danger)',
+                'warning': 'var(--warning)',
+                'info': 'var(--info)'
+            };
+
+            const toast = document.createElement('div');
+            toast.className = `toast-custom ${type === 'danger' ? 'toast-danger' : ''} ${type === 'warning' ? 'toast-warning' : ''}`;
+            toast.innerHTML = `
+                <i class="fas ${iconMap[type] || 'fa-check-circle'}" style="color: ${colorMap[type] || 'var(--success)'};"></i>
+                <div class="msg">
+                    <h6>${title}</h6>
+                    <small>${message}</small>
+                </div>
+            `;
+
+            container.appendChild(toast);
+
+            setTimeout(() => {
+                toast.style.opacity = '0';
+                toast.style.transform = 'translateX(50px)';
+                setTimeout(() => toast.remove(), 400);
+            }, 4000);
+        }
+
+        // ========================================
+        // CONSOLE BRANDING
+        // ========================================
+        console.log('%c✝ CBWCI - Registered Users ✝', 'font-size: 18px; color: #C9A84C; font-weight: bold;');
+        console.log('%c"Change, Dominate and Walk in Glory"', 'font-size: 14px; color: #4A1942; font-style: italic;');
+        console.log(`👥 ${usersData.length} registered users loaded`);
+
+        // ========================================
+        // INITIAL LOAD
+        // ========================================
+        document.addEventListener('DOMContentLoaded', function() {
+            loadUsers();
+        });
+    </script>
+
+</body>
+</html>
