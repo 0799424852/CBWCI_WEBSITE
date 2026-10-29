@@ -887,6 +887,8 @@ def api_admin_meeting_share(meeting_id):
 # OLD "*.html" LINKS -> REAL PAGES
 # The templates link to files like login.html, but Flask serves /login.
 # These routes catch the old links and send people to the right page.
+# Links to login.html also CLEAR the server session: every logout button
+# and every "Log In" link ends up there, so you always get a fresh login form.
 # ========================================
 
 MEMBER_PAGE_ALIASES = {
@@ -911,8 +913,10 @@ ADMIN_PAGE_ALIASES = {
 }
 
 
-def _redirect_to(endpoint):
+def _redirect_to(endpoint, clear_session=False):
     def view():
+        if clear_session:
+            session.clear()
         target = url_for(endpoint)
         if request.query_string:
             target += '?' + request.query_string.decode()
@@ -920,11 +924,11 @@ def _redirect_to(endpoint):
     return view
 
 
-def _add_alias(path, endpoint):
+def _add_alias(path, endpoint, clear_session=False):
     if any(rule.rule == path for rule in app.url_map.iter_rules()):
         return  # a real route already uses this path
     app.add_url_rule(path, endpoint='alias_' + path.strip('/').replace('/', '_').replace('.', '_'),
-                     view_func=_redirect_to(endpoint))
+                     view_func=_redirect_to(endpoint, clear_session))
 
 
 # Admin pages first, so "/admin/followup.html" means the ADMIN follow-up page
@@ -934,11 +938,10 @@ for _name, _endpoint in ADMIN_PAGE_ALIASES.items():
 # Member pages are linked from the root, from /admin/ pages and from /driver/ pages
 for _name, _endpoint in MEMBER_PAGE_ALIASES.items():
     for _prefix in ('', '/admin', '/driver'):
-        _add_alias(f'{_prefix}/{_name}', _endpoint)
+        _add_alias(f'{_prefix}/{_name}', _endpoint, clear_session=(_name == 'login.html'))
 
 # The driver dashboard links to itself
 _add_alias('/driver/Drivers_Dashboard.html', 'driver_dashboard')
-
 
 # ========================================
 # ERROR HANDLERS
