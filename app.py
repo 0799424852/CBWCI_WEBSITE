@@ -7,6 +7,7 @@ import os
 import json
 import time
 import secrets
+import re
 from datetime import datetime, timedelta, timezone
 
 
@@ -641,6 +642,13 @@ def api_announcements():
                 continue
             if audience == 'specific' and (not uid or (audience_list and uid not in audience_list)):
                 continue
+            if raw.get('type') == 'meeting' and raw.get('meetingId'):
+                # Always point meeting announcements at THIS site (old ones may hold a 127.0.0.1 link)
+                join_path = f"/meeting/{raw['meetingId']}"
+                join_url = (PUBLIC_BASE_URL or request.host_url.rstrip('/')) + join_path
+                raw = {**raw, 'link': join_path}
+                if raw.get('message'):
+                    raw['message'] = re.sub(r'^Join: .*$', 'Join: ' + join_url, raw['message'], flags=re.M)
             announcements.append({'id': announcement_id, **raw})
         announcements.sort(key=lambda item: item.get('createdAt', 0), reverse=True)
         return jsonify({'success': True, 'announcements': announcements})
@@ -958,6 +966,23 @@ def api_admin_meeting_end(meeting_id):
     return jsonify({'success': True})
 
 
+@app.route("/api/admin/meetings/<meeting_id>", methods=['PUT'])
+@api_role_required('admin')
+def api_admin_meeting_update(meeting_id):
+    ref = db.reference(f'{MEETINGS_PATH}/{meeting_id}')
+    existing = ref.get()
+    if not existing:
+        return jsonify({'success': False, 'message': 'Meeting not found'}), 404
+    if meeting_status(existing) == 'ended':
+        return jsonify({'success': False, 'message': 'An ended meeting cannot be edited.'}), 400
+    data, error = clean_meeting_input(request.get_json(silent=True) or {})
+    if error:
+        return jsonify({'success': False, 'message': error}), 400
+    data['updatedAt'] = now_ms()
+    ref.update(data)
+    return jsonify({'success': True})
+
+
 @app.route("/api/admin/meetings/<meeting_id>/share", methods=['POST'])
 @api_role_required('admin')
 def api_admin_meeting_share(meeting_id):
@@ -980,6 +1005,7 @@ def api_admin_meeting_share(meeting_id):
         'meetingId': meeting_id, 'link': link})
     ref.update({'announcementId': new.key, 'sharedAt': now_ms()})
     return jsonify({'success': True, 'link': link})
+
 
 # ========================================
 # OLD "*.html" LINKS -> REAL PAGES
