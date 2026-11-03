@@ -98,7 +98,7 @@
       headers: body ? {'Content-Type': 'application/json'} : {}, body: body ? JSON.stringify(body) : undefined});
     if (res.status === 401) { location.href = '/login'; throw new Error('login'); }
     let data = {}; try { data = await res.json(); } catch (e) {}
-    if (!res.ok || data.success === false) throw new Error(data.message || 'Something went wrong.');
+    if (!res.ok || data.success === false) throw new Error(data.message || ('Request failed (' + res.status + ') ' + url));
     return data;
   }
   const fail = err => { if (err.message !== 'login') toast(err.message, true); };

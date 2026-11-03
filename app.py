@@ -7,7 +7,7 @@ import os
 import json
 import time
 import secrets
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 
 
 from urllib.parse import urlparse
@@ -748,31 +748,128 @@ def public_meeting(meeting_id, m):
 
 # ----- pages -----
 
+MEETINGS_PATH = 'cbwci/meetings'
+MEETING_DOMAIN = os.environ.get('MEETING_DOMAIN', 'meet.jit.si')
+PUBLIC_BASE_URL = os.environ.get('PUBLIC_BASE_URL', '').strip().rstrip('/')
+CHURCH_TZ = timezone(timedelta(hours=2))        # South Africa (SAST), no daylight saving
+MEETING_GRACE_MS = 3 * 60 * 60 * 1000           # never-started meeting counts as ended 3h after its end
+MEETING_STALE_LIVE_MS = 6 * 60 * 60 * 1000      # forgotten live meeting is closed 6h after its end
+
+
+def now_ms():
+    return int(time.time() * 1000)
+
+
+def api_login_required(admin_only=False):
+    """Like login_required, but answers JSON (401/403) instead of redirecting."""
+    def wrapper(f):
+        @wraps(f)
+        def decorated(*args, **kwargs):
+            if 'user_id' not in session:
+                return jsonify({'success': False, 'message': 'Please log in.'}), 401
+            if admin_only and session.get('role') != 'admin':
+                return jsonify({'success': False, 'message': 'Not allowed.'}), 403
+            return f(*args, **kwargs)
+        return decorated
+    return wrapper
+
+
+def effective_status(m):
+    status = m.get('status', 'upcoming')
+    end = int(m.get('startsAt') or 0) + int(m.get('durationMins') or 60) * 60000
+    if status == 'ended':
+        return 'ended'
+    if status == 'live':
+        return 'ended' if now_ms() > end + MEETING_STALE_LIVE_MS else 'live'
+    return 'ended' if now_ms() > end + MEETING_GRACE_MS else 'upcoming'
+
+
+def meeting_link(meeting_id):
+    base = PUBLIC_BASE_URL or request.host_url.rstrip('/')
+    return f"{base}{url_for('meeting_room', meeting_id=meeting_id)}"
+
+
+def public_meeting(meeting_id, m):
+    """What any logged-in user may see (the room name is never included)."""
+    return {
+        'id': meeting_id,
+        'title': m.get('title', 'Meeting'),
+        'description': m.get('description', ''),
+        'hostName': m.get('hostName', ''),
+        'startsAt': int(m.get('startsAt') or 0),
+        'durationMins': int(m.get('durationMins') or 60),
+        'status': effective_status(m),
+    }
+
+
+def format_when(ms):
+    return datetime.fromtimestamp(ms / 1000, tz=CHURCH_TZ).strftime('%a, %d %b %Y at %H:%M')
+
+
+def clean_meeting_input(data):
+    title = str(data.get('title', '')).strip()
+    description = str(data.get('description', '')).strip()
+    try:
+        starts_at = int(data.get('startsAt'))
+        duration = int(data.get('durationMins', 60))
+    except (TypeError, ValueError):
+        return None, 'Please choose a valid date and time.'
+    if not title or len(title) > 120:
+        return None, 'Please enter a title (up to 120 characters).'
+    if len(description) > 1000:
+        return None, 'Description is too long (max 1000 characters).'
+    if not 15 <= duration <= 480:
+        return None, 'Duration must be between 15 and 480 minutes.'
+    if starts_at < now_ms() - 60 * 60 * 1000:
+        return None, 'The start time is in the past.'
+    return {'title': title, 'description': description,
+            'startsAt': starts_at, 'durationMins': duration}, None
+
+
 @app.route("/admin/meetings")
 @admin_required
 def admin_meetings():
     return render_template("admin/meetings.html", user=session)
 
 
+@app.route("/meetings")
+@login_required
+def meetings_page():
+    return render_template("meetings.html", user=session)
+
+
 @app.route("/meeting/<meeting_id>")
-@member_required
+@login_required            # every logged-in user: member, follow-up, driver, admin
 def meeting_room(meeting_id):
-    m = db.reference(f'{MEETINGS_PATH}/{meeting_id}').get()
-    if not m:
-        return 'Meeting not found.', 404
-    is_host = session.get('role') == 'admin'
-    status = meeting_status(m)
-    state = 'ended' if status == 'ended' else ('waiting' if (not is_host and status != 'live') else 'ready')
-    room = {'domain': Config.MEETING_DOMAIN, 'roomName': m.get('roomName'),
-            'scriptUrl': f'https://{Config.MEETING_DOMAIN}/external_api.js'} if state == 'ready' else None
-    return render_template("meeting_room.html", meeting=public_meeting(meeting_id, m),
-                           state=state, is_host=is_host, jitsi=room, user=session)
+    """Admins are hosts. Everyone else gets in once an admin has started the meeting."""
+    try:
+        m = db.reference(f'{MEETINGS_PATH}/{meeting_id}').get()
+        if not m:
+            return render_template("coming_soon.html", page_title="Meeting not found", user=session), 404
+        is_host = session.get('role') == 'admin'
+        status = effective_status(m)
+        if status == 'ended':
+            state, jitsi = 'ended', None
+        elif not is_host and status != 'live':
+            state, jitsi = 'waiting', None
+        else:
+            state = 'ready'
+            jitsi = {'domain': MEETING_DOMAIN, 'roomName': m['roomName'],
+                     'scriptUrl': f'https://{MEETING_DOMAIN}/external_api.js'}
+        return render_template("meeting_room.html", meeting=public_meeting(meeting_id, m),
+                               state=state, is_host=is_host, jitsi=jitsi, user=session)
+    except Exception as error:
+        app.logger.exception('Meeting room failed')
+        if session.get('role') == 'admin':
+            from markupsafe import escape
+            return f"Meeting room error ({type(error).__name__}): {escape(str(error))}", 500
+        return "The meeting room is not available right now.", 500
 
 
 # ----- API used by members -----
 
 @app.route("/api/meetings")
-@api_role_required(*MEMBER_ROLES)
+@api_login_required()
 def api_meetings():
     records = db.reference(MEETINGS_PATH).get() or {}
     items = [public_meeting(k, v) for k, v in records.items() if v]
@@ -782,7 +879,7 @@ def api_meetings():
 
 
 @app.route("/api/meetings/<meeting_id>/status")
-@api_role_required(*MEMBER_ROLES)
+@api_login_required()
 def api_meeting_status(meeting_id):
     m = db.reference(f'{MEETINGS_PATH}/{meeting_id}').get()
     if not m:
@@ -802,6 +899,7 @@ def api_admin_meetings():
             item = public_meeting(k, v)
             item['link'] = meeting_link(k)
             item['shared'] = bool(v.get('announcementId'))
+            item['announcementId'] = v.get('announcementId')
             items.append(item)
     items.sort(key=lambda i: -i['startsAt'])
     return jsonify({'success': True, 'meetings': items})
@@ -953,6 +1051,15 @@ def page_not_found(e):
 
 @app.errorhandler(500)
 def internal_server_error(e):
+    original = getattr(e, 'original_exception', None)
+    detail = f"{type(original).__name__}: {original}" if original is not None else "Internal server error"
+    is_admin = session.get('role') == 'admin'
+    if request.path.startswith('/api/'):
+        # Admins see the real reason (useful while testing); everyone else gets a short message
+        return jsonify({'success': False, 'message': ('Server error - ' + detail) if is_admin else 'Server error'}), 500
+    if is_admin:
+        from markupsafe import escape
+        return f"Server error ({escape(detail)})", 500
     return "Internal server error", 500
 
 # ========================================

@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{{ meeting.title }} - CBWCI Virtual Meeting</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    :root{--plum:#230f22;--gold:#c9a24d}
+    *{box-sizing:border-box}
+    html,body{height:100%;margin:0}
+    body{display:flex;flex-direction:column;background:var(--plum);color:#fff;font-family:system-ui,Segoe UI,Arial,sans-serif}
+    header{display:flex;align-items:center;gap:12px;padding:10px 16px;background:#17091a;border-bottom:1px solid rgba(201,162,77,.35);flex-wrap:wrap}
+    header .brand{font-weight:700;color:var(--gold);white-space:nowrap}
+    header .title{flex:1;min-width:140px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+    .btn{border:0;border-radius:8px;padding:8px 14px;font-weight:600;cursor:pointer;text-decoration:none;font-size:14px}
+    .btn-gold{background:var(--gold);color:var(--plum)}
+    .btn-danger{background:#c0392b;color:#fff}
+    .btn-ghost{background:rgba(255,255,255,.12);color:#fff}
+    .tag{font-size:12px;padding:3px 9px;border-radius:20px;background:rgba(201,162,77,.2);color:var(--gold)}
+    #jitsi{flex:1;min-height:0;width:100%}
+    .center{flex:1;display:flex;align-items:center;justify-content:center;text-align:center;padding:24px}
+    .card{max-width:460px}
+    .card i{font-size:44px;color:var(--gold);margin-bottom:12px}
+    .card h1{margin:.2rem 0 .6rem;font-size:1.6rem}
+    .card p{opacity:.85;line-height:1.55;margin:.4rem 0}
+    .pulse{animation:pulse 1.6s infinite}
+    @keyframes pulse{50%{opacity:.35}}
+  </style>
+</head>
+<body>
+  <header>
+    <span class="brand"><i class="fas fa-church"></i> CBWCI</span>
+    <span class="title">{{ meeting.title }}</span>
+    {% if is_host %}<span class="tag"><i class="fas fa-crown"></i> You are the host</span>{% endif %}
+    {% if state == 'ready' and is_host %}<button class="btn btn-danger" id="endBtn" type="button"><i class="fas fa-stop"></i> End for everyone</button>{% endif %}
+    <a class="btn btn-ghost" href="{{ '/admin/meetings' if is_host else '/meetings' }}"><i class="fas fa-arrow-left"></i> Leave</a>
+  </header>
+
+  {% if state == 'ready' %}
+    <div id="jitsi"
+         data-meeting-id='{{ meeting.id|tojson }}'
+         data-is-host='{{ "true" if is_host else "false" }}'
+         data-config='{{ jitsi|tojson }}'
+         data-name='{{ (user.get("name") or "Guest")|tojson }}'
+         data-email='{{ (user.get("email") or "")|tojson }}'
+         data-title='{{ meeting.title|tojson }}'></div>
+    <script>
+      const box = document.getElementById('jitsi');
+      const MEETING_ID = JSON.parse(box.dataset.meetingId);
+      const IS_HOST = box.dataset.isHost === 'true';
+      const CFG = JSON.parse(box.dataset.config);
+      const TITLE = JSON.parse(box.dataset.title);
+      const ME = { displayName: JSON.parse(box.dataset.name), email: JSON.parse(box.dataset.email) };
+
+      function post(url){ return fetch(url, {method:'POST', credentials:'same-origin'}).catch(function(){}); }
+
+      function startRoom(){
+        const api = new JitsiMeetExternalAPI(CFG.domain, {
+          roomName: CFG.roomName,
+          parentNode: box,
+          width: '100%', height: '100%',
+          userInfo: ME,
+          configOverwrite: { subject: TITLE, prejoinPageEnabled: true, disableDeepLinking: true }
+        });
+
+        if (IS_HOST) {
+          // The meeting opens to everyone the moment the host is inside.
+          api.addListener('videoConferenceJoined', function(){ post('/api/admin/meetings/' + MEETING_ID + '/start'); });
+          document.getElementById('endBtn').addEventListener('click', function(){
+            if (!confirm('End this meeting for everyone?')) return;
+            post('/api/admin/meetings/' + MEETING_ID + '/end').then(function(){
+              try { api.executeCommand('hangup'); } catch (e) {}
+              window.location.href = '/admin/meetings';
+            });
+          });
+        }
+        api.addListener('readyToClose', function(){ window.location.href = IS_HOST ? '/admin/meetings' : '/meetings'; });
+      }
+
+      const s = document.createElement('script');
+      s.src = CFG.scriptUrl;
+      s.onload = startRoom;
+      s.onerror = function(){
+        box.innerHTML =
+          '<div class="center"><div class="card"><i class="fas fa-triangle-exclamation"></i><h1>Could not load the meeting</h1><p>Check your internet connection and refresh the page.</p></div></div>';
+      };
+      document.head.appendChild(s);
+    </script>
+
+  {% elif state == 'waiting' %}
+    <div class="center" id="waitBox" data-starts-at="{{ meeting.startsAt }}" data-meeting-id="{{ meeting.id }}"><div class="card">
+      <i class="fas fa-hourglass-half pulse"></i>
+      <h1>Waiting for {{ meeting.hostName or 'the host' }} to start the meeting</h1>
+      <p><strong>{{ meeting.title }}</strong></p>
+      <p id="when"></p>
+      <p>This page opens the meeting automatically as soon as the host starts it. You can keep this tab open.</p>
+    </div></div>
+    <script>
+      const waitBox = document.getElementById('waitBox');
+      const startsAt = Number(waitBox.dataset.startsAt);
+      const meetingId = waitBox.dataset.meetingId;
+      document.getElementById('when').textContent = 'Scheduled: ' + new Date(startsAt).toLocaleString('en-ZA', {weekday:'long', day:'numeric', month:'long', hour:'2-digit', minute:'2-digit'});
+      setInterval(function(){
+        fetch('/api/meetings/' + encodeURIComponent(meetingId) + '/status', {credentials:'same-origin'})
+          .then(function(r){ return r.json(); })
+          .then(function(d){ if (d.status === 'live' || d.status === 'ended') window.location.reload(); })
+          .catch(function(){});
+      }, 8000);
+    </script>
+
+  {% else %}
+    <div class="center"><div class="card">
+      <i class="fas fa-circle-check"></i>
+      <h1>This meeting has ended</h1>
+      <p><strong>{{ meeting.title }}</strong></p>
+      <p>Check Announcements for the next one.</p>
+      <p><a class="btn btn-gold" href="{{ '/admin/meetings' if is_host else '/meetings' }}">Back</a></p>
+    </div></div>
+  {% endif %}
+</body>
+</html>
